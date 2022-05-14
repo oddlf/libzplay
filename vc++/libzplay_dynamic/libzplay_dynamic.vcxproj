@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{BFC588B1-34DB-4D8A-9B11-5C89F5F8F0EB}</ProjectGuid>
+    <RootNamespace>libzplay_dynamic</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>17.0.32505.173</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/libzplay_dynamic.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;FLAC__NO_DLL;LIB_ZPLAY_DYNAMIC;LIB_ZPLAY_EXPORT_WITH_DEF_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\Debug/libzplay_dynamic.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041a</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../binary/libzplay.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\..\src\libzplay.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/libzplay.pdb</ProgramDatabaseFile>
+      <ImportLibrary>.\Debug/libzplay.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/libzplay_dynamic.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/libzplay_dynamic.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;FLAC__NO_DLL;LIB_ZPLAY_DYNAMIC;LIB_ZPLAY_EXPORT_WITH_DEF_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\Release/libzplay_dynamic.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041a</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../binary/libzplay.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>..\..\src\libzplay.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>.\Release/libzplay.pdb</ProgramDatabaseFile>
+      <ImportLibrary>.\Release/libzplay.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/libzplay_dynamic.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\libzplay.cpp" />
+    <ClCompile Include="..\..\src\waacdecoder.cpp" />
+    <ClCompile Include="..\..\src\waacencoder.cpp" />
+    <ClCompile Include="..\..\src\wac3decoder.cpp" />
+    <ClCompile Include="..\..\src\waudioprocessor.cpp" />
+    <ClCompile Include="..\..\src\wbmpfont.cpp" />
+    <ClCompile Include="..\..\src\wbpmdetect.cpp" />
+    <ClCompile Include="..\..\src\wbpmdetect1.cpp" />
+    <ClCompile Include="..\..\src\wbpmdetect2.cpp" />
+    <ClCompile Include="..\..\src\wbpmdetect3.cpp" />
+    <ClCompile Include="..\..\src\wcentercutprocessor.cpp" />
+    <ClCompile Include="..\..\src\wdecoder.cpp" />
+    <ClCompile Include="..\..\src\wechoprocessor.cpp" />
+    <ClCompile Include="..\..\src\wencoder.cpp" />
+    <ClCompile Include="..\..\src\weqprocessor.cpp" />
+    <ClCompile Include="..\..\src\wfft.cpp" />
+    <ClCompile Include="..\..\src\wflacdecoder.cpp" />
+    <ClCompile Include="..\..\src\wflacencoder.cpp" />
+    <ClCompile Include="..\..\src\winputprocessor.cpp" />
+    <ClCompile Include="..\..\src\wmp3decoder.cpp" />
+    <ClCompile Include="..\..\src\wmp3encoder.cpp" />
+    <ClCompile Include="..\..\src\wmp3x.cpp" />
+    <ClCompile Include="..\..\src\woggdecoder.cpp" />
+    <ClCompile Include="..\..\src\woutputprocessor.cpp" />
+    <ClCompile Include="..\..\src\wpcmdecoder.cpp" />
+    <ClCompile Include="..\..\src\wqueue.cpp" />
+    <ClCompile Include="..\..\src\wspectrum.cpp" />
+    <ClCompile Include="..\..\src\wstprocessor.cpp" />
+    <ClCompile Include="..\..\src\wtags.cpp" />
+    <ClCompile Include="..\..\src\wtools.cpp" />
+    <ClCompile Include="..\..\src\wvorbisencoder.cpp" />
+    <ClCompile Include="..\..\src\wwavedecoder.cpp" />
+    <ClCompile Include="..\..\src\wwaveencoder.cpp" />
+    <ClCompile Include="..\..\src\wwavein.cpp" />
+    <ClCompile Include="..\..\src\wwavelet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\libzplay.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\libzplay.h" />
+    <ClInclude Include="..\..\src\debug.h" />
+    <ClInclude Include="..\..\src\waacdecoder.h" />
+    <ClInclude Include="..\..\src\waacencoder.h" />
+    <ClInclude Include="..\..\src\wac3decoder.h" />
+    <ClInclude Include="..\..\src\waudioprocessor.h" />
+    <ClInclude Include="..\..\src\wbmpfont.h" />
+    <ClInclude Include="..\..\src\wbpmdetect.h" />
+    <ClInclude Include="..\..\src\wbpmdetect1.h" />
+    <ClInclude Include="..\..\src\wbpmdetect2.h" />
+    <ClInclude Include="..\..\src\wbpmdetect3.h" />
+    <ClInclude Include="..\..\src\wcentercutprocessor.h" />
+    <ClInclude Include="..\..\src\wdecoder.h" />
+    <ClInclude Include="..\..\src\wechoprocessor.h" />
+    <ClInclude Include="..\..\src\wencoder.h" />
+    <ClInclude Include="..\..\src\weqprocessor.h" />
+    <ClInclude Include="..\..\src\wfft.h" />
+    <ClInclude Include="..\..\src\wflacdecoder.h" />
+    <ClInclude Include="..\..\src\winputprocessor.h" />
+    <ClInclude Include="..\..\src\wmp3decoder.h" />
+    <ClInclude Include="..\..\src\wmp3x.h" />
+    <ClInclude Include="..\..\src\woggdecoder.h" />
+    <ClInclude Include="..\..\src\woutputprocessor.h" />
+    <ClInclude Include="..\..\src\wpcmdecoder.h" />
+    <ClInclude Include="..\..\src\wqueue.h" />
+    <ClInclude Include="..\..\src\wspectrum.h" />
+    <ClInclude Include="..\..\src\wstprocessor.h" />
+    <ClInclude Include="..\..\src\wwavedecoder.h" />
+    <ClInclude Include="..\..\src\wwaveencoder.h" />
+    <ClInclude Include="..\..\src\wwavein.h" />
+    <ClInclude Include="..\..\src\wwavelet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\src\main.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\resource.rc">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\01project\libzplay-2.00\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\01project\libzplay-2.00\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\decoders\a52dec\vc++\liba52.vcxproj">
+      <Project>{84013315-db4a-44ab-842f-d4ca5354199e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\faac\libfaac\libfaac.vcxproj">
+      <Project>{56dfcbb3-e006-453a-9895-79f9d169da52}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\faad\libfaad\libfaad.vcxproj">
+      <Project>{fc8d0291-9c82-4476-8c35-3a5f9c5d32b1}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\jpeglib\jpeglib.vcxproj">
+      <Project>{87c70515-fe5a-4cbb-b1c9-8333e6c5343e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\lame\libmp3lame\libmp3lame_vc6.vcxproj">
+      <Project>{78c37135-7117-47ed-bb41-22f42a044654}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libFLAC\libFLAC_static.vcxproj">
+      <Project>{adf45fc5-456d-4544-a24c-19487c74e34a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libmad\msvc++\libmad.vcxproj">
+      <Project>{943d1fe8-a5da-4882-a733-ef0fe6d16f15}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libogg\win32\ogg_static.vcxproj">
+      <Project>{95538b52-b61b-4714-9c26-e365def1e457}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbisenc_static.vcxproj">
+      <Project>{c28f8e38-e34f-4e84-9c11-f07a8323fc06}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbisfile_static.vcxproj">
+      <Project>{9a143874-75ac-449a-8e9c-79324ebbc7a5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbis_static.vcxproj">
+      <Project>{70b77de6-4b8c-487b-b158-6a23311727cb}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\lpng\libpng\libpng.vcxproj">
+      <Project>{64312546-17af-405d-973a-b67f70e5f81a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\decoders\soundtouch\source\SoundTouch\SoundTouch.vcxproj">
+      <Project>{2d9234e0-d8a9-476f-95fa-c864009b0329}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
