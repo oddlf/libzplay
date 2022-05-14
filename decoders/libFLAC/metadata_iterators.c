@@ -46,10 +46,10 @@
 #endif
 #include <io.h> /* for chmod() */
 #include <sys/types.h> /* for off_t */
-#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
+//#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
 #define fseeko fseek
 #define ftello ftell
-#endif
+//#endif
 #else
 #include <sys/types.h> /* some flavors of BSD (like OS X) require this to get time_t */
 #include <utime.h> /* for utime() */

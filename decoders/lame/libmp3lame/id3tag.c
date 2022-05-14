@@ -52,9 +52,9 @@ char   *strchr(), *strrchr();
 #endif
 
 
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
+//#ifdef _MSC_VER
+//#define snprintf _snprintf
+//#endif
 
 
 #include "lame.h"

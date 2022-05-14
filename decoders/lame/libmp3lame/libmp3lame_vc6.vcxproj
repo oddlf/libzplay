@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release NASM|Win32">
+      <Configuration>Release NASM</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectName>libmp3lame</ProjectName>
+    <ProjectGuid>{78C37135-7117-47ED-BB41-22F42A044654}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>17.0.32505.173</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">
+    <OutDir>.\..\output\Release_NASM\</OutDir>
+    <IntDir>.\..\obj\Release_NASM\libmp3lame\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\..\output\Release\</OutDir>
+    <IntDir>.\..\obj\Release\libmp3lame\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\..\output\Debug\</OutDir>
+    <IntDir>.\..\obj\Debug\libmp3lame\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/GAy /QIfdiv /QI0f  %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../;../mpglib;../include;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN32;HAVE_CONFIG_H;HAVE_NASM;MMX_choose_table;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\..\obj\Release_NASM\libmp3lame/libmp3lame_vc6.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\obj\Release_NASM\libmp3lame/</AssemblerListingLocation>
+      <ObjectFileName>.\..\obj\Release_NASM\libmp3lame/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\obj\Release_NASM\libmp3lame/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>..\output\Release_NASM\libmp3lame-static.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\output\Release_NASM/libmp3lame_vc6.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/GAy /QIfdiv /QI0f  %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>../;../mpglib;../include;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN32;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\..\obj\Release\libmp3lame/libmp3lame_vc6.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\obj\Release\libmp3lame/</AssemblerListingLocation>
+      <ObjectFileName>.\..\obj\Release\libmp3lame/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\obj\Release\libmp3lame/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>..\output\Release\libmp3lame-static.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\output\Release/libmp3lame_vc6.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../;../mpglib;../include;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\..\obj\Debug\libmp3lame/libmp3lame_vc6.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\obj\Debug\libmp3lame/</AssemblerListingLocation>
+      <ObjectFileName>.\..\obj\Debug\libmp3lame/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\obj\Debug\libmp3lame/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>..\output\Debug\libmp3lame-static.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\output\Debug/libmp3lame_vc6.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="bitstream.c" />
+    <ClCompile Include="encoder.c" />
+    <ClCompile Include="fft.c" />
+    <ClCompile Include="gain_analysis.c" />
+    <ClCompile Include="id3tag.c" />
+    <ClCompile Include="lame.c" />
+    <ClCompile Include="mpglib_interface.c" />
+    <ClCompile Include="newmdct.c" />
+    <ClCompile Include="presets.c" />
+    <ClCompile Include="psymodel.c" />
+    <ClCompile Include="quantize.c" />
+    <ClCompile Include="quantize_pvt.c" />
+    <ClCompile Include="reservoir.c" />
+    <ClCompile Include="set_get.c" />
+    <ClCompile Include="tables.c">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level1</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Level1</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Level1</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="takehiro.c" />
+    <ClCompile Include="util.c" />
+    <ClCompile Include="vbrquantize.c" />
+    <ClCompile Include="VbrTag.c" />
+    <ClCompile Include="version.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\configMS.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Performing Custom Build Step on %(Filename)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy ..\configMS.h ..\config.h
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\config.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Performing Custom Build Step on %(Filename)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">copy ..\configMS.h ..\config.h
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">..\config.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Performing Custom Build Step on %(Filename)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy ..\configMS.h ..\config.h
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\config.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <ClInclude Include="bitstream.h" />
+    <ClInclude Include="encoder.h" />
+    <ClInclude Include="fft.h" />
+    <ClInclude Include="gain_analysis.h" />
+    <ClInclude Include="id3tag.h" />
+    <ClInclude Include="l3side.h" />
+    <ClInclude Include="lame-analysis.h" />
+    <ClInclude Include="lameerror.h" />
+    <ClInclude Include="lame_global_flags.h" />
+    <ClInclude Include="machine.h" />
+    <ClInclude Include="newmdct.h" />
+    <ClInclude Include="psymodel.h" />
+    <ClInclude Include="quantize.h" />
+    <ClInclude Include="quantize_pvt.h" />
+    <ClInclude Include="reservoir.h" />
+    <ClInclude Include="set_get.h" />
+    <ClInclude Include="tables.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="vbrquantize.h" />
+    <ClInclude Include="VbrTag.h" />
+    <ClInclude Include="version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="i386\choose_table.nas">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Assembling %(Filename)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">nasmw -f win32 -i %(RootDir)%(Directory) -DWIN32 %(FullPath) -o   $(IntDir)%(Filename).obj
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="i386\cpu_feat.nas">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Assembling %(Filename)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">nasmw -f win32 -i %(RootDir)%(Directory) -DWIN32 %(FullPath) -o   $(IntDir)%(Filename).obj
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="i386\fft.nas">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="i386\fft3dn.nas">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Assembling %(Filename)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">nasmw -f win32 -i %(RootDir)%(Directory) -DWIN32 %(FullPath) -o   $(IntDir)%(Filename).obj
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="i386\fftfpu.nas">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="i386\fftsse.nas">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">Assembling %(Filename)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">nasmw -f win32 -i %(RootDir)%(Directory) -DWIN32 %(FullPath) -o   $(IntDir)%(Filename).obj
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="i386\ffttbl.nas">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="i386\scalar.nas">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release NASM|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

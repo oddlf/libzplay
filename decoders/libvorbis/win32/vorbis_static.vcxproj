@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{70B77DE6-4B8C-487B-B158-6A23311727CB}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>17.0.32505.173</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Vorbis_Static_Release\</OutDir>
+    <IntDir>.\Vorbis_Static_Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Vorbis_Static_Debug\</OutDir>
+    <IntDir>.\Vorbis_Static_Debug\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/O3 /QaxK /Qsox- /Qip  %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\include;..\..\ogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\Vorbis_Static_Release/vorbis_static.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Vorbis_Static_Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Vorbis_Static_Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Vorbis_Static_Release/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>.\Vorbis_Static_Release\vorbis_static.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Vorbis_Static_Release/vorbis_static.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include;..\..\ogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\Vorbis_Static_Debug/vorbis_static.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Vorbis_Static_Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Vorbis_Static_Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Vorbis_Static_Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>Vorbis_Static_Debug\vorbis_static_d.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Vorbis_Static_Debug/vorbis_static.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\analysis.c" />
+    <ClCompile Include="..\lib\bitrate.c" />
+    <ClCompile Include="..\lib\block.c" />
+    <ClCompile Include="..\lib\codebook.c" />
+    <ClCompile Include="..\lib\envelope.c" />
+    <ClCompile Include="..\lib\floor0.c" />
+    <ClCompile Include="..\lib\floor1.c" />
+    <ClCompile Include="..\lib\info.c" />
+    <ClCompile Include="..\lib\lookup.c" />
+    <ClCompile Include="..\lib\lpc.c" />
+    <ClCompile Include="..\lib\lsp.c" />
+    <ClCompile Include="..\lib\mapping0.c" />
+    <ClCompile Include="..\lib\mdct.c" />
+    <ClCompile Include="..\lib\psy.c" />
+    <ClCompile Include="..\lib\registry.c" />
+    <ClCompile Include="..\lib\res0.c" />
+    <ClCompile Include="..\lib\sharedbook.c" />
+    <ClCompile Include="..\lib\smallft.c" />
+    <ClCompile Include="..\lib\synthesis.c" />
+    <ClCompile Include="..\lib\window.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\vorbis\backends.h" />
+    <ClInclude Include="..\include\vorbis\codebook.h" />
+    <ClInclude Include="..\include\vorbis\codec.h" />
+    <ClInclude Include="..\lib\bitbuffer.h" />
+    <ClInclude Include="..\lib\bitrate.h" />
+    <ClInclude Include="..\lib\codec_internal.h" />
+    <ClInclude Include="..\lib\envelope.h" />
+    <ClInclude Include="..\lib\highlevel.h" />
+    <ClInclude Include="..\lib\lookup.h" />
+    <ClInclude Include="..\lib\lookup_data.h" />
+    <ClInclude Include="..\lib\lpc.h" />
+    <ClInclude Include="..\lib\lsp.h" />
+    <ClInclude Include="..\lib\masking.h" />
+    <ClInclude Include="..\lib\mdct.h" />
+    <ClInclude Include="..\lib\misc.h" />
+    <ClInclude Include="..\lib\os.h" />
+    <ClInclude Include="..\lib\psy.h" />
+    <ClInclude Include="..\lib\registry.h" />
+    <ClInclude Include="..\lib\scales.h" />
+    <ClInclude Include="..\lib\smallft.h" />
+    <ClInclude Include="..\lib\window.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
