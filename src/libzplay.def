@@ -93,4 +93,4 @@ EXPORTS
     zplay_GetWaveInInfoW           @90
     zplay_SetWaveInDevice          @91
     zplay_SetWaveOutFile           @92
-	zplay_SetWaveOutFileW          @93
+    zplay_SetWaveOutFileW          @93

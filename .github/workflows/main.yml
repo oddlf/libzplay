@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        vcpkg install faac:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install faad2:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install liba52:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libflac:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libjpeg-turbo:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libmad:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libogg:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libpng:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install libvorbis:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install mp3lame:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install soundtouch[integer]:x86-windows-static --overlay-ports=vcpkg-ports
+        vcpkg install zlib:x86-windows-static --overlay-ports=vcpkg-ports
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Run MSBuild
+      run: |
+        vcpkg integrate install
+        msbuild vc++\libzplay_dynamic\libzplay_dynamic.vcxproj /p:Configuration="Release" /p:Platform=Win32
+
+    - name: Create artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: libzplay
+        path: binary/libzplay.dll

@@ -35,10 +35,10 @@
 extern "C" {
 #endif
 
-#include "../decoders/a52dec/include/config.h"
-#include "../decoders/a52dec/include/inttypes.h"
-#include "../decoders/a52dec/include/a52.h"
-#include "../decoders/a52dec/include/mm_accel.h"
+#include <a52dec/config.h>
+#include <a52dec/inttypes.h>
+#include <a52dec/a52.h>
+#include <a52dec/mm_accel.h>
 
 #ifdef __cplusplus
 }

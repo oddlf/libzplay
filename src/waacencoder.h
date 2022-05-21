@@ -29,7 +29,7 @@
 
 #include "wencoder.h"
 #include "wqueue.h"
-#include "../decoders/faac/include/faac.h"
+#include <faac.h>
 
 
 class WAACEncoder : public WAudioEncoder {

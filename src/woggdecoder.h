@@ -35,8 +35,8 @@
 #define _W_OGGDECODER_H_
 
 #include "wdecoder.h"
-#include "../decoders/libvorbis/include/vorbis/codec.h"
-#include "../decoders/libvorbis/include/vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 
 typedef struct {

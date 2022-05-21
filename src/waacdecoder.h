@@ -28,7 +28,7 @@
 #define _W_AACDECODER_H_
 
 #include "wdecoder.h"
-#include "../decoders/faad/include/neaacdec.h"
+#include <neaacdec.h>
 #include "wtags.h"
 
 

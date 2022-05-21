@@ -50,11 +50,11 @@
 #define _W_FLACDECODER_H_
 
 #include "wdecoder.h"
-#include "../decoders/libvorbis/include/vorbis/codec.h"
-#include "../decoders/libvorbis/include/vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
-#include "../decoders/libflac/FLAC/stream_decoder.h"
-#include "../decoders/libflac/FLAC/metadata.h"
+#include <FLAC/stream_decoder.h>
+#include <FLAC/metadata.h>
 
 
 typedef struct {

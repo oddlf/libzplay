@@ -30,11 +30,11 @@
 #include "wencoder.h"
 
 // need this for FLAC encoder
-#include "../decoders/libvorbis/include/vorbis/codec.h"
-#include "../decoders/libvorbis/include/vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
-#include "../decoders/libflac/FLAC/stream_encoder.h"
-#include "../decoders/libflac/FLAC/metadata.h"
+#include <FLAC/stream_encoder.h>
+#include <FLAC/metadata.h>
 
 
 class WFLACEncoder : public WAudioEncoder {

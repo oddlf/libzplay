@@ -38,8 +38,8 @@
 #include "config.h"
 
 
-#include "../decoders/lpng/png.h"
-#include "../decoders/jpeglib/jpeglib.h"
+#include <png.h>
+#include <jpeglib.h>
 
 extern WAVEIN_ID g_wavein_id[WAVE_IN_NUM];
 
@@ -4606,7 +4606,7 @@ int WMp3x::_PlayingLoop(WMp3x *instance, unsigned int fFlush)
 		{	
 			
 			// send fade callback message
-			int callback_ret;
+			int callback_ret = 0;
 				
 			if(instance->c_nFadeSemaphore == 0)
 			{
@@ -6378,7 +6378,7 @@ static void png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 
-   PNG_STREAM *stream = (PNG_STREAM*) png_ptr->io_ptr;
+   PNG_STREAM *stream = (PNG_STREAM*) png_get_io_ptr(png_ptr);
 
    if(stream->size == 0)
    {

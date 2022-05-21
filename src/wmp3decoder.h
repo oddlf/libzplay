@@ -38,7 +38,7 @@
 
 
 #include "wdecoder.h"
-#include "../decoders/libmad/mad.h"
+#include <mad.h>
 #include "wtags.h"
 
 

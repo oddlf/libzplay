@@ -3,8 +3,5 @@
 **/.svn
 **/.vs
 /binary
-/decoders/**/*Debug*
-/decoders/**/lib
-/decoders/**/*Release*
 /vc++/**/*Debug*
 /vc++/**/*Release*

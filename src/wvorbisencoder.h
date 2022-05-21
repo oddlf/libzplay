@@ -29,7 +29,7 @@
 
 #include "wencoder.h"
 
-#include "../decoders/libvorbis/include/vorbis/vorbisenc.h"
+#include <vorbis/vorbisenc.h>
 
 
 

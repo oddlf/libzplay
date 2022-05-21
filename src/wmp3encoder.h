@@ -28,7 +28,7 @@
 #define _W_WMP3ENCODER_H_
 
 #include "wencoder.h"
-#include "../decoders/lame/include/lame.h"
+#include <lame/lame.h>
 
 
 class WMp3Encoder : public WAudioEncoder {

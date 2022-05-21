@@ -53,8 +53,11 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnabled>false</VcpkgEnabled>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -220,60 +223,6 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\01project\libzplay-2.00\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\01project\libzplay-2.00\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\decoders\a52dec\vc++\liba52.vcxproj">
-      <Project>{84013315-db4a-44ab-842f-d4ca5354199e}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\faac\libfaac\libfaac.vcxproj">
-      <Project>{56dfcbb3-e006-453a-9895-79f9d169da52}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\faad\libfaad\libfaad.vcxproj">
-      <Project>{fc8d0291-9c82-4476-8c35-3a5f9c5d32b1}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\jpeglib\jpeglib.vcxproj">
-      <Project>{87c70515-fe5a-4cbb-b1c9-8333e6c5343e}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\lame\libmp3lame\libmp3lame_vc6.vcxproj">
-      <Project>{78c37135-7117-47ed-bb41-22f42a044654}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libFLAC\libFLAC_static.vcxproj">
-      <Project>{adf45fc5-456d-4544-a24c-19487c74e34a}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libmad\msvc++\libmad.vcxproj">
-      <Project>{943d1fe8-a5da-4882-a733-ef0fe6d16f15}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libogg\win32\ogg_static.vcxproj">
-      <Project>{95538b52-b61b-4714-9c26-e365def1e457}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbisenc_static.vcxproj">
-      <Project>{c28f8e38-e34f-4e84-9c11-f07a8323fc06}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbisfile_static.vcxproj">
-      <Project>{9a143874-75ac-449a-8e9c-79324ebbc7a5}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\libvorbis\win32\vorbis_static.vcxproj">
-      <Project>{70b77de6-4b8c-487b-b158-6a23311727cb}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\lpng\libpng\libpng.vcxproj">
-      <Project>{64312546-17af-405d-973a-b67f70e5f81a}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\decoders\soundtouch\source\SoundTouch\SoundTouch.vcxproj">
-      <Project>{2d9234e0-d8a9-476f-95fa-c864009b0329}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
