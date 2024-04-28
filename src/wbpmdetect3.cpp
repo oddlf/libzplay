@@ -23,7 +23,7 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,7 +32,6 @@
 
 #include "debug.h"
 #include "WBPMDetect3.h"
-
 
 typedef struct {
 	unsigned int BackwardWindow;
@@ -46,7 +45,6 @@ typedef struct {
 	unsigned int HistoryMatch;
 } SUBBAND_PARAMETERS;
 
-
 typedef struct {
 	unsigned int BPM;
 	unsigned int Hit;
@@ -54,7 +52,6 @@ typedef struct {
 } BPM_MOD_STRUCT;
 
 #define PI 3.1415926535897932384626433832795029L
-
 
 // number of fft points for analyse
 #define BPM_DETECT_FFT_POINTS3 64
@@ -65,43 +62,38 @@ typedef struct {
 #define BPM_MIN 40
 #define BPM_MAX 170
 
-
 const SUBBAND_PARAMETERS g_SubBandParam[NUMBER_OF_SUBBANDS] = {
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 0
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 1
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 2
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 3
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 4
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 5
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 6
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 7
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 8
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 9
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 10
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 11
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 12
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 13
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10}, // 14
-													{400, 200, 100, 0, 10, 10, 1.1, 1.05, 10} // 15
-													
-													
-};
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 0
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 1
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 2
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 3
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 4
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 5
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 6
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 7
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 8
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 9
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 10
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 11
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 12
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 13
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }, // 14
+	{ 400, 200, 100, 0, 10, 10, 1.1, 1.05, 10 }	 // 15
 
+};
 
 #define BACKWARD_TRESHOLD 1.9
 #define FORWARD_TRESHOLD 1.0
 
-
-
 WBPMDetect3::WBPMDetect3()
 {
-// initialize
+	// initialize
 	c_fReady = 0;
 	c_pSubBand = 0;
 	c_Amplitudes = 0;
 	c_Samples = 0;
 	c_pflWindow = 0;
-	c_pnIp = 0;		
+	c_pnIp = 0;
 	c_pflw = 0;
 	c_nChannel = 0;
 	c_nSampleRate = 0;
@@ -112,16 +104,15 @@ WBPMDetect3::~WBPMDetect3()
 	FreeInternalMemory();
 }
 
-
 int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 {
-	if(nSampleRate == 0 || nChannel == 0)
+	if (nSampleRate == 0 || nChannel == 0)
 		return 0;
 
-	if(c_fReady == 0 || c_nSampleRate != nSampleRate || c_nChannel != nChannel)
+	if (c_fReady == 0 || c_nSampleRate != nSampleRate || c_nChannel != nChannel)
 	{
 		FreeInternalMemory();
-		if(AllocateInternalMemory(nSampleRate) == 0)
+		if (AllocateInternalMemory(nSampleRate) == 0)
 			return 0;
 
 		c_nSampleRate = nSampleRate;
@@ -129,9 +120,9 @@ int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 	}
 
 	unsigned int i;
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		SUBBAND3 *subband = &c_pSubBand[i];
+		SUBBAND3* subband = &c_pSubBand[i];
 		memset(subband->BackwardAmplitude, 0, subband->BackwardWindow * sizeof(BPM_DETECT3_REAL));
 		subband->SumBackwardAmplitude = 0;
 		subband->BackwardIndex = 0;
@@ -151,7 +142,6 @@ int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 		subband->SamplePos = 0;
 		subband->HistoryBPMPos = 0;
 
-
 		subband->LastPeakAvgAmplitude = 0.0;
 		subband->LastBackwardAvgAmplitude = 0.0;
 		subband->LastForwardAvgAmplitude = 0.0;
@@ -164,84 +154,74 @@ int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 		subband->ForwardTreshold = FORWARD_TRESHOLD;
 		subband->BackwardTreshold = BACKWARD_TRESHOLD;
 
-
 		memset(subband->BPMHistoryHit, 0, (BPM_MAX + 2) * sizeof(unsigned int));
 	}
-
 
 	c_nSubbandBPMDetected = 0;
 	return 1;
 }
 
-
-int WBPMDetect3::PutSamples(short *pSamples, unsigned int nSampleNum)
+int WBPMDetect3::PutSamples(short* pSamples, unsigned int nSampleNum)
 {
 
 	// create samples array
 
 	unsigned int i;
 
-	if(c_nChannel == 2)
+	if (c_nChannel == 2)
 	{
 		// convert to mono
-		for(i = 0; i < nSampleNum; i++)
-			c_Samples[i] = ((BPM_DETECT3_REAL) pSamples[2 * i] +  (BPM_DETECT3_REAL) pSamples[2 * i + 1])  * c_pflWindow[i] / 2.0;
+		for (i = 0; i < nSampleNum; i++)
+			c_Samples[i] = ((BPM_DETECT3_REAL)pSamples[2 * i] + (BPM_DETECT3_REAL)pSamples[2 * i + 1]) * c_pflWindow[i] / 2.0;
 	}
 	else
 	{
-		for(i = 0; i < nSampleNum; i++)
-			c_Samples[i] = (BPM_DETECT3_REAL) pSamples[i] * c_pflWindow[i];
+		for (i = 0; i < nSampleNum; i++)
+			c_Samples[i] = (BPM_DETECT3_REAL)pSamples[i] * c_pflWindow[i];
 	}
-
 
 	// make fft
 	rdft(BPM_DETECT_FFT_POINTS3, 1, c_Samples, c_pnIp, c_pflw);
 
-	
-	BPM_DETECT3_REAL re = c_Samples[1] ;
+	BPM_DETECT3_REAL re = c_Samples[1];
 	BPM_DETECT3_REAL im = 0;
 	BPM_DETECT3_REAL amp = sqrt(re * re + im * im);
 	c_Amplitudes[BPM_DETECT_FFT_POINTS3 / 2 - 1] = amp;
 
-	for(i = 1; i < BPM_DETECT_FFT_POINTS3 / 2; i++)
+	for (i = 1; i < BPM_DETECT_FFT_POINTS3 / 2; i++)
 	{
-		re = c_Samples[i * 2] ;
+		re = c_Samples[i * 2];
 		im = c_Samples[i * 2 + 1];
 		amp = sqrt(re * re + im * im);
 		c_Amplitudes[i - 1] = amp;
-
-
 	}
 
 	unsigned int j;
 
-	unsigned int nSubbandSize = BPM_DETECT_FFT_POINTS3 / ( 2 * NUMBER_OF_SUBBANDS);
-	
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
-	{
-		SUBBAND3 *subband = &c_pSubBand[i];
+	unsigned int nSubbandSize = BPM_DETECT_FFT_POINTS3 / (2 * NUMBER_OF_SUBBANDS);
 
-		if(subband->BPM)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	{
+		SUBBAND3* subband = &c_pSubBand[i];
+
+		if (subband->BPM)
 			continue;
 
-	
 		// === CREATE SUBBAND3S =================================
 		BPM_DETECT3_REAL InstantAmplitude = 0;
 
-		for(j =  i * nSubbandSize; j < (i + 1) * nSubbandSize; j++)
+		for (j = i * nSubbandSize; j < (i + 1) * nSubbandSize; j++)
 			InstantAmplitude += c_Amplitudes[j];
 
-		InstantAmplitude /= (BPM_DETECT3_REAL) nSubbandSize;
-		
+		InstantAmplitude /= (BPM_DETECT3_REAL)nSubbandSize;
 
 		// =====================================================
-		
-		 
+
 		BPM_DETECT3_REAL amp;
 
-		if(subband->PeakLoad >= subband->PeakWindow)
+		if (subband->PeakLoad >= subband->PeakWindow)
 		{
-			
+
 			amp = subband->BackwardAmplitude[subband->BackwardIndex];
 			// update backward window
 			subband->SumBackwardAmplitude -= amp;
@@ -249,18 +229,17 @@ int WBPMDetect3::PutSamples(short *pSamples, unsigned int nSampleNum)
 			amp = subband->PeakAmplitude[subband->PeakIndex];
 			subband->BackwardAmplitude[subband->BackwardIndex] = amp;
 			subband->SumBackwardAmplitude += amp;
-		
+
 			subband->BackwardIndex++;
-			if(subband->BackwardIndex >= subband->BackwardWindow)
+			if (subband->BackwardIndex >= subband->BackwardWindow)
 				subband->BackwardIndex = 0;
 
 			subband->BackwardLoad++;
-			if(subband->BackwardLoad > subband->BackwardWindow)
+			if (subband->BackwardLoad > subband->BackwardWindow)
 				subband->BackwardLoad = subband->BackwardWindow;
 		}
-			
 
-		if(subband->ForwardLoad >= subband->ForwardWindow)
+		if (subband->ForwardLoad >= subband->ForwardWindow)
 		{
 			// update peak window
 			amp = subband->PeakAmplitude[subband->PeakIndex];
@@ -268,20 +247,17 @@ int WBPMDetect3::PutSamples(short *pSamples, unsigned int nSampleNum)
 			amp = subband->ForwardAmplitude[subband->ForwardIndex];
 			subband->PeakAmplitude[subband->PeakIndex] = amp;
 			subband->SumPeakAmplitude += amp;
-			
+
 			subband->PeakIndex++;
-			if(subband->PeakIndex >= subband->PeakWindow)
+			if (subband->PeakIndex >= subband->PeakWindow)
 				subband->PeakIndex = 0;
 
 			subband->PeakLoad++;
-			if(subband->PeakLoad > subband->PeakWindow)
+			if (subband->PeakLoad > subband->PeakWindow)
 				subband->PeakLoad = subband->PeakWindow;
 
 			subband->SamplePos += nSampleNum;
-				
 		}
-
-
 
 		// update forward window
 		amp = subband->ForwardAmplitude[subband->ForwardIndex];
@@ -291,108 +267,96 @@ int WBPMDetect3::PutSamples(short *pSamples, unsigned int nSampleNum)
 		subband->SumForwardAmplitude += InstantAmplitude;
 
 		subband->ForwardIndex++;
-		if(subband->ForwardIndex >= subband->ForwardWindow)
+		if (subband->ForwardIndex >= subband->ForwardWindow)
 			subband->ForwardIndex = 0;
 
 		subband->ForwardLoad++;
-		if(subband->ForwardLoad > subband->ForwardWindow)
+		if (subband->ForwardLoad > subband->ForwardWindow)
 			subband->ForwardLoad = subband->ForwardWindow;
 
-
-		if(subband->ShiftIndex > 0)
+		if (subband->ShiftIndex > 0)
 		{
 			subband->ShiftIndex--;
 			continue;
 		}
 
-		
-		if(subband->BackwardLoad >= subband->BackwardWindow)
+		if (subband->BackwardLoad >= subband->BackwardWindow)
 		{
 			// calculate average values
-			BPM_DETECT3_REAL AvgBackwardAmplitude = subband->SumBackwardAmplitude / (BPM_DETECT3_REAL) subband->BackwardLoad;	
-			BPM_DETECT3_REAL AvgForwardAmplitude = subband->SumForwardAmplitude / (BPM_DETECT3_REAL) subband->ForwardLoad;
-			BPM_DETECT3_REAL AvgPeakAmplitude = subband->SumPeakAmplitude / (BPM_DETECT3_REAL) subband->PeakLoad;
+			BPM_DETECT3_REAL AvgBackwardAmplitude = subband->SumBackwardAmplitude / (BPM_DETECT3_REAL)subband->BackwardLoad;
+			BPM_DETECT3_REAL AvgForwardAmplitude = subband->SumForwardAmplitude / (BPM_DETECT3_REAL)subband->ForwardLoad;
+			BPM_DETECT3_REAL AvgPeakAmplitude = subband->SumPeakAmplitude / (BPM_DETECT3_REAL)subband->PeakLoad;
 
-			if(AvgPeakAmplitude >= subband->LastPeakAvgAmplitude)
+			if (AvgPeakAmplitude >= subband->LastPeakAvgAmplitude)
 			{
 				// UP
 				subband->Up++;
-				if(subband->Down != 0)
+				if (subband->Down != 0)
 					subband->Down--;
 			}
 			else
 			{
 				// DOWN
 				subband->Down++;
-				if(subband->Up != 0)
+				if (subband->Up != 0)
 					subband->Up--;
-				
-			
-				if(subband->Up >= g_SubBandParam[i].Up)
+
+				if (subband->Up >= g_SubBandParam[i].Up)
 				{
 					subband->PossiblePeak = 0;
 
-				
-					
-
 					unsigned int nSampleDiff = subband->LastSamplePos - subband->HistoryBPMPos;
-					unsigned int bpm = (unsigned int) ((60.0 * (BPM_DETECT3_REAL) c_nSampleRate / (BPM_DETECT3_REAL) nSampleDiff) + 0.5);
-					
-					
-					if(subband->LastPeakAvgAmplitude > subband->LastBackwardAvgAmplitude * subband->BackwardTreshold && 
+					unsigned int bpm = (unsigned int)((60.0 * (BPM_DETECT3_REAL)c_nSampleRate / (BPM_DETECT3_REAL)nSampleDiff) + 0.5);
+
+					if (subband->LastPeakAvgAmplitude > subband->LastBackwardAvgAmplitude * subband->BackwardTreshold &&
 						subband->LastPeakAvgAmplitude > subband->LastForwardAvgAmplitude * subband->ForwardTreshold)
 					{
-					
-						if(bpm <= BPM_MAX)
+
+						if (bpm <= BPM_MAX)
 						{
 							subband->PossiblePeak = 1;
 							subband->Down = 1;
-							subband->PeakPos = 	subband->LastSamplePos;	
+							subband->PeakPos = subband->LastSamplePos;
 							subband->BPMCandidate = bpm;
 						}
 					}
 					else
 					{
-						if(subband->LastPeakAvgAmplitude > subband->LastBackwardAvgAmplitude  && 
+						if (subband->LastPeakAvgAmplitude > subband->LastBackwardAvgAmplitude &&
 							subband->LastPeakAvgAmplitude > subband->LastForwardAvgAmplitude && bpm <= BPM_MAX)
 						{
 
-							if(subband->BPMHistoryHit[bpm] > 5 || subband->BPMHistoryHit[bpm - 1] > g_SubBandParam[i].HistoryMatch / 2 || subband->BPMHistoryHit[bpm + 1] > g_SubBandParam[i].HistoryMatch / 2)
+							if (subband->BPMHistoryHit[bpm] > 5 || subband->BPMHistoryHit[bpm - 1] > g_SubBandParam[i].HistoryMatch / 2 || subband->BPMHistoryHit[bpm + 1] > g_SubBandParam[i].HistoryMatch / 2)
 							{
 								subband->PossiblePeak = 1;
 								subband->Down = 1;
-								subband->PeakPos = 	subband->LastSamplePos;	
+								subband->PeakPos = subband->LastSamplePos;
 								subband->BPMCandidate = bpm;
 							}
 							subband->BackwardTreshold -= 0.05;
-							if(subband->BackwardTreshold < 1.0)
+							if (subband->BackwardTreshold < 1.0)
 								subband->BackwardTreshold = 1.0;
-
-						
 						}
 					}
-					
 
-				
 					subband->Up = g_SubBandParam[i].Up - 1;
-					
 				}
-				
-				if(subband->PossiblePeak && subband->Down >= g_SubBandParam[i].Down)
+
+				if (subband->PossiblePeak && subband->Down >= g_SubBandParam[i].Down)
 				{
 					subband->Up = 0;
 					subband->Down = 0;
 					subband->PossiblePeak = 0;
 
 					unsigned int bpm = subband->BPMCandidate;
-					if(bpm >= BPM_MIN)
-					{	
+					if (bpm >= BPM_MIN)
+					{
 						unsigned int HistoryHit = subband->BPMHistoryHit[bpm] + subband->BPMHistoryHit[bpm - 1] + subband->BPMHistoryHit[bpm + 1];
-						if(HistoryHit)
+						if (HistoryHit)
 						{
-							if(HistoryHit >= g_SubBandParam[i].HistoryMatch)
-							{	
-								unsigned int Avg = (bpm * subband->BPMHistoryHit[bpm]  + (bpm - 1) * subband->BPMHistoryHit[bpm - 1] + (bpm + 1) * subband->BPMHistoryHit[bpm + 1]) / HistoryHit ;
+							if (HistoryHit >= g_SubBandParam[i].HistoryMatch)
+							{
+								unsigned int Avg = (bpm * subband->BPMHistoryHit[bpm] + (bpm - 1) * subband->BPMHistoryHit[bpm - 1] + (bpm + 1) * subband->BPMHistoryHit[bpm + 1]) / HistoryHit;
 								subband->BPM = Avg;
 								c_nSubbandBPMDetected++;
 							}
@@ -405,39 +369,35 @@ int WBPMDetect3::PutSamples(short *pSamples, unsigned int nSampleNum)
 					else
 					{
 						subband->HistoryBPMPos = subband->PeakPos;
-						subband->BackwardTreshold += 0.1;	
-					}		
-				}	
+						subband->BackwardTreshold += 0.1;
+					}
+				}
 			}
 
 			subband->LastPeakAvgAmplitude = AvgPeakAmplitude;
 			subband->LastBackwardAvgAmplitude = AvgBackwardAmplitude;
 			subband->LastForwardAvgAmplitude = AvgForwardAmplitude;
 			subband->LastSamplePos = subband->SamplePos;
-		}		
+		}
 	}
-	
-	
-	if(c_nSubbandBPMDetected == NUMBER_OF_SUBBANDS)
+
+	if (c_nSubbandBPMDetected == NUMBER_OF_SUBBANDS)
 		return 1;
-	
 
 	return 0;
 }
-
 
 unsigned int WBPMDetect3::GetBPM()
 {
 	unsigned int i;
 	unsigned int j;
-/*
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
-	{
-		SUBBAND3 *subband = &c_pSubBand[i];
-		printf("Subband: %02u  %u\n", i, subband->BPM);
-	}
-*/
-
+	/*
+		for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+		{
+			SUBBAND3 *subband = &c_pSubBand[i];
+			printf("Subband: %02u  %u\n", i, subband->BPM);
+		}
+	*/
 
 	// get BPM by calculating mod value
 	BPM_MOD_STRUCT mod_value[NUMBER_OF_SUBBANDS];
@@ -445,19 +405,19 @@ unsigned int WBPMDetect3::GetBPM()
 
 	// search unique values
 	unsigned int size = 0;
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
 		unsigned int have = 0;
-		for(j = 0; j < size; j++)
+		for (j = 0; j < size; j++)
 		{
-			if(c_pSubBand[i].BPM != 0 && mod_value[j].BPM == c_pSubBand[i].BPM)
+			if (c_pSubBand[i].BPM != 0 && mod_value[j].BPM == c_pSubBand[i].BPM)
 			{
 				have = 1;
 				break;
 			}
 		}
 
-		if(have == 0 && c_pSubBand[i].BPM != 0)
+		if (have == 0 && c_pSubBand[i].BPM != 0)
 		{
 			mod_value[size].BPM = c_pSubBand[i].BPM;
 			size++;
@@ -467,33 +427,32 @@ unsigned int WBPMDetect3::GetBPM()
 	// calculate hit values and get value with maximal hit
 	unsigned int max_hit = 0;
 	unsigned int BPM = 0;
-	for(i = 0; i < size; i++)
+	for (i = 0; i < size; i++)
 	{
-		for(j = 0; j < NUMBER_OF_SUBBANDS; j++)
+		for (j = 0; j < NUMBER_OF_SUBBANDS; j++)
 		{
-			if(mod_value[i].BPM == c_pSubBand[j].BPM)
+			if (mod_value[i].BPM == c_pSubBand[j].BPM)
 			{
 				mod_value[i].Hit++;
 				mod_value[i].Sum += c_pSubBand[j].BPM;
 			}
 
-			if(mod_value[i].BPM + 1 == c_pSubBand[j].BPM)
+			if (mod_value[i].BPM + 1 == c_pSubBand[j].BPM)
 			{
 				mod_value[i].Hit++;
 				mod_value[i].Sum += c_pSubBand[j].BPM;
 			}
 
-			if(mod_value[i].BPM - 1 == c_pSubBand[j].BPM)
+			if (mod_value[i].BPM - 1 == c_pSubBand[j].BPM)
 			{
 				mod_value[i].Hit++;
 				mod_value[i].Sum += c_pSubBand[j].BPM;
 			}
 
-
-			if(mod_value[i].Hit > max_hit)
+			if (mod_value[i].Hit > max_hit)
 			{
 				max_hit = mod_value[i].Hit;
-				BPM = (unsigned int) (((double) mod_value[i].Sum / (double) mod_value[i].Hit) + 0.5);
+				BPM = (unsigned int)(((double)mod_value[i].Sum / (double)mod_value[i].Hit) + 0.5);
 			}
 		}
 	}
@@ -501,16 +460,15 @@ unsigned int WBPMDetect3::GetBPM()
 	return BPM;
 }
 
-
 int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 {
-	c_Amplitudes = (BPM_DETECT3_REAL*) malloc(BPM_DETECT_FFT_POINTS3 / 2 * sizeof(BPM_DETECT3_REAL));
-	c_Samples = (BPM_DETECT3_REAL*) malloc(BPM_DETECT_FFT_POINTS3 * sizeof(BPM_DETECT3_REAL));
-	c_pflWindow = (BPM_DETECT3_REAL*) malloc(BPM_DETECT_FFT_POINTS3 * sizeof(BPM_DETECT3_REAL));
-	c_pnIp = (int*) malloc( ( 2 + (int) sqrt((BPM_DETECT3_REAL) BPM_DETECT_FFT_POINTS3 / 2.0) ) * sizeof(int));
-	c_pflw = (BPM_DETECT3_REAL*) malloc(BPM_DETECT_FFT_POINTS3 / 2 * sizeof(BPM_DETECT3_REAL));
+	c_Amplitudes = (BPM_DETECT3_REAL*)malloc(BPM_DETECT_FFT_POINTS3 / 2 * sizeof(BPM_DETECT3_REAL));
+	c_Samples = (BPM_DETECT3_REAL*)malloc(BPM_DETECT_FFT_POINTS3 * sizeof(BPM_DETECT3_REAL));
+	c_pflWindow = (BPM_DETECT3_REAL*)malloc(BPM_DETECT_FFT_POINTS3 * sizeof(BPM_DETECT3_REAL));
+	c_pnIp = (int*)malloc((2 + (int)sqrt((BPM_DETECT3_REAL)BPM_DETECT_FFT_POINTS3 / 2.0)) * sizeof(int));
+	c_pflw = (BPM_DETECT3_REAL*)malloc(BPM_DETECT_FFT_POINTS3 / 2 * sizeof(BPM_DETECT3_REAL));
 
-	if(c_Amplitudes == 0 || c_Samples == 0 || c_pflWindow == 0 || c_pnIp == 0 || c_pflw == 0)
+	if (c_Amplitudes == 0 || c_Samples == 0 || c_pflWindow == 0 || c_pnIp == 0 || c_pflw == 0)
 	{
 		FreeInternalMemory();
 		return 0;
@@ -520,8 +478,8 @@ int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 
 	memset(c_Samples, 0, BPM_DETECT_FFT_POINTS3 * sizeof(BPM_DETECT3_REAL));
 
-	c_pSubBand = (SUBBAND3*) malloc(NUMBER_OF_SUBBANDS * sizeof(SUBBAND3));
-	if(c_pSubBand == 0)
+	c_pSubBand = (SUBBAND3*)malloc(NUMBER_OF_SUBBANDS * sizeof(SUBBAND3));
+	if (c_pSubBand == 0)
 	{
 		FreeInternalMemory();
 		return 0;
@@ -530,13 +488,13 @@ int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 	memset(c_pSubBand, 0, NUMBER_OF_SUBBANDS * sizeof(SUBBAND3));
 
 	unsigned int i;
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		unsigned int size =  (g_SubBandParam[i].BackwardWindow * nSampleRate) / ( 1000 * BPM_DETECT_FFT_POINTS3);
-		if(size == 0)
+		unsigned int size = (g_SubBandParam[i].BackwardWindow * nSampleRate) / (1000 * BPM_DETECT_FFT_POINTS3);
+		if (size == 0)
 			size = 1;
-		c_pSubBand[i].BackwardAmplitude = (BPM_DETECT3_REAL*) malloc(size * sizeof(BPM_DETECT3_REAL));
-		if(c_pSubBand[i].BackwardAmplitude == 0)
+		c_pSubBand[i].BackwardAmplitude = (BPM_DETECT3_REAL*)malloc(size * sizeof(BPM_DETECT3_REAL));
+		if (c_pSubBand[i].BackwardAmplitude == 0)
 		{
 			FreeInternalMemory();
 			return 0;
@@ -545,13 +503,13 @@ int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 		c_pSubBand[i].BackwardWindow = size;
 	}
 
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		unsigned int size =  (g_SubBandParam[i].ForwardWindow * nSampleRate) / ( 1000 * BPM_DETECT_FFT_POINTS3);
-		if(size == 0)
+		unsigned int size = (g_SubBandParam[i].ForwardWindow * nSampleRate) / (1000 * BPM_DETECT_FFT_POINTS3);
+		if (size == 0)
 			size = 1;
-		c_pSubBand[i].ForwardAmplitude = (BPM_DETECT3_REAL*) malloc(size * sizeof(BPM_DETECT3_REAL));
-		if(c_pSubBand[i].ForwardAmplitude == 0)
+		c_pSubBand[i].ForwardAmplitude = (BPM_DETECT3_REAL*)malloc(size * sizeof(BPM_DETECT3_REAL));
+		if (c_pSubBand[i].ForwardAmplitude == 0)
 		{
 			FreeInternalMemory();
 			return 0;
@@ -560,14 +518,13 @@ int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 		c_pSubBand[i].ForwardWindow = size;
 	}
 
-
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		unsigned int size =  (g_SubBandParam[i].PeakWindow * nSampleRate) / ( 1000 * BPM_DETECT_FFT_POINTS3);
-		if(size == 0)
+		unsigned int size = (g_SubBandParam[i].PeakWindow * nSampleRate) / (1000 * BPM_DETECT_FFT_POINTS3);
+		if (size == 0)
 			size = 1;
-		c_pSubBand[i].PeakAmplitude = (BPM_DETECT3_REAL*) malloc(size * sizeof(BPM_DETECT3_REAL));
-		if(c_pSubBand[i].PeakAmplitude == 0)
+		c_pSubBand[i].PeakAmplitude = (BPM_DETECT3_REAL*)malloc(size * sizeof(BPM_DETECT3_REAL));
+		if (c_pSubBand[i].PeakAmplitude == 0)
 		{
 			FreeInternalMemory();
 			return 0;
@@ -576,94 +533,86 @@ int WBPMDetect3::AllocateInternalMemory(unsigned int nSampleRate)
 		c_pSubBand[i].PeakWindow = size;
 	}
 
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		unsigned int size =  (g_SubBandParam[i].ShiftWindow * nSampleRate) / ( 1000 * BPM_DETECT_FFT_POINTS3);
+		unsigned int size = (g_SubBandParam[i].ShiftWindow * nSampleRate) / (1000 * BPM_DETECT_FFT_POINTS3);
 		c_pSubBand[i].ShiftWindow = size;
 	}
 
-
-	for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+	for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 	{
-		c_pSubBand[i].BPMHistoryHit = (unsigned int*) malloc((BPM_MAX + 2) * sizeof(unsigned int));
-		if(c_pSubBand[i].BPMHistoryHit == 0)
+		c_pSubBand[i].BPMHistoryHit = (unsigned int*)malloc((BPM_MAX + 2) * sizeof(unsigned int));
+		if (c_pSubBand[i].BPMHistoryHit == 0)
 		{
 			FreeInternalMemory();
 			return 0;
 		}
 	}
 
-
 	// create COSINE window
 
 	double n;
-	double N = (double) BPM_DETECT_FFT_POINTS3;
+	double N = (double)BPM_DETECT_FFT_POINTS3;
 	double pi = PI;
-	for(i = 0; i < BPM_DETECT_FFT_POINTS3; i++)
+	for (i = 0; i < BPM_DETECT_FFT_POINTS3; i++)
 	{
-		n = (double) i;
-		c_pflWindow[i] = (BPM_DETECT3_REAL) ( sin( (pi * n) / (N - 1.0)) );
+		n = (double)i;
+		c_pflWindow[i] = (BPM_DETECT3_REAL)(sin((pi * n) / (N - 1.0)));
 	}
-
 
 	c_fReady = 1;
 	return 1;
-
 }
-
 
 int WBPMDetect3::FreeInternalMemory()
 {
-	if(c_Amplitudes)
+	if (c_Amplitudes)
 	{
 		free(c_Amplitudes);
 		c_Amplitudes = 0;
 	}
 
-	if(c_Samples)
+	if (c_Samples)
 	{
 		free(c_Samples);
 		c_Samples = 0;
 	}
 
-	if(c_pflWindow)
+	if (c_pflWindow)
 	{
 		free(c_pflWindow);
 		c_pflWindow = 0;
 	}
 
-	if(c_pnIp)
+	if (c_pnIp)
 	{
 		free(c_pnIp);
 		c_pnIp = 0;
 	}
 
-	if(c_pflw)
+	if (c_pflw)
 	{
 		free(c_pflw);
 		c_pflw = 0;
 	}
 
-
-	if(c_pSubBand)
+	if (c_pSubBand)
 	{
 
 		unsigned int i;
-		for(i = 0; i < NUMBER_OF_SUBBANDS; i++)
+		for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 		{
-			if(c_pSubBand[i].BackwardAmplitude)
+			if (c_pSubBand[i].BackwardAmplitude)
 				free(c_pSubBand[i].BackwardAmplitude);
 
-			if(c_pSubBand[i].ForwardAmplitude)
+			if (c_pSubBand[i].ForwardAmplitude)
 				free(c_pSubBand[i].ForwardAmplitude);
 
-			if(c_pSubBand[i].PeakAmplitude)
+			if (c_pSubBand[i].PeakAmplitude)
 				free(c_pSubBand[i].PeakAmplitude);
 
-			if(c_pSubBand[i].BPMHistoryHit)
+			if (c_pSubBand[i].BPMHistoryHit)
 				free(c_pSubBand[i].BPMHistoryHit);
-			
-
 		}
 
 		free(c_pSubBand);
@@ -674,7 +623,7 @@ int WBPMDetect3::FreeInternalMemory()
 	return 1;
 }
 
-void  WBPMDetect3::Release()
+void WBPMDetect3::Release()
 {
 	delete this;
 }
@@ -687,5 +636,4 @@ unsigned int WBPMDetect3::NumOfSamples()
 int WBPMDetect3::SetFrequencyBand(unsigned int nLowLimit, unsigned int nHighLimit)
 {
 	return 0;
-
 }

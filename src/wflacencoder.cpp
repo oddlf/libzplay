@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -33,26 +33,18 @@
 #include "wtools.h"
 #include "WFLACEncoder.h"
 
-
-
-
-
-enum {
+enum
+{
 	ENCODER_NO_ERROR = 0,
 	ENCODER_FILEOPEN_ERROR,
 	ENCODER_NOT_READY,
 	ENCODER_INITIALIZATION_ERROR,
 	ENCODER_MEMORY_ALLOCATION_FAIL,
 
-
 	ENCODER_UNKNOWN_ERROR
 };
 
-
-
-
-
-wchar_t *g_flac_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
+wchar_t* g_flac_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WFLACEncoder::No error.",
 	L"WFLACEncoder::File open error.",
 	L"WFLACEncoder::Encoder is not ready.",
@@ -63,28 +55,23 @@ wchar_t *g_flac_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 
 };
 
-
-
 void WFLACEncoder::Release()
 {
 	delete this;
 }
 
-DECODER_ERROR_MESSAGE *WFLACEncoder::GetError()
+DECODER_ERROR_MESSAGE* WFLACEncoder::GetError()
 {
 	return &c_err_msg;
 }
 
-
 void WFLACEncoder::err(unsigned int error_code)
 {
-	if(error_code > ENCODER_UNKNOWN_ERROR)
+	if (error_code > ENCODER_UNKNOWN_ERROR)
 		error_code = ENCODER_UNKNOWN_ERROR;
 
 	c_err_msg.errorW = g_flac_encoder_error_strW[error_code];
-
 }
-
 
 WFLACEncoder::WFLACEncoder(int fOgg)
 {
@@ -96,44 +83,37 @@ WFLACEncoder::WFLACEncoder(int fOgg)
 	c_pcm = NULL;
 	c_pcm_size = 0;
 	c_fOgg = fOgg;
-	
 }
-
 
 WFLACEncoder::~WFLACEncoder()
 {
 	Uninitialize();
 }
 
-
 int WFLACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback)
+	unsigned int custom_value,
+	TEncoderReadCallback read_callback,
+	TEncoderWriteCallback write_callback,
+	TEncoderSeekCallback seek_callback,
+	TEncoderTellCallback tell_callback)
 {
-
 
 	c_nSampleRate = nSampleRate;
 	c_nNumberOfChannels = nNumberOfChannels;
 	c_nBitBerSample = nBitPerSample;
-
 
 	c_read_calllback = read_callback;
 	c_write_callback = write_callback;
 	c_seek_callback = seek_callback;
 	c_tell_callback = tell_callback;
 
-	c_user_data = (void*) custom_value;
+	c_user_data = (void*)custom_value;
 
-
-	if((c_encoder = FLAC__stream_encoder_new()) == NULL)
+	if ((c_encoder = FLAC__stream_encoder_new()) == NULL)
 	{
 		err(ENCODER_INITIALIZATION_ERROR);
 		return 0;
 	}
-
 
 	FLAC__bool ok = true;
 
@@ -144,7 +124,7 @@ int WFLACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 	ok &= FLAC__stream_encoder_set_sample_rate(c_encoder, c_nSampleRate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(c_encoder, 0);
 
-	if(!ok)
+	if (!ok)
 	{
 		FLAC__stream_encoder_delete(c_encoder);
 		c_encoder = NULL;
@@ -152,26 +132,24 @@ int WFLACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 		return 0;
 	}
 
-
-	if(c_fOgg)
+	if (c_fOgg)
 	{
-		if(FLAC__stream_encoder_init_ogg_stream(c_encoder, f_read_callback, f_write_callback, f_seek_callback, f_tell_callback, NULL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
+		if (FLAC__stream_encoder_init_ogg_stream(c_encoder, f_read_callback, f_write_callback, f_seek_callback, f_tell_callback, NULL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 		{
 			FLAC__stream_encoder_delete(c_encoder);
 			c_encoder = NULL;
 			err(ENCODER_FILEOPEN_ERROR);
-			return 0;			
+			return 0;
 		}
-
 	}
 	else
 	{
-		if(FLAC__stream_encoder_init_stream(c_encoder, f_write_callback, f_seek_callback, f_tell_callback, NULL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
+		if (FLAC__stream_encoder_init_stream(c_encoder, f_write_callback, f_seek_callback, f_tell_callback, NULL, this) != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 		{
 			FLAC__stream_encoder_delete(c_encoder);
 			c_encoder = NULL;
 			err(ENCODER_FILEOPEN_ERROR);
-			return 0;			
+			return 0;
 		}
 	}
 
@@ -181,15 +159,14 @@ int WFLACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 
 int WFLACEncoder::Uninitialize()
 {
-	if(c_fReady)
+	if (c_fReady)
 	{
 		FLAC__stream_encoder_finish(c_encoder);
 		FLAC__stream_encoder_delete(c_encoder);
 		c_encoder = NULL;
-
 	}
 
-	if(c_pcm)
+	if (c_pcm)
 		free(c_pcm);
 
 	c_pcm = NULL;
@@ -199,116 +176,93 @@ int WFLACEncoder::Uninitialize()
 	return 1;
 }
 
-
-int WFLACEncoder::EncodeSamples(void *pSamples, unsigned int nNumberOfSamples)
+int WFLACEncoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 {
-	if(c_fReady == 0)
+	if (c_fReady == 0)
 	{
 		err(ENCODER_NOT_READY);
 		return 0;
-
 	}
 
-
-	if(c_pcm_size < nNumberOfSamples)
+	if (c_pcm_size < nNumberOfSamples)
 	{
-		FLAC__int32 *tmp = (FLAC__int32*) malloc(nNumberOfSamples * c_nNumberOfChannels * sizeof(FLAC__int32));
-		if(tmp == 0)
+		FLAC__int32* tmp = (FLAC__int32*)malloc(nNumberOfSamples * c_nNumberOfChannels * sizeof(FLAC__int32));
+		if (tmp == 0)
 		{
 			err(ENCODER_MEMORY_ALLOCATION_FAIL);
 			return 0;
 		}
 
-		if(c_pcm)
+		if (c_pcm)
 			free(c_pcm);
 
 		c_pcm = tmp;
 		c_pcm_size = nNumberOfSamples;
 	}
 
-
-
 	unsigned int i;
 
-
-	switch(c_nBitBerSample)
+	switch (c_nBitBerSample)
 	{
 
-		case 16:
-		{
+	case 16: {
 
-			short *samples = (short*) pSamples;
-			for(i = 0; i < nNumberOfSamples * c_nNumberOfChannels; i++)		
-				c_pcm[i] = samples[i];
-			
-		}
-		break;
+		short* samples = (short*)pSamples;
+		for (i = 0; i < nNumberOfSamples * c_nNumberOfChannels; i++)
+			c_pcm[i] = samples[i];
+	}
+	break;
 
-		default:
+	default:
 		return 1;
-
-
 	}
 
-			
 	FLAC__stream_encoder_process_interleaved(c_encoder, c_pcm, nNumberOfSamples);
 	return 1;
 }
 
-
-
-FLAC__StreamEncoderReadStatus WFLACEncoder::f_read_callback(const FLAC__StreamEncoder *encoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
+FLAC__StreamEncoderReadStatus WFLACEncoder::f_read_callback(const FLAC__StreamEncoder* encoder, FLAC__byte buffer[], size_t* bytes, void* client_data)
 {
-	WFLACEncoder *instance = (WFLACEncoder*) client_data;
-	if(*bytes > 0)
+	WFLACEncoder* instance = (WFLACEncoder*)client_data;
+	if (*bytes > 0)
 	{
 		unsigned int ret = instance->c_read_calllback(buffer, *bytes, instance->c_user_data);
 		*bytes = ret;
-		if(ret == 0)
+		if (ret == 0)
 			return FLAC__STREAM_ENCODER_READ_STATUS_END_OF_STREAM;
 
 		return FLAC__STREAM_ENCODER_READ_STATUS_CONTINUE;
 	}
 	else
 		return FLAC__STREAM_ENCODER_READ_STATUS_ABORT;
-
 }
 
-
-
-FLAC__StreamEncoderWriteStatus WFLACEncoder::f_write_callback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
+FLAC__StreamEncoderWriteStatus WFLACEncoder::f_write_callback(const FLAC__StreamEncoder* encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void* client_data)
 {
-	WFLACEncoder *instance = (WFLACEncoder*) client_data;
-	unsigned int ret = instance->c_write_callback((void*) buffer, bytes, instance->c_user_data);
-	if(ret == 0)
+	WFLACEncoder* instance = (WFLACEncoder*)client_data;
+	unsigned int ret = instance->c_write_callback((void*)buffer, bytes, instance->c_user_data);
+	if (ret == 0)
 		return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 
-
-FLAC__StreamEncoderSeekStatus WFLACEncoder::f_seek_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data)
+FLAC__StreamEncoderSeekStatus WFLACEncoder::f_seek_callback(const FLAC__StreamEncoder* encoder, FLAC__uint64 absolute_byte_offset, void* client_data)
 {
-	WFLACEncoder *instance = (WFLACEncoder*) client_data;
+	WFLACEncoder* instance = (WFLACEncoder*)client_data;
 	unsigned int ret = instance->c_seek_callback(absolute_byte_offset, instance->c_user_data);
-	if(ret == 0)
+	if (ret == 0)
 		return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
 
 	return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
-
-
-
 }
 
-
-FLAC__StreamEncoderTellStatus WFLACEncoder::f_tell_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
+FLAC__StreamEncoderTellStatus WFLACEncoder::f_tell_callback(const FLAC__StreamEncoder* encoder, FLAC__uint64* absolute_byte_offset, void* client_data)
 {
-	WFLACEncoder *instance = (WFLACEncoder*) client_data;
+	WFLACEncoder* instance = (WFLACEncoder*)client_data;
 
 	unsigned int ret = instance->c_tell_callback(instance->c_user_data);
 
 	*absolute_byte_offset = ret;
 	return FLAC__STREAM_ENCODER_TELL_STATUS_OK;
-
 }
-

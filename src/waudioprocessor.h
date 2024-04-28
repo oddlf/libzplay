@@ -23,24 +23,17 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #ifndef _W_AUDIOPROCESSOR_H_
 #define _W_AUDIOPROCESSOR_H_
-
-
-
 
 #define AUDIO_PROCESSOR_RETURN_ERROR_STR
 
 // output function
 
-
-
-
-
 typedef struct {
-	void * pSamples;
+	void* pSamples;
 	unsigned int nNumberOfSamples;
 	unsigned int nStartPosition;
 	unsigned int nEndPosition;
@@ -49,61 +42,49 @@ typedef struct {
 	unsigned int nSongIndex;
 } PROCESSOR_AUDIO_DATA;
 
-
-
 typedef struct audio_elem {
-	void *pAllocatedBuffer;
-	void *pDataBuffer;
-	struct audio_elem *next; 
+	void* pAllocatedBuffer;
+	void* pDataBuffer;
+	struct audio_elem* next;
 } AUDIO_QUEUE_ELEM;
 
+typedef int (*t_audio_processor_output)(PROCESSOR_AUDIO_DATA* data);
 
-typedef int  (*t_audio_processor_output)(PROCESSOR_AUDIO_DATA *data);
+class WAudioQueue
+{
+public:
+	WAudioQueue();
+	~WAudioQueue();
 
-class WAudioQueue {
-	public:
-		WAudioQueue();
-		~WAudioQueue();
+	void Clear();
+	unsigned int PushSamples(PROCESSOR_AUDIO_DATA* data);
+	unsigned int PullSamples(PROCESSOR_AUDIO_DATA* data);
 
-		void Clear();
-		unsigned int PushSamples(PROCESSOR_AUDIO_DATA *data);
-		unsigned int PullSamples(PROCESSOR_AUDIO_DATA *data);
+private:
+	AUDIO_QUEUE_ELEM* c_first;
+	AUDIO_QUEUE_ELEM* c_last;
+	unsigned int c_nNumberOfElements;
+	unsigned int c_nSumOfSamples;
 
-	
-
-	private:
-		AUDIO_QUEUE_ELEM *c_first;
-		AUDIO_QUEUE_ELEM *c_last;
-		unsigned int c_nNumberOfElements;
-		unsigned int c_nSumOfSamples;
-		 
-
-		
-	protected:
-
-
-
-
+protected:
 };
 
-class WAudioProcessor {
+class WAudioProcessor
+{
 public:
 	// constructor
 	WAudioProcessor();
 	// destructor
 	~WAudioProcessor();
 
+	virtual int PushSamples(PROCESSOR_AUDIO_DATA* data);
 
-	virtual int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	virtual int PushData(char* pchData, unsigned int nDataSize, unsigned int nUserData);
 
-		virtual int PushData(char *pchData, unsigned int nDataSize, unsigned int nUserData);
+	// =====================================================================
+	// SET OUTPUT PROCESSOR
 
-
-
-// =====================================================================
-	// SET OUTPUT PROCESSOR 
-
-	int SetOutputProcessor(WAudioProcessor *instance);
+	int SetOutputProcessor(WAudioProcessor* instance);
 
 	//	PARAMETERS:
 	//		instance
@@ -124,8 +105,8 @@ public:
 	//
 	//		This function disables SetOutputFunction.
 
-// =====================================================================
-	// SET OUTPUT FUNCTION 
+	// =====================================================================
+	// SET OUTPUT FUNCTION
 
 	int SetOutputFunction(t_audio_processor_output output_func);
 
@@ -151,19 +132,17 @@ public:
 	//
 	//		This function disables SetOutputProcessor function.
 
-// =============================================================================================
-// check if processor is enabled
+	// =============================================================================================
+	// check if processor is enabled
 
 	int IsEnabled() { return c_fEnable; };
 
+	// =====================================================================
+	//	VITRUAL FUNCTIONS - DERIVED CLASS MUST IMPLEMENT THIS
+	// =====================================================================
 
-// =====================================================================
-//	VITRUAL FUNCTIONS - DERIVED CLASS MUST IMPLEMENT THIS 
-// =====================================================================
-
-
-// ========================================================================================
-// CONFIGURE BASIC PARAMETERS
+	// ========================================================================================
+	// CONFIGURE BASIC PARAMETERS
 
 	virtual int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
 
@@ -171,7 +150,7 @@ public:
 	//		fBroadcast
 	//			Set this to 1 if you need to broadcast this data across whole chain.
 	//			Set this to 0 if you need to apply this data only on this processor.
-	//		
+	//
 	//		nSampleRate
 	//			Sample rate.
 	//
@@ -189,12 +168,12 @@ public:
 	//		Call this function to set basic parameters for PCM stream.
 	//		This function will propagate through whole chain.
 
-// ==========================================================================================================
+	// ==========================================================================================================
 	// enable or disable processor
 	//
-	
-	virtual int Enable(int fBroadcast, int fEnable);	
-	
+
+	virtual int Enable(int fBroadcast, int fEnable);
+
 	//	PARAMETERS:
 	//		fBroadcast
 	//			Set this to 1 if you need to broadcast this data across whole chain.
@@ -208,10 +187,8 @@ public:
 	//		1 - all OK
 	//		0 - error, call GetError() to get error string
 
-
-
-// =====================================================================
-//	clear internal and output buffers
+	// =====================================================================
+	//	clear internal and output buffers
 
 	virtual int Clear(int fBroadcast);
 
@@ -224,8 +201,8 @@ public:
 	//		1	- all ok
 	//		0	- error
 
-// =====================================================================
-//	flush internal buffers to output buffer, all data are available in output buffer
+	// =====================================================================
+	//	flush internal buffers to output buffer, all data are available in output buffer
 
 	virtual int Flush(int fBroadcast);
 	//	PARAMETERS:
@@ -235,12 +212,11 @@ public:
 	//
 	//	RETURN VALUES:
 	//		1	- all ok
-	//		0	- error	
+	//		0	- error
 
-
-// =====================================================================
+	// =====================================================================
 	// get error string
-	char *GetError();
+	char* GetError();
 
 	//	PARAMETERS:
 	//		None.
@@ -248,22 +224,19 @@ public:
 	//	RETURN VALUES:
 	//		Pointer to error message string.
 
-// =====================================================================
+	// =====================================================================
 
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+	// return error message
+	char* c_pchReturnError;
+#endif
 
-
-	#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-		// return error message
-		char *c_pchReturnError;
-	#endif
-	
-private:	
-
+private:
 protected:
 	// error message
 	char c_pchErrorMessageStr[128];
 	// pointer to next processor in chain
-	WAudioProcessor *c_next;
+	WAudioProcessor* c_next;
 	// output function
 	t_audio_processor_output c_output;
 
@@ -279,16 +252,9 @@ protected:
 	// indicates enabled or disabled processor
 	int c_fEnable;
 
-
 	// ============================================
 
 	WAudioQueue c_queue;
-
-			
 };
-
-
-
-
 
 #endif

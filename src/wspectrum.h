@@ -28,7 +28,7 @@
  * Contact Mr.Ooura for details of distributing licenses.
  * http://momonga.t.u-tokyo.ac.jp/~ooura/fft.html
  * ==================================================================================
-*/
+ */
 
 #ifndef _W_SPECTRUM_H_
 #define _W_SPECTRUM_H_
@@ -51,12 +51,13 @@ typedef struct {
 	unsigned short nWidth;
 } FREQUENCY_TABLE;
 
-class WSpectrum {
+class WSpectrum
+{
 public:
 	WSpectrum();
 	~WSpectrum();
 
-// =====================================================================================================================
+	// =====================================================================================================================
 	// initialize spectrum
 	int Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitsPerSample);
 	//
@@ -81,7 +82,7 @@ public:
 	//		Call this function before all other functions to initialize class. You can call
 	//		This function later if you need to change FFT points, sample rate, channel or bits per sample.
 
-// =============================================================================================================
+	// =============================================================================================================
 	// free allocated resources
 	void Free();
 	//
@@ -93,9 +94,9 @@ public:
 	//
 	//	REMARKS:
 	//		Call this function to free memory and GDI resources.
-// =============================================================================================================
+	// =============================================================================================================
 	// set PCM samples
-	int SetSamples(void *pSamples, unsigned int nSampleNum);
+	int SetSamples(void* pSamples, unsigned int nSampleNum);
 	//
 	//	PARAMETERS:
 	//		pSamples
@@ -109,8 +110,8 @@ public:
 	//		0	- error
 	//
 	//	REMARKS:
-	//		This function will calculate FFT and prepare data for drawing.	
-// =============================================================================================================
+	//		This function will calculate FFT and prepare data for drawing.
+	// =============================================================================================================
 	// draw graph on screen
 	int DrawOnHDC(HDC hdc, int nX, int nY, int nWidth, int nHeight);
 	//
@@ -133,14 +134,12 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-// =============================================================================================================
-//	enable subgrid lines
+	// =============================================================================================================
+	//	enable subgrid lines
 	int EnableSubGrid(int fEnable);
 	int IsSubGridEnabled();
 
-
-
-// =============================================================================================================
+	// =============================================================================================================
 	// set FFT window
 	int SetFFTWindow(unsigned int nWindow);
 	//
@@ -149,9 +148,9 @@ public:
 	//			FFT window. Use one of these values:
 	//				FFT_WINDOW_RECTANGULAR
 	//				FFT_WINDOW_HAMMING
-	//				FFT_WINDOW_HANN	
+	//				FFT_WINDOW_HANN
 	//				FFT_WINDOW_COSINE
-	//				FFT_WINDOW_LANCZOS	
+	//				FFT_WINDOW_LANCZOS
 	//				FFT_WINDOW_BARTLETT
 	//				FFT_WINDOW_TRIANGULAR
 	//				FFT_WINDOW_GAUSS
@@ -165,10 +164,10 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-// =============================================
+	// =============================================
 
 	int GetFFTWindow();
-// ===================================================================================================================
+	// ===================================================================================================================
 	// set graph type
 	int SetGraphType(unsigned int nType);
 	//
@@ -185,10 +184,10 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-// ====================================
-//	get graph type
+	// ====================================
+	//	get graph type
 	int GetGraphType();
-// ===================================================================================================================
+	// ===================================================================================================================
 	// set graph type
 	int SetLinearGraph(unsigned int fLinear);
 	//
@@ -199,10 +198,10 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-// =======================================
-	int IsLinearGraph();	
+	// =======================================
+	int IsLinearGraph();
 
-// ========================================
+	// ========================================
 	// set graph area transparency
 	int SetTransparency(int nTransparency);
 	// PARAMETERS:
@@ -211,8 +210,8 @@ public:
 	//
 	//	RETURN VALUES:
 	//		1	- all OK
-	//		0	- error	
-// =========================================
+	//		0	- error
+	// =========================================
 	// get graph area transparency
 
 	int GetTransparency();
@@ -221,9 +220,9 @@ public:
 	//
 	//	RETURN VALUES:
 	//		Current graph area transparency. 0 - not transparent, 100 - full transparent
-// ===================================================================================================================
+	// ===================================================================================================================
 	// return samples buffer
-	void *GetSamplesBuffer();
+	void* GetSamplesBuffer();
 	//
 	//	PARAMETERS:
 	//		None.
@@ -233,7 +232,7 @@ public:
 	//		allocated by Initialize function and has size for c_nFFTPoints stereo 32 bit samples.
 	//		Class is responsible for this buffer so user don't need to fre this buffer.
 
-// ===================================================================================================================
+	// ===================================================================================================================
 
 	// show frequency scale
 	//
@@ -246,7 +245,7 @@ public:
 	//		if fShow is -1, returned value represents current show state
 	int ShowFrequencyScale(int fShow);
 
-// ===================================================================================================================
+	// ===================================================================================================================
 	// show decibel scale
 	//
 	// PARAMATERS:
@@ -258,8 +257,7 @@ public:
 	//		if fShow is -1, returned value represents current show state
 	int ShowDecibelScale(int fShow);
 
-// ===================================================================================================================
-
+	// ===================================================================================================================
 
 	// show frequency grid
 	//
@@ -272,8 +270,7 @@ public:
 	//		if fShow is -1, returned value represents current show state
 	int ShowFrequencyGrid(int fShow);
 
-
-// ===================================================================================================================
+	// ===================================================================================================================
 
 	// show decibel grid
 	//
@@ -286,7 +283,7 @@ public:
 	//		if fShow is -1, returned value represents current show state
 	int ShowDecibelGrid(int fShow);
 
-// ===================================================================================================================
+	// ===================================================================================================================
 	// show background bitmap
 	//
 	// PARAMATERS:
@@ -299,7 +296,7 @@ public:
 
 	int ShowBgBitmap(int fShow);
 
-// ===================================================================================================================
+	// ===================================================================================================================
 	// set background bitmap, function makes copy of bitmap, user can destroy original
 	//
 	// PARAMATERS:
@@ -311,7 +308,7 @@ public:
 
 	int SetBgBitmap(HBITMAP hbm);
 
-// ===================================================================================================================
+	// ===================================================================================================================
 
 	// stretch background bitmap
 	//
@@ -324,7 +321,7 @@ public:
 
 	int StretchBgBitmap(int fStretch);
 
-// ===================================================================================================================
+	// ===================================================================================================================
 	// set color
 	//
 	// PARAMETERS:
@@ -335,8 +332,7 @@ public:
 
 	COLORREF GetColor(int nIndex);
 
-// ===================================================================================================================
-
+	// ===================================================================================================================
 
 private:
 	WFFT c_fft;
@@ -344,7 +340,7 @@ private:
 	int c_fShowHScale;
 	int c_fShowVScale;
 
-	int c_fDrawSubGrid;	// draw subgrid lines
+	int c_fDrawSubGrid; // draw subgrid lines
 
 	// show decibel grid
 	int c_fShowVGrid;
@@ -358,11 +354,11 @@ private:
 	int c_nBitmapHeight;
 	int c_fStretchBgBitmap;
 
-	COLORREF cr1;	// scale background color
-	COLORREF cr2;	// graph background color
-	COLORREF cr3;	// freq grid
-	COLORREF cr4;	// decibel grid
-	COLORREF cr5;	// freq subgrid
+	COLORREF cr1; // scale background color
+	COLORREF cr2; // graph background color
+	COLORREF cr3; // freq grid
+	COLORREF cr4; // decibel grid
+	COLORREF cr5; // freq subgrid
 	COLORREF cr6;
 	COLORREF cr7;
 	COLORREF cr8;
@@ -386,31 +382,30 @@ private:
 
 	unsigned int c_nSpectrumType;
 
-	int *c_pnSamplesBuffer;
+	int* c_pnSamplesBuffer;
 
 	int c_fLinear;
-	
 
-	int c_nAreaTransparency;	// transparency of area ( 0 - 100, 100 transparent )
+	int c_nAreaTransparency; // transparency of area ( 0 - 100, 100 transparent )
 	int c_nAlpha;
 	int c_nInvAlpha;
 
-	unsigned int c_nHarmonicsNumber;	// number of harmonics
+	unsigned int c_nHarmonicsNumber; // number of harmonics
 
-	int *c_pnLeftAmplitude;				// left amplitude array
-	int *c_pnRightAmplitude;				// right amplitude array
-	unsigned int *c_pnReductionTable;
+	int* c_pnLeftAmplitude;	 // left amplitude array
+	int* c_pnRightAmplitude; // right amplitude array
+	unsigned int* c_pnReductionTable;
 	int c_fNeedReduction;
 
-	POINT *FFT_Left;
-	POINT *FFT_Right;
-	POINT *FFT_Tmp;	
-	POINT *FFT_Tmp1;	
-	POINT *FFT_Tmp2;	
-	POINT *FFT_Tmp3;
-		
-	WBmpFont *c_BmpFont;
-	WBmpFont *c_BmpFontInverse;
+	POINT* FFT_Left;
+	POINT* FFT_Right;
+	POINT* FFT_Tmp;
+	POINT* FFT_Tmp1;
+	POINT* FFT_Tmp2;
+	POINT* FFT_Tmp3;
+
+	WBmpFont* c_BmpFont;
+	WBmpFont* c_BmpFontInverse;
 	HDC c_hdcSrc;
 	HDC c_hdcDest;
 	HBITMAP c_hbmSrc;
@@ -420,23 +415,22 @@ private:
 	HBITMAP c_hbmSrcOld;
 	HBITMAP c_hbmDestOld;
 
-	BYTE *c_pSrcBits;
-	BYTE *c_pDestBits;
-	BYTE *c_pBgBits;
+	BYTE* c_pSrcBits;
+	BYTE* c_pDestBits;
+	BYTE* c_pBgBits;
 
-
-//	HBRUSH hBrushFFTBackground;
+	//	HBRUSH hBrushFFTBackground;
 	HBRUSH hBrushFFTLeft;
 	HBRUSH hBrushFFTLeftOverlap;
 	HBRUSH hBrushFFTRight;
 	HBRUSH hBrushFFTRightOverlap;
 
-//	HPEN hPenBgLine;
-//	HPEN hPenBgLineStrong;
-	HPEN hPenLeft; 
+	//	HPEN hPenBgLine;
+	//	HPEN hPenBgLineStrong;
+	HPEN hPenLeft;
 	HPEN hPenRight;
 
-	HPEN hPenLeftOverlap; 
+	HPEN hPenLeftOverlap;
 	HPEN hPenRightOverlap;
 
 	HDC c_hdc;
@@ -456,22 +450,14 @@ private:
 	int _CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeight);
 
 	// end freq included
-	void DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int nStartFreq, unsigned int EndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight);
-	void DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int nStartFreq, unsigned int EndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight);
+	void DrawXLinear(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int nStartFreq, unsigned int EndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight);
+	void DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int nStartFreq, unsigned int EndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight);
 	void alpha_blend();
 
 	int c_spectrum_pos;
 	int c_clearFFTDisplay;
 
-	int c_fInitalizeY;	
-
+	int c_fInitalizeY;
 };
-
-
-
-
-
-
-
 
 #endif

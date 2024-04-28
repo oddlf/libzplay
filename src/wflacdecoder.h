@@ -43,8 +43,7 @@
  * distribution.
  * ============================================================================
  *
-*/
-
+ */
 
 #ifndef _W_FLACDECODER_H_
 #define _W_FLACDECODER_H_
@@ -56,14 +55,12 @@
 #include <FLAC/stream_decoder.h>
 #include <FLAC/metadata.h>
 
-
 typedef struct {
-	unsigned char *start;
-	unsigned char *end;
-	unsigned char *pos;
+	unsigned char* start;
+	unsigned char* end;
+	unsigned char* pos;
 	unsigned int size;
 } USER_FLAC_STREAM;
-
 
 typedef struct {
 	FLAC__StreamDecoderReadCallback read_func;
@@ -77,71 +74,67 @@ typedef struct {
 
 } FLAC_CALLBACK_FUNCTIONS;
 
-class WFLACDecoder : public WAudioDecoder {
+class WFLACDecoder : public WAudioDecoder
+{
 public:
-
 	WFLACDecoder();
 	WFLACDecoder(int fOgg);
 	~WFLACDecoder();
 
-	int OpenStream(WQueue *pQueue, int fDynamic, int param1, int param2);
-	INPUT_STREAM_INFO *GetStreamInfo();
+	int OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2);
+	INPUT_STREAM_INFO* GetStreamInfo();
 
-	wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSize, int param1, int param2);
+	wchar_t** GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2);
 
 	int Close();
 
-// ==================================================================
-// INITIALIZE DECODER
+	// ==================================================================
+	// INITIALIZE DECODER
 	// PARAMETERS:
 	//  param1	- 0: native FLAC, 1: OGG FLAC
 	int Initialize(int param1, int param2, int param3, int param4);
-// ===============================================================
+	// ===============================================================
 
 	int Uninitialize();
-	void  Release();
+	void Release();
 
-	int GetData(DECODER_DATA *pDecoderData);
+	int GetData(DECODER_DATA* pDecoderData);
 
 	// seek current position
 	int Seek(unsigned int nSamples);
 
 	int GetBitrate(int fAverage);
 
-	DECODER_ERROR_MESSAGE *GetError();
+	DECODER_ERROR_MESSAGE* GetError();
 
 	int SetReverseMode(int fReverse);
 
 private:
-	FLAC__StreamDecoder *c_decoder;
+	FLAC__StreamDecoder* c_decoder;
 	unsigned int c_ogg_transport_layer;
-	
 
 	FLAC_CALLBACK_FUNCTIONS flac_cb;
 
-	static void error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
-	static void metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data);
-	static FLAC__StreamDecoderReadStatus read_func(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
-	static FLAC__StreamDecoderReadStatus managed_read_func(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
-	static FLAC__StreamDecoderSeekStatus seek_func(const FLAC__StreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data);
-	static FLAC__StreamDecoderTellStatus tell_func(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
-	static FLAC__StreamDecoderLengthStatus length_func(const FLAC__StreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data);
-	static FLAC__bool eof_func(const FLAC__StreamDecoder *decoder, void *client_data);
-	static FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
+	static void error_callback(const FLAC__StreamDecoder* decoder, FLAC__StreamDecoderErrorStatus status, void* client_data);
+	static void metadata_callback(const FLAC__StreamDecoder* decoder, const FLAC__StreamMetadata* metadata, void* client_data);
+	static FLAC__StreamDecoderReadStatus read_func(const FLAC__StreamDecoder* decoder, FLAC__byte buffer[], size_t* bytes, void* client_data);
+	static FLAC__StreamDecoderReadStatus managed_read_func(const FLAC__StreamDecoder* decoder, FLAC__byte buffer[], size_t* bytes, void* client_data);
+	static FLAC__StreamDecoderSeekStatus seek_func(const FLAC__StreamDecoder* decoder, FLAC__uint64 absolute_byte_offset, void* client_data);
+	static FLAC__StreamDecoderTellStatus tell_func(const FLAC__StreamDecoder* decoder, FLAC__uint64* absolute_byte_offset, void* client_data);
+	static FLAC__StreamDecoderLengthStatus length_func(const FLAC__StreamDecoder* decoder, FLAC__uint64* stream_length, void* client_data);
+	static FLAC__bool eof_func(const FLAC__StreamDecoder* decoder, void* client_data);
+	static FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder* decoder, const FLAC__Frame* frame, const FLAC__int32* const buffer[], void* client_data);
 
-
-	static size_t IOCallback_Read(void *ptr, size_t size, size_t nmemb, FLAC__IOHandle handle);
+	static size_t IOCallback_Read(void* ptr, size_t size, size_t nmemb, FLAC__IOHandle handle);
 	static int IOCallback_Seek(FLAC__IOHandle handle, FLAC__int64 offset, int whence);
 	static FLAC__int64 IOCallback_Tell(FLAC__IOHandle handle);
 
-
 	// pointer to first byte of input  data stream
-	unsigned char *c_pchStreamStart;
+	unsigned char* c_pchStreamStart;
 	// pointer to last byte of input data stream
-	unsigned char *c_pchStreamEnd;
+	unsigned char* c_pchStreamEnd;
 	// size of input data stream
 	unsigned int c_nStreamSize;
-
 
 	// indicates that stream is ready
 	unsigned int c_fReady;
@@ -151,7 +144,7 @@ private:
 
 	// ID3 INFO
 
-	wchar_t *c_fields[ID3_FIELD_NUMBER_EX];
+	wchar_t* c_fields[ID3_FIELD_NUMBER_EX];
 
 	// indicates reverse mode
 	unsigned int c_fReverse;
@@ -168,34 +161,26 @@ private:
 
 	int _OpenFile(unsigned int fSkipExtraChecking);
 
-	WQueue *c_Queue;
+	WQueue* c_Queue;
 
-// ============================================================
-
+	// ============================================================
 
 	USER_FLAC_STREAM bit_stream;
 
 	// ==========================================
 
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 
+	int* c_pSamplesAlloc;			  // allocated buffer for samples
+	unsigned int c_nSamplesAllocSize; // size of allocated buffer in samples
+	int* c_pSamplesBuffer;			  // current position inside samples buffer
+	unsigned int c_nSamplesNum;		  // number of samples in samples buffer
 
-	int *c_pSamplesAlloc;				// allocated buffer for samples
-	unsigned int c_nSamplesAllocSize;	// size of allocated buffer in samples
-	int *c_pSamplesBuffer;			// current position inside samples buffer
-	unsigned int c_nSamplesNum;		// number of samples in samples buffer
-
-
-	int *c_pReverseBufferAlloc;	// buffer for reverse playing
-	int *c_pReverseBuffer;	// buffer for reverse playing
+	int* c_pReverseBufferAlloc; // buffer for reverse playing
+	int* c_pReverseBuffer;		// buffer for reverse playing
 
 	unsigned int c_nCurrentPosition;
-
 };
-
-
-
 
 #endif

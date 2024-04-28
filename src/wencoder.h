@@ -22,12 +22,10 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
-
+ */
 
 #ifndef _W_ENCODER_H_
 #define _W_ENCODER_H_
-
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -35,27 +33,25 @@
 #include "wqueue.h"
 #include "wdecoder.h"
 
+typedef unsigned int (*TEncoderReadCallback)(void* data, unsigned int data_size, void* user_data);
+typedef unsigned int (*TEncoderWriteCallback)(void* data, unsigned int data_size, void* user_data);
+typedef unsigned int (*TEncoderSeekCallback)(unsigned int offset, void* user_data);
+typedef unsigned int (*TEncoderTellCallback)(void* user_data);
 
-typedef unsigned int  ( * TEncoderReadCallback)(void *data, unsigned int data_size, void *user_data);
-typedef unsigned int  ( * TEncoderWriteCallback)(void *data, unsigned int data_size, void *user_data);
-typedef unsigned int  ( * TEncoderSeekCallback)(unsigned int offset, void *user_data);
-typedef unsigned int  ( * TEncoderTellCallback)(void *user_data);
-
-class WAudioEncoder {
+class WAudioEncoder
+{
 public:
-//==============================================
+	//==============================================
 	// initialize encoder, call before you use encoder
-	virtual int  Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			) = 0;
+	virtual int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback) = 0;
 
-
-//==============================================
-//	uninitialize decoder, call when you don't need encoder anymore
+	//==============================================
+	//	uninitialize decoder, call when you don't need encoder anymore
 
 	virtual int Uninitialize() = 0;
 
@@ -66,21 +62,21 @@ public:
 	//		1	- all OK
 	//		0	- error
 
-// ====================================================================
-// send wave samples for encoding
+	// ====================================================================
+	// send wave samples for encoding
 
-	virtual int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples) = 0;
+	virtual int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples) = 0;
 
-// ======================================================================================
+	// ======================================================================================
 
-//	free class instance
+	//	free class instance
 
-	virtual void  Release() = 0;
+	virtual void Release() = 0;
 
-// ======================================================
+	// ======================================================
 
 	// get error messages from decoder
-	virtual DECODER_ERROR_MESSAGE * GetError() = 0;
+	virtual DECODER_ERROR_MESSAGE* GetError() = 0;
 
 	// PARAMETERS:
 	//		None.
@@ -88,21 +84,29 @@ public:
 	//	RETURN VALUES:
 	//		Pointer to ENCODER_ERROR_MESSAGE structure.
 
-// ======================================================
-
+	// ======================================================
 };
 
-WAudioEncoder * CreateWaveEncoder();
-WAudioEncoder * CreatePCMEncoder();
-WAudioEncoder * CreateFLACEncoder();
-WAudioEncoder * CreateFLACOggEncoder();
-WAudioEncoder * CreateVorbisOggEncoder();
-
-#ifndef LIBZPLAY_PF_VERSION
-WAudioEncoder * CreateMp3Encoder();
-WAudioEncoder * CreateAacEncoder();
+#if defined(LIBZPLAY_OUTPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+WAudioEncoder* CreateAacEncoder();
 #endif
 
-
+#ifdef LIBZPLAY_OUTPUT_FLAC
+WAudioEncoder* CreateFLACEncoder();
+WAudioEncoder* CreateFLACOggEncoder();
 #endif
 
+#ifdef LIBZPLAY_OUTPUT_MP3
+WAudioEncoder* CreateMp3Encoder();
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_VORBIS
+WAudioEncoder* CreateVorbisOggEncoder();
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_WAV
+WAudioEncoder* CreatePCMEncoder();
+WAudioEncoder* CreateWaveEncoder();
+#endif
+
+#endif

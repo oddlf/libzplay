@@ -23,8 +23,7 @@
  * date: 15. April, 2010.
  *
  *
-*/
-
+ */
 
 #ifndef _W_BPM_DETECT2_H_
 #define _W_BPM_DETECT2_H_
@@ -34,36 +33,34 @@
 
 #define BPM_DETECT2_REAL float
 
-
 typedef struct {
-	BPM_DETECT2_REAL *Buffer;
+	BPM_DETECT2_REAL* Buffer;
 	unsigned int BufferLoad;
-	unsigned int *BPMHistoryHit; 
+	unsigned int* BPMHistoryHit;
 	unsigned int BPM;
 } SUBBAND2;
 
-
-
-class WBPMDetect2 : public WBPMDetect {
+class WBPMDetect2 : public WBPMDetect
+{
 public:
 	WBPMDetect2();
 	~WBPMDetect2();
 	int Initialize(unsigned int nSampleRate, unsigned int nChannel);
 	int SetFrequencyBand(unsigned int nLowLimit, unsigned int nHighLimit);
 	unsigned int NumOfSamples();
-	int PutSamples(short *pSamples, unsigned int nSampleNum);
-	unsigned int GetBPM(); 
-	void  Release();   
+	int PutSamples(short* pSamples, unsigned int nSampleNum);
+	unsigned int GetBPM();
+	void Release();
 
 private:
-	WWavelet *wavelet;
+	WWavelet* wavelet;
 
 	unsigned int c_fReady;
-	unsigned int *c_pnOffset;
+	unsigned int* c_pnOffset;
 	// subbands array
-	SUBBAND2 *c_pSubBand;
+	SUBBAND2* c_pSubBand;
 	// array of samples sent to FFT analyse
-	BPM_DETECT2_REAL *c_Samples;
+	BPM_DETECT2_REAL* c_Samples;
 
 	unsigned int c_nChannel;
 	unsigned int c_nSampleRate;
@@ -75,22 +72,11 @@ private:
 	unsigned int c_nOverlapSuccessStart;
 	unsigned int c_nOverlapFailStart;
 
-
 	// number of subbands with detected BPM
 	unsigned int c_nSubbandBPMDetected;
 
 	int AllocateInternalMemory();
 	int FreeInternalMemory();
-
-
-
 };
-
-
-
-
-
-
-
 
 #endif

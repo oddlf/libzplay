@@ -28,21 +28,15 @@
  * Contact Mr.Ooura for details of distributing licenses.
  * http://momonga.t.u-tokyo.ac.jp/~ooura/fft.html
  * ==================================================================================
-*/
-
+ */
 
 #include "wspectrum.h"
 #include "debug.h"
 #include <stdio.h>
 
-
-
-
-
 #define MASK_RED 0
 #define MASK_GREEN 0
 #define MASK_BLUE 0
-
 
 typedef struct {
 	int Resolution;
@@ -56,49 +50,43 @@ const int g_FFT_GRAPH_MIN_HEIGHT = 60;
 
 const unsigned int ResolutionTableSize = 11;
 const RESOLUTION_MARKS ResolutionTableLinear[ResolutionTableSize] = { { 100, 20, 0, 1 }, { 200, 50, 1, 1 },
-																{ 500, 100, 0, 1}, { 1000, 200, 0, 1 },
-																{ 2000, 500, 1, 1 }, { 5000, 1000, 0, 1 },
-																{ 10000, 2000, 0, 1 }, {20000, 5000, 0, 1},
-																{30000, 10000, 0, 1}, { 50000, 10000, 0, 1},
-																{100000, 50000, 0, 1 }};
-
+	{ 500, 100, 0, 1 }, { 1000, 200, 0, 1 },
+	{ 2000, 500, 1, 1 }, { 5000, 1000, 0, 1 },
+	{ 10000, 2000, 0, 1 }, { 20000, 5000, 0, 1 },
+	{ 30000, 10000, 0, 1 }, { 50000, 10000, 0, 1 },
+	{ 100000, 50000, 0, 1 } };
 
 const RESOLUTION_MARKS ResolutionTableLogarithmic[ResolutionTableSize] = { { 100, 20, 0, 1 }, { 200, 50, 1, 1 },
-																{ 500, 100, 0, 1}, { 1000, 100, 0, 1 },
-																{ 2000, 500, 1, 1 }, { 5000, 1000, 0, 1 },
-																{ 10000, 2000, 0, 1 }, {20000, 5000, 0, 1},
-																{30000, 10000, 0, 1}, { 50000, 10000, 0, 1},
-																{100000, 50000, 0, 1 }};
-
+	{ 500, 100, 0, 1 }, { 1000, 100, 0, 1 },
+	{ 2000, 500, 1, 1 }, { 5000, 1000, 0, 1 },
+	{ 10000, 2000, 0, 1 }, { 20000, 5000, 0, 1 },
+	{ 30000, 10000, 0, 1 }, { 50000, 10000, 0, 1 },
+	{ 100000, 50000, 0, 1 } };
 
 const unsigned int DecibelTableSize = 9;
-const RESOLUTION_MARKS DecibelTable[DecibelTableSize] = { { 5, 1, 0 }, 
-															{ 10, 2, 0 }, 
-															{ 12, 2, 0 },
-															{ 15, 5, 0},
-															{ 20, 5, 1 },
-															{ 24, 6, 1 },
-															{ 30, 5, 1 },
-															{ 40, 10, 0 },
-															{ 60, 10, 0 }}; 
+const RESOLUTION_MARKS DecibelTable[DecibelTableSize] = { { 5, 1, 0 },
+	{ 10, 2, 0 },
+	{ 12, 2, 0 },
+	{ 15, 5, 0 },
+	{ 20, 5, 1 },
+	{ 24, 6, 1 },
+	{ 30, 5, 1 },
+	{ 40, 10, 0 },
+	{ 60, 10, 0 } };
 
 // minimal frame size available, in pixel, to enable drawing middle marks in linear distribution
 const unsigned int MinMiddleMarksFrameWidthLinear = 20;
 // minimal frame size available, in pixel, to enable drawing middle marks in logarithmic distribution
 const unsigned int MinMiddleMarksFrameWidthLogarithmic = 25;
 // offset in logarithmic table, larger value specifies smooth curve, this value CAN NOT be 0
-//const unsigned int LogarithmicOffset = 1;
-
+// const unsigned int LogarithmicOffset = 1;
 
 #define LOGARITHMIC_OFFSET_NUM 16
-//																
-const unsigned int LogarithmicOffset[LOGARITHMIC_OFFSET_NUM] = {1, 1, 1, 1, 1, 1, 2, 5, 10, 20, 40, 80, 160, 320, 640, 1280}; 
-
-
+//
+const unsigned int LogarithmicOffset[LOGARITHMIC_OFFSET_NUM] = { 1, 1, 1, 1, 1, 1, 2, 5, 10, 20, 40, 80, 160, 320, 640, 1280 };
 
 // spece between frequency text
 const unsigned int SpaceBetweenText = 6;
-
 
 // color of grid lines
 const COLORREF GridColor = RGB(96, 96, 96);
@@ -111,35 +99,30 @@ const unsigned int LetterHeight = 7;
 const unsigned int MaxDecibel = 120;
 const unsigned int MinDecibelGridSpace = 30;
 
-const unsigned int MinGraphHeight = MinDecibelGridSpace + LetterHeight +  2 * BottomVSpace + 10;
-
-
-
+const unsigned int MinGraphHeight = MinDecibelGridSpace + LetterHeight + 2 * BottomVSpace + 10;
 
 // create bitmap from data in memory
-HBITMAP CreateBitmapFromMemory(HDC hdc,								// handle to device context, can be NULL
-									int nWidth,							// Specifies the width of the bitmap, in pixels.
-									int nHeight,						// Specifies the height of the bitmap, in pixels.
-									unsigned int nBitPerPixel,			// Specifies the number of bits per pixel. This value must be 1, 4, 8, 16, 24, or 32.
-									RGBQUAD *rgbColorTable,				// pSpecifies an array of RGBQUAD or doubleword data types that define the colors in the bitmap.
-									unsigned int nColorUsed,			// Specifies the number of color indices in the color table ( number of elements in rgbColorTable array)
-									VOID *pBitmapBitsArray,				// pointer to array containing bitmap data
-									unsigned int nSizeOfBitmapArray);	// size of pBitmapBitsArray array in bytes.
+HBITMAP CreateBitmapFromMemory(HDC hdc, // handle to device context, can be NULL
+	int nWidth,							// Specifies the width of the bitmap, in pixels.
+	int nHeight,						// Specifies the height of the bitmap, in pixels.
+	unsigned int nBitPerPixel,			// Specifies the number of bits per pixel. This value must be 1, 4, 8, 16, 24, or 32.
+	RGBQUAD* rgbColorTable,				// pSpecifies an array of RGBQUAD or doubleword data types that define the colors in the bitmap.
+	unsigned int nColorUsed,			// Specifies the number of color indices in the color table ( number of elements in rgbColorTable array)
+	VOID* pBitmapBitsArray,				// pointer to array containing bitmap data
+	unsigned int nSizeOfBitmapArray);	// size of pBitmapBitsArray array in bytes.
 
 /* color table, use this with CreateBitmapFromMemory function */
 
 RGBQUAD pColorTable[] = {
-	{0x00, 0x00, 0x00, 0x00},
-	{0xFF, 0xFF, 0xFF, 0xFF}
+	{ 0x00, 0x00, 0x00, 0x00 },
+	{ 0xFF, 0xFF, 0xFF, 0xFF }
 };
-
 
 RGBQUAD pColorTableInverse[] = {
-	{0xFF, 0xFF, 0xFF, 0xFF},
-	{0x00, 0x00, 0x00, 0x00}
-	
-};
+	{ 0xFF, 0xFF, 0xFF, 0xFF },
+	{ 0x00, 0x00, 0x00, 0x00 }
 
+};
 
 /* bitmap bits, use this with CreateBitmapFromMemory function */
 unsigned char bitMap[] = {
@@ -165,276 +148,271 @@ unsigned char bitMap[] = {
 	0x00, 0x00, 0x88, 0x40, 0x00, 0x00
 };
 
-
 #define BITMAP_WIDTH 15
 #define BITMAP_HEIGHT 49
 #define BITMAP_BIT_PER_PIXEL 1
 #define BITMAP_COLOR_USED 2
 #define BITMAP_ARRAY_SIZE 196
 
-
-
 /* color table, use this with CreateBitmapFromMemory function */
 RGBQUAD pColorTable1[] = {
-	{0x00, 0x00, 0x00, 0x00},
-	{0x0A, 0x11, 0x0C, 0x00},
-	{0x0E, 0x1B, 0x14, 0x00},
-	{0x1B, 0x1C, 0x1B, 0x00},
-	{0x15, 0x24, 0x1C, 0x00},
-	{0x18, 0x2B, 0x20, 0x00},
-	{0x18, 0x3A, 0x2A, 0x00},
-	{0x23, 0x23, 0x23, 0x00},
-	{0x21, 0x36, 0x29, 0x00},
-	{0x3A, 0x3A, 0x3A, 0x00},
-	{0x4F, 0x3C, 0x3C, 0x00},
-	{0x6E, 0x39, 0x39, 0x00},
-	{0x1F, 0x42, 0x31, 0x00},
-	{0x21, 0x41, 0x2F, 0x00},
-	{0x24, 0x45, 0x32, 0x00},
-	{0x27, 0x52, 0x3C, 0x00},
-	{0x1B, 0x3D, 0x4D, 0x00},
-	{0x1A, 0x3F, 0x50, 0x00},
-	{0x03, 0x03, 0x6B, 0x00},
-	{0x1C, 0x44, 0x58, 0x00},
-	{0x3E, 0x4B, 0x4D, 0x00},
-	{0x2B, 0x5B, 0x44, 0x00},
-	{0x34, 0x5B, 0x46, 0x00},
-	{0x25, 0x45, 0x54, 0x00},
-	{0x35, 0x4D, 0x59, 0x00},
-	{0x3A, 0x52, 0x5E, 0x00},
-	{0x2B, 0x63, 0x49, 0x00},
-	{0x38, 0x65, 0x4D, 0x00},
-	{0x2C, 0x6E, 0x51, 0x00},
-	{0x3B, 0x69, 0x50, 0x00},
-	{0x2C, 0x71, 0x53, 0x00},
-	{0x38, 0x76, 0x58, 0x00},
-	{0x1F, 0x4B, 0x60, 0x00},
-	{0x22, 0x4D, 0x61, 0x00},
-	{0x24, 0x52, 0x69, 0x00},
-	{0x3B, 0x56, 0x62, 0x00},
-	{0x26, 0x5B, 0x75, 0x00},
-	{0x29, 0x61, 0x7D, 0x00},
-	{0x47, 0x47, 0x47, 0x00},
-	{0x56, 0x4A, 0x4A, 0x00},
-	{0x42, 0x5F, 0x4B, 0x00},
-	{0x47, 0x54, 0x5A, 0x00},
-	{0x57, 0x57, 0x57, 0x00},
-	{0x73, 0x48, 0x48, 0x00},
-	{0x46, 0x6E, 0x58, 0x00},
-	{0x43, 0x79, 0x5A, 0x00},
-	{0x55, 0x71, 0x5E, 0x00},
-	{0x48, 0x4E, 0x60, 0x00},
-	{0x45, 0x59, 0x63, 0x00},
-	{0x4F, 0x60, 0x69, 0x00},
-	{0x58, 0x66, 0x6D, 0x00},
-	{0x49, 0x7A, 0x60, 0x00},
-	{0x51, 0x75, 0x60, 0x00},
-	{0x41, 0x66, 0x77, 0x00},
-	{0x57, 0x64, 0x71, 0x00},
-	{0x52, 0x70, 0x7F, 0x00},
-	{0x69, 0x69, 0x69, 0x00},
-	{0x77, 0x6B, 0x6B, 0x00},
-	{0x66, 0x6E, 0x71, 0x00},
-	{0x6B, 0x72, 0x75, 0x00},
-	{0x76, 0x77, 0x77, 0x00},
-	{0x90, 0x4D, 0x4D, 0x00},
-	{0xAA, 0x59, 0x59, 0x00},
-	{0x89, 0x65, 0x65, 0x00},
-	{0x85, 0x70, 0x70, 0x00},
-	{0x97, 0x75, 0x75, 0x00},
-	{0xB3, 0x6E, 0x6E, 0x00},
-	{0xC8, 0x71, 0x71, 0x00},
-	{0x3D, 0x88, 0x63, 0x00},
-	{0x45, 0x82, 0x5E, 0x00},
-	{0x4A, 0x84, 0x64, 0x00},
-	{0x51, 0x8A, 0x69, 0x00},
-	{0x47, 0x94, 0x6C, 0x00},
-	{0x52, 0x92, 0x6C, 0x00},
-	{0x59, 0x8F, 0x71, 0x00},
-	{0x45, 0x9F, 0x76, 0x00},
-	{0x58, 0x97, 0x73, 0x00},
-	{0x63, 0x88, 0x6D, 0x00},
-	{0x6C, 0x83, 0x75, 0x00},
-	{0x75, 0x86, 0x7D, 0x00},
-	{0x64, 0x96, 0x79, 0x00},
-	{0x44, 0xAC, 0x7F, 0x00},
-	{0x5A, 0xA4, 0x79, 0x00},
-	{0x63, 0xA2, 0x7C, 0x00},
-	{0x18, 0x67, 0x8F, 0x00},
-	{0x2C, 0x69, 0x86, 0x00},
-	{0x2F, 0x70, 0x8F, 0x00},
-	{0x34, 0x70, 0x8C, 0x00},
-	{0x3A, 0x6D, 0x99, 0x00},
-	{0x2F, 0x70, 0x90, 0x00},
-	{0x31, 0x75, 0x96, 0x00},
-	{0x12, 0x74, 0xA6, 0x00},
-	{0x35, 0x7D, 0xA0, 0x00},
-	{0x46, 0x66, 0x8C, 0x00},
-	{0x49, 0x77, 0x8D, 0x00},
-	{0x5A, 0x78, 0x86, 0x00},
-	{0x52, 0x7D, 0x92, 0x00},
-	{0x65, 0x7B, 0x86, 0x00},
-	{0x79, 0x7E, 0x80, 0x00},
-	{0x00, 0x00, 0xFF, 0x00},
-	{0x39, 0x85, 0xAA, 0x00},
-	{0x3D, 0x8C, 0xB2, 0x00},
-	{0x3E, 0x92, 0xBB, 0x00},
-	{0x4E, 0x81, 0x99, 0x00},
-	{0x58, 0x85, 0x98, 0x00},
-	{0x66, 0x80, 0x8C, 0x00},
-	{0x7E, 0x81, 0x80, 0x00},
-	{0x68, 0x9E, 0x81, 0x00},
-	{0x77, 0x9B, 0x85, 0x00},
-	{0x65, 0x86, 0x95, 0x00},
-	{0x5E, 0xAD, 0x81, 0x00},
-	{0x46, 0xB8, 0x87, 0x00},
-	{0x5A, 0xBA, 0x88, 0x00},
-	{0x65, 0xA7, 0x82, 0x00},
-	{0x76, 0xA7, 0x85, 0x00},
-	{0x69, 0xB6, 0x89, 0x00},
-	{0x74, 0xB5, 0x8D, 0x00},
-	{0x7F, 0xAB, 0x93, 0x00},
-	{0x70, 0xBB, 0x91, 0x00},
-	{0x4A, 0x85, 0xA2, 0x00},
-	{0x5F, 0x95, 0xAE, 0x00},
-	{0x40, 0x8E, 0xB4, 0x00},
-	{0x43, 0x92, 0xB9, 0x00},
-	{0x58, 0x99, 0xB9, 0x00},
-	{0x6A, 0x93, 0xA7, 0x00},
-	{0x79, 0x94, 0xA1, 0x00},
-	{0x60, 0x9D, 0xBC, 0x00},
-	{0x6D, 0xA0, 0xBA, 0x00},
-	{0x79, 0xA7, 0xBD, 0x00},
-	{0x52, 0xC1, 0x8A, 0x00},
-	{0x5E, 0xC0, 0x94, 0x00},
-	{0x4F, 0xD8, 0x9E, 0x00},
-	{0x6B, 0xC0, 0x8F, 0x00},
-	{0x67, 0xC5, 0x97, 0x00},
-	{0x75, 0xC8, 0x98, 0x00},
-	{0x6A, 0xD5, 0x9E, 0x00},
-	{0x76, 0xD1, 0x9D, 0x00},
-	{0x56, 0xD8, 0xA0, 0x00},
-	{0x74, 0xCD, 0xA1, 0x00},
-	{0x60, 0xDB, 0xA1, 0x00},
-	{0x79, 0xDA, 0xA4, 0x00},
-	{0x59, 0xE2, 0xA6, 0x00},
-	{0x64, 0xE7, 0xA8, 0x00},
-	{0x7A, 0xE4, 0xAA, 0x00},
-	{0x6D, 0xF1, 0xAF, 0x00},
-	{0x71, 0xEF, 0xB0, 0x00},
-	{0x6E, 0xF5, 0xB3, 0x00},
-	{0x7A, 0xFA, 0xB7, 0x00},
-	{0x2C, 0x8F, 0xD0, 0x00},
-	{0x38, 0x9E, 0xFF, 0x00},
-	{0x45, 0x9B, 0xC4, 0x00},
-	{0x5B, 0x9F, 0xC0, 0x00},
-	{0x65, 0x96, 0xD6, 0x00},
-	{0x4B, 0xA1, 0xCA, 0x00},
-	{0x53, 0xA6, 0xCD, 0x00},
-	{0x47, 0xA6, 0xD4, 0x00},
-	{0x54, 0xAB, 0xD5, 0x00},
-	{0x4B, 0xB1, 0xDF, 0x00},
-	{0x5B, 0xB3, 0xDD, 0x00},
-	{0x6D, 0xAA, 0xC8, 0x00},
-	{0x72, 0xAF, 0xCD, 0x00},
-	{0x6F, 0xBB, 0xCC, 0x00},
-	{0x7B, 0xB1, 0xCC, 0x00},
-	{0x4D, 0xB2, 0xE3, 0x00},
-	{0x58, 0xB7, 0xE5, 0x00},
-	{0x4D, 0xB3, 0xF9, 0x00},
-	{0x58, 0xBF, 0xF1, 0x00},
-	{0x63, 0xBA, 0xE5, 0x00},
-	{0x71, 0xBE, 0xE4, 0x00},
-	{0x5F, 0xC5, 0xD9, 0x00},
-	{0x78, 0xC3, 0xD2, 0x00},
-	{0x5C, 0xC3, 0xF6, 0x00},
-	{0x67, 0xC2, 0xED, 0x00},
-	{0x7C, 0xC9, 0xEE, 0x00},
-	{0x6B, 0xC7, 0xF4, 0x00},
-	{0x74, 0xCD, 0xF9, 0x00},
-	{0x6B, 0xD2, 0xFF, 0x00},
-	{0x78, 0xDA, 0xFE, 0x00},
-	{0x7C, 0xE3, 0xFF, 0x00},
-	{0x87, 0x87, 0x87, 0x00},
-	{0x87, 0x91, 0x8A, 0x00},
-	{0x87, 0x8F, 0x93, 0x00},
-	{0x8F, 0x95, 0x99, 0x00},
-	{0x97, 0x97, 0x97, 0x00},
-	{0xB4, 0x83, 0x83, 0x00},
-	{0x87, 0xA7, 0x91, 0x00},
-	{0x93, 0xA7, 0x9A, 0x00},
-	{0x8B, 0xB3, 0x9B, 0x00},
-	{0x85, 0x9A, 0xA5, 0x00},
-	{0x98, 0xA7, 0xA5, 0x00},
-	{0x98, 0xB5, 0xA4, 0x00},
-	{0x98, 0xB0, 0xBB, 0x00},
-	{0xA7, 0xA7, 0xA7, 0x00},
-	{0xBC, 0xA9, 0xA9, 0x00},
-	{0xA4, 0xB5, 0xAB, 0x00},
-	{0xAB, 0xAE, 0xB0, 0x00},
-	{0xB7, 0xB7, 0xB7, 0x00},
-	{0xD1, 0x8A, 0x8A, 0x00},
-	{0xF2, 0x93, 0x93, 0x00},
-	{0xC9, 0xB0, 0xB0, 0x00},
-	{0xF7, 0xA9, 0xA9, 0x00},
-	{0x85, 0xC4, 0x98, 0x00},
-	{0x88, 0xDA, 0xA9, 0x00},
-	{0x90, 0xD6, 0xA7, 0x00},
-	{0xAC, 0xC6, 0xB8, 0x00},
-	{0x83, 0xE3, 0xAA, 0x00},
-	{0x85, 0xE9, 0xB3, 0x00},
-	{0x8A, 0xF5, 0xB8, 0x00},
-	{0x91, 0xF8, 0xBC, 0x00},
-	{0x89, 0xAF, 0xC2, 0x00},
-	{0x8C, 0xB1, 0xC2, 0x00},
-	{0x99, 0xB8, 0xC7, 0x00},
-	{0x94, 0xBD, 0xD0, 0x00},
-	{0xB6, 0xBD, 0xC1, 0x00},
-	{0x97, 0xC1, 0xCA, 0x00},
-	{0xB8, 0xC8, 0xC6, 0x00},
-	{0xA9, 0xC9, 0xD8, 0x00},
-	{0x8A, 0xFE, 0xC3, 0x00},
-	{0x96, 0xFE, 0xC8, 0x00},
-	{0xA8, 0xFF, 0xCE, 0x00},
-	{0xA5, 0xFF, 0xD7, 0x00},
-	{0xB0, 0xFF, 0xDC, 0x00},
-	{0x88, 0xCA, 0xE9, 0x00},
-	{0x87, 0xD9, 0xE6, 0x00},
-	{0x99, 0xD0, 0xEB, 0x00},
-	{0x83, 0xCE, 0xF2, 0x00},
-	{0x89, 0xD3, 0xF6, 0x00},
-	{0x9E, 0xD5, 0xF0, 0x00},
-	{0xAB, 0xD4, 0xE8, 0x00},
-	{0xA9, 0xD9, 0xF0, 0x00},
-	{0x87, 0xE8, 0xFE, 0x00},
-	{0x8E, 0xF5, 0xFF, 0x00},
-	{0x95, 0xF8, 0xFE, 0x00},
-	{0xB4, 0xFF, 0xE2, 0x00},
-	{0xB8, 0xE4, 0xF9, 0x00},
-	{0xA7, 0xFF, 0xFF, 0x00},
-	{0xB7, 0xFF, 0xFF, 0x00},
-	{0xC6, 0xC6, 0xC6, 0x00},
-	{0xD8, 0xCC, 0xCC, 0x00},
-	{0xC5, 0xD6, 0xCC, 0x00},
-	{0xC6, 0xCE, 0xD2, 0x00},
-	{0xCB, 0xD5, 0xDA, 0x00},
-	{0xD8, 0xD8, 0xD8, 0x00},
-	{0xF4, 0xD2, 0xD2, 0x00},
-	{0xD4, 0xE2, 0xDA, 0x00},
-	{0xD3, 0xDD, 0xE3, 0x00},
-	{0xD9, 0xE4, 0xE4, 0x00},
-	{0xC4, 0xFF, 0xEB, 0x00},
-	{0xC8, 0xEA, 0xFA, 0x00},
-	{0xD8, 0xEC, 0xF6, 0x00},
-	{0xE8, 0xE8, 0xE8, 0x00},
-	{0xF7, 0xE8, 0xE8, 0x00},
-	{0xE7, 0xED, 0xF0, 0x00},
-	{0xE7, 0xF3, 0xF9, 0x00},
-	{0xFD, 0xFD, 0xFD, 0x00},
-	{0x00, 0x00, 0x00, 0x00}
+	{ 0x00, 0x00, 0x00, 0x00 },
+	{ 0x0A, 0x11, 0x0C, 0x00 },
+	{ 0x0E, 0x1B, 0x14, 0x00 },
+	{ 0x1B, 0x1C, 0x1B, 0x00 },
+	{ 0x15, 0x24, 0x1C, 0x00 },
+	{ 0x18, 0x2B, 0x20, 0x00 },
+	{ 0x18, 0x3A, 0x2A, 0x00 },
+	{ 0x23, 0x23, 0x23, 0x00 },
+	{ 0x21, 0x36, 0x29, 0x00 },
+	{ 0x3A, 0x3A, 0x3A, 0x00 },
+	{ 0x4F, 0x3C, 0x3C, 0x00 },
+	{ 0x6E, 0x39, 0x39, 0x00 },
+	{ 0x1F, 0x42, 0x31, 0x00 },
+	{ 0x21, 0x41, 0x2F, 0x00 },
+	{ 0x24, 0x45, 0x32, 0x00 },
+	{ 0x27, 0x52, 0x3C, 0x00 },
+	{ 0x1B, 0x3D, 0x4D, 0x00 },
+	{ 0x1A, 0x3F, 0x50, 0x00 },
+	{ 0x03, 0x03, 0x6B, 0x00 },
+	{ 0x1C, 0x44, 0x58, 0x00 },
+	{ 0x3E, 0x4B, 0x4D, 0x00 },
+	{ 0x2B, 0x5B, 0x44, 0x00 },
+	{ 0x34, 0x5B, 0x46, 0x00 },
+	{ 0x25, 0x45, 0x54, 0x00 },
+	{ 0x35, 0x4D, 0x59, 0x00 },
+	{ 0x3A, 0x52, 0x5E, 0x00 },
+	{ 0x2B, 0x63, 0x49, 0x00 },
+	{ 0x38, 0x65, 0x4D, 0x00 },
+	{ 0x2C, 0x6E, 0x51, 0x00 },
+	{ 0x3B, 0x69, 0x50, 0x00 },
+	{ 0x2C, 0x71, 0x53, 0x00 },
+	{ 0x38, 0x76, 0x58, 0x00 },
+	{ 0x1F, 0x4B, 0x60, 0x00 },
+	{ 0x22, 0x4D, 0x61, 0x00 },
+	{ 0x24, 0x52, 0x69, 0x00 },
+	{ 0x3B, 0x56, 0x62, 0x00 },
+	{ 0x26, 0x5B, 0x75, 0x00 },
+	{ 0x29, 0x61, 0x7D, 0x00 },
+	{ 0x47, 0x47, 0x47, 0x00 },
+	{ 0x56, 0x4A, 0x4A, 0x00 },
+	{ 0x42, 0x5F, 0x4B, 0x00 },
+	{ 0x47, 0x54, 0x5A, 0x00 },
+	{ 0x57, 0x57, 0x57, 0x00 },
+	{ 0x73, 0x48, 0x48, 0x00 },
+	{ 0x46, 0x6E, 0x58, 0x00 },
+	{ 0x43, 0x79, 0x5A, 0x00 },
+	{ 0x55, 0x71, 0x5E, 0x00 },
+	{ 0x48, 0x4E, 0x60, 0x00 },
+	{ 0x45, 0x59, 0x63, 0x00 },
+	{ 0x4F, 0x60, 0x69, 0x00 },
+	{ 0x58, 0x66, 0x6D, 0x00 },
+	{ 0x49, 0x7A, 0x60, 0x00 },
+	{ 0x51, 0x75, 0x60, 0x00 },
+	{ 0x41, 0x66, 0x77, 0x00 },
+	{ 0x57, 0x64, 0x71, 0x00 },
+	{ 0x52, 0x70, 0x7F, 0x00 },
+	{ 0x69, 0x69, 0x69, 0x00 },
+	{ 0x77, 0x6B, 0x6B, 0x00 },
+	{ 0x66, 0x6E, 0x71, 0x00 },
+	{ 0x6B, 0x72, 0x75, 0x00 },
+	{ 0x76, 0x77, 0x77, 0x00 },
+	{ 0x90, 0x4D, 0x4D, 0x00 },
+	{ 0xAA, 0x59, 0x59, 0x00 },
+	{ 0x89, 0x65, 0x65, 0x00 },
+	{ 0x85, 0x70, 0x70, 0x00 },
+	{ 0x97, 0x75, 0x75, 0x00 },
+	{ 0xB3, 0x6E, 0x6E, 0x00 },
+	{ 0xC8, 0x71, 0x71, 0x00 },
+	{ 0x3D, 0x88, 0x63, 0x00 },
+	{ 0x45, 0x82, 0x5E, 0x00 },
+	{ 0x4A, 0x84, 0x64, 0x00 },
+	{ 0x51, 0x8A, 0x69, 0x00 },
+	{ 0x47, 0x94, 0x6C, 0x00 },
+	{ 0x52, 0x92, 0x6C, 0x00 },
+	{ 0x59, 0x8F, 0x71, 0x00 },
+	{ 0x45, 0x9F, 0x76, 0x00 },
+	{ 0x58, 0x97, 0x73, 0x00 },
+	{ 0x63, 0x88, 0x6D, 0x00 },
+	{ 0x6C, 0x83, 0x75, 0x00 },
+	{ 0x75, 0x86, 0x7D, 0x00 },
+	{ 0x64, 0x96, 0x79, 0x00 },
+	{ 0x44, 0xAC, 0x7F, 0x00 },
+	{ 0x5A, 0xA4, 0x79, 0x00 },
+	{ 0x63, 0xA2, 0x7C, 0x00 },
+	{ 0x18, 0x67, 0x8F, 0x00 },
+	{ 0x2C, 0x69, 0x86, 0x00 },
+	{ 0x2F, 0x70, 0x8F, 0x00 },
+	{ 0x34, 0x70, 0x8C, 0x00 },
+	{ 0x3A, 0x6D, 0x99, 0x00 },
+	{ 0x2F, 0x70, 0x90, 0x00 },
+	{ 0x31, 0x75, 0x96, 0x00 },
+	{ 0x12, 0x74, 0xA6, 0x00 },
+	{ 0x35, 0x7D, 0xA0, 0x00 },
+	{ 0x46, 0x66, 0x8C, 0x00 },
+	{ 0x49, 0x77, 0x8D, 0x00 },
+	{ 0x5A, 0x78, 0x86, 0x00 },
+	{ 0x52, 0x7D, 0x92, 0x00 },
+	{ 0x65, 0x7B, 0x86, 0x00 },
+	{ 0x79, 0x7E, 0x80, 0x00 },
+	{ 0x00, 0x00, 0xFF, 0x00 },
+	{ 0x39, 0x85, 0xAA, 0x00 },
+	{ 0x3D, 0x8C, 0xB2, 0x00 },
+	{ 0x3E, 0x92, 0xBB, 0x00 },
+	{ 0x4E, 0x81, 0x99, 0x00 },
+	{ 0x58, 0x85, 0x98, 0x00 },
+	{ 0x66, 0x80, 0x8C, 0x00 },
+	{ 0x7E, 0x81, 0x80, 0x00 },
+	{ 0x68, 0x9E, 0x81, 0x00 },
+	{ 0x77, 0x9B, 0x85, 0x00 },
+	{ 0x65, 0x86, 0x95, 0x00 },
+	{ 0x5E, 0xAD, 0x81, 0x00 },
+	{ 0x46, 0xB8, 0x87, 0x00 },
+	{ 0x5A, 0xBA, 0x88, 0x00 },
+	{ 0x65, 0xA7, 0x82, 0x00 },
+	{ 0x76, 0xA7, 0x85, 0x00 },
+	{ 0x69, 0xB6, 0x89, 0x00 },
+	{ 0x74, 0xB5, 0x8D, 0x00 },
+	{ 0x7F, 0xAB, 0x93, 0x00 },
+	{ 0x70, 0xBB, 0x91, 0x00 },
+	{ 0x4A, 0x85, 0xA2, 0x00 },
+	{ 0x5F, 0x95, 0xAE, 0x00 },
+	{ 0x40, 0x8E, 0xB4, 0x00 },
+	{ 0x43, 0x92, 0xB9, 0x00 },
+	{ 0x58, 0x99, 0xB9, 0x00 },
+	{ 0x6A, 0x93, 0xA7, 0x00 },
+	{ 0x79, 0x94, 0xA1, 0x00 },
+	{ 0x60, 0x9D, 0xBC, 0x00 },
+	{ 0x6D, 0xA0, 0xBA, 0x00 },
+	{ 0x79, 0xA7, 0xBD, 0x00 },
+	{ 0x52, 0xC1, 0x8A, 0x00 },
+	{ 0x5E, 0xC0, 0x94, 0x00 },
+	{ 0x4F, 0xD8, 0x9E, 0x00 },
+	{ 0x6B, 0xC0, 0x8F, 0x00 },
+	{ 0x67, 0xC5, 0x97, 0x00 },
+	{ 0x75, 0xC8, 0x98, 0x00 },
+	{ 0x6A, 0xD5, 0x9E, 0x00 },
+	{ 0x76, 0xD1, 0x9D, 0x00 },
+	{ 0x56, 0xD8, 0xA0, 0x00 },
+	{ 0x74, 0xCD, 0xA1, 0x00 },
+	{ 0x60, 0xDB, 0xA1, 0x00 },
+	{ 0x79, 0xDA, 0xA4, 0x00 },
+	{ 0x59, 0xE2, 0xA6, 0x00 },
+	{ 0x64, 0xE7, 0xA8, 0x00 },
+	{ 0x7A, 0xE4, 0xAA, 0x00 },
+	{ 0x6D, 0xF1, 0xAF, 0x00 },
+	{ 0x71, 0xEF, 0xB0, 0x00 },
+	{ 0x6E, 0xF5, 0xB3, 0x00 },
+	{ 0x7A, 0xFA, 0xB7, 0x00 },
+	{ 0x2C, 0x8F, 0xD0, 0x00 },
+	{ 0x38, 0x9E, 0xFF, 0x00 },
+	{ 0x45, 0x9B, 0xC4, 0x00 },
+	{ 0x5B, 0x9F, 0xC0, 0x00 },
+	{ 0x65, 0x96, 0xD6, 0x00 },
+	{ 0x4B, 0xA1, 0xCA, 0x00 },
+	{ 0x53, 0xA6, 0xCD, 0x00 },
+	{ 0x47, 0xA6, 0xD4, 0x00 },
+	{ 0x54, 0xAB, 0xD5, 0x00 },
+	{ 0x4B, 0xB1, 0xDF, 0x00 },
+	{ 0x5B, 0xB3, 0xDD, 0x00 },
+	{ 0x6D, 0xAA, 0xC8, 0x00 },
+	{ 0x72, 0xAF, 0xCD, 0x00 },
+	{ 0x6F, 0xBB, 0xCC, 0x00 },
+	{ 0x7B, 0xB1, 0xCC, 0x00 },
+	{ 0x4D, 0xB2, 0xE3, 0x00 },
+	{ 0x58, 0xB7, 0xE5, 0x00 },
+	{ 0x4D, 0xB3, 0xF9, 0x00 },
+	{ 0x58, 0xBF, 0xF1, 0x00 },
+	{ 0x63, 0xBA, 0xE5, 0x00 },
+	{ 0x71, 0xBE, 0xE4, 0x00 },
+	{ 0x5F, 0xC5, 0xD9, 0x00 },
+	{ 0x78, 0xC3, 0xD2, 0x00 },
+	{ 0x5C, 0xC3, 0xF6, 0x00 },
+	{ 0x67, 0xC2, 0xED, 0x00 },
+	{ 0x7C, 0xC9, 0xEE, 0x00 },
+	{ 0x6B, 0xC7, 0xF4, 0x00 },
+	{ 0x74, 0xCD, 0xF9, 0x00 },
+	{ 0x6B, 0xD2, 0xFF, 0x00 },
+	{ 0x78, 0xDA, 0xFE, 0x00 },
+	{ 0x7C, 0xE3, 0xFF, 0x00 },
+	{ 0x87, 0x87, 0x87, 0x00 },
+	{ 0x87, 0x91, 0x8A, 0x00 },
+	{ 0x87, 0x8F, 0x93, 0x00 },
+	{ 0x8F, 0x95, 0x99, 0x00 },
+	{ 0x97, 0x97, 0x97, 0x00 },
+	{ 0xB4, 0x83, 0x83, 0x00 },
+	{ 0x87, 0xA7, 0x91, 0x00 },
+	{ 0x93, 0xA7, 0x9A, 0x00 },
+	{ 0x8B, 0xB3, 0x9B, 0x00 },
+	{ 0x85, 0x9A, 0xA5, 0x00 },
+	{ 0x98, 0xA7, 0xA5, 0x00 },
+	{ 0x98, 0xB5, 0xA4, 0x00 },
+	{ 0x98, 0xB0, 0xBB, 0x00 },
+	{ 0xA7, 0xA7, 0xA7, 0x00 },
+	{ 0xBC, 0xA9, 0xA9, 0x00 },
+	{ 0xA4, 0xB5, 0xAB, 0x00 },
+	{ 0xAB, 0xAE, 0xB0, 0x00 },
+	{ 0xB7, 0xB7, 0xB7, 0x00 },
+	{ 0xD1, 0x8A, 0x8A, 0x00 },
+	{ 0xF2, 0x93, 0x93, 0x00 },
+	{ 0xC9, 0xB0, 0xB0, 0x00 },
+	{ 0xF7, 0xA9, 0xA9, 0x00 },
+	{ 0x85, 0xC4, 0x98, 0x00 },
+	{ 0x88, 0xDA, 0xA9, 0x00 },
+	{ 0x90, 0xD6, 0xA7, 0x00 },
+	{ 0xAC, 0xC6, 0xB8, 0x00 },
+	{ 0x83, 0xE3, 0xAA, 0x00 },
+	{ 0x85, 0xE9, 0xB3, 0x00 },
+	{ 0x8A, 0xF5, 0xB8, 0x00 },
+	{ 0x91, 0xF8, 0xBC, 0x00 },
+	{ 0x89, 0xAF, 0xC2, 0x00 },
+	{ 0x8C, 0xB1, 0xC2, 0x00 },
+	{ 0x99, 0xB8, 0xC7, 0x00 },
+	{ 0x94, 0xBD, 0xD0, 0x00 },
+	{ 0xB6, 0xBD, 0xC1, 0x00 },
+	{ 0x97, 0xC1, 0xCA, 0x00 },
+	{ 0xB8, 0xC8, 0xC6, 0x00 },
+	{ 0xA9, 0xC9, 0xD8, 0x00 },
+	{ 0x8A, 0xFE, 0xC3, 0x00 },
+	{ 0x96, 0xFE, 0xC8, 0x00 },
+	{ 0xA8, 0xFF, 0xCE, 0x00 },
+	{ 0xA5, 0xFF, 0xD7, 0x00 },
+	{ 0xB0, 0xFF, 0xDC, 0x00 },
+	{ 0x88, 0xCA, 0xE9, 0x00 },
+	{ 0x87, 0xD9, 0xE6, 0x00 },
+	{ 0x99, 0xD0, 0xEB, 0x00 },
+	{ 0x83, 0xCE, 0xF2, 0x00 },
+	{ 0x89, 0xD3, 0xF6, 0x00 },
+	{ 0x9E, 0xD5, 0xF0, 0x00 },
+	{ 0xAB, 0xD4, 0xE8, 0x00 },
+	{ 0xA9, 0xD9, 0xF0, 0x00 },
+	{ 0x87, 0xE8, 0xFE, 0x00 },
+	{ 0x8E, 0xF5, 0xFF, 0x00 },
+	{ 0x95, 0xF8, 0xFE, 0x00 },
+	{ 0xB4, 0xFF, 0xE2, 0x00 },
+	{ 0xB8, 0xE4, 0xF9, 0x00 },
+	{ 0xA7, 0xFF, 0xFF, 0x00 },
+	{ 0xB7, 0xFF, 0xFF, 0x00 },
+	{ 0xC6, 0xC6, 0xC6, 0x00 },
+	{ 0xD8, 0xCC, 0xCC, 0x00 },
+	{ 0xC5, 0xD6, 0xCC, 0x00 },
+	{ 0xC6, 0xCE, 0xD2, 0x00 },
+	{ 0xCB, 0xD5, 0xDA, 0x00 },
+	{ 0xD8, 0xD8, 0xD8, 0x00 },
+	{ 0xF4, 0xD2, 0xD2, 0x00 },
+	{ 0xD4, 0xE2, 0xDA, 0x00 },
+	{ 0xD3, 0xDD, 0xE3, 0x00 },
+	{ 0xD9, 0xE4, 0xE4, 0x00 },
+	{ 0xC4, 0xFF, 0xEB, 0x00 },
+	{ 0xC8, 0xEA, 0xFA, 0x00 },
+	{ 0xD8, 0xEC, 0xF6, 0x00 },
+	{ 0xE8, 0xE8, 0xE8, 0x00 },
+	{ 0xF7, 0xE8, 0xE8, 0x00 },
+	{ 0xE7, 0xED, 0xF0, 0x00 },
+	{ 0xE7, 0xF3, 0xF9, 0x00 },
+	{ 0xFD, 0xFD, 0xFD, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x00 }
 };
-
-
 
 /* bitmap bits, use this with CreateBitmapFromMemory function */
 unsigned char bitMap1[] = {
@@ -1241,14 +1219,11 @@ unsigned char bitMap1[] = {
 	0xFE, 0x00, 0x00, 0x00
 };
 
-
 #define BITMAP_WIDTH1 89
 #define BITMAP_HEIGHT1 87
 #define BITMAP_BIT_PER_PIXEL1 8
 #define BITMAP_COLOR_USED1 256
 #define BITMAP_ARRAY_SIZE1 8004
-
-
 
 typedef struct {
 	BYTE rgbRed;
@@ -1296,13 +1271,12 @@ RGB_TABLE g_spectrum_map[120] = {
 	0xF7, 0xE6, 0xFE, 0xF7, 0xEA, 0xFE, 0xF8, 0xED, 0xFE, 0xF8
 };
 
-
 // ========================================================================================
 // if there is more harmonics in FFT than screen width in pixel, then we have multiple
 // points with the same X coordinate. We need to fix this and to combine multiple points
 // with same X coordinate into one point.
 
-void FixPoints(POINT *ptLeft, POINT *ptRight, unsigned int *pNumOfPoints);
+void FixPoints(POINT* ptLeft, POINT* ptRight, unsigned int* pNumOfPoints);
 //
 //	PARAMETERS:
 //		ptLeft
@@ -1310,10 +1284,10 @@ void FixPoints(POINT *ptLeft, POINT *ptRight, unsigned int *pNumOfPoints);
 //
 //		ptRight
 //			Right channel array
-//	
+//
 //		pNumOfPoints
 //			Number of points in array. This parameter also returns number of
-//			reduced points.	
+//			reduced points.
 
 // ========================================================================================
 
@@ -1321,11 +1295,10 @@ WSpectrum::WSpectrum()
 {
 	c_fInitalizeY = 1;
 
-
 	c_spectrum_pos = 0;
 	c_clearFFTDisplay = 1;
 
-// colors
+	// colors
 	cr1 = RGB(65, 71, 81);
 	cr2 = RGB(0, 0, 0);
 	cr3 = RGB(96, 96, 96);
@@ -1333,17 +1306,16 @@ WSpectrum::WSpectrum()
 	cr5 = RGB(48, 48, 48);
 	cr6 = RGB(255, 255, 255);
 	cr7 = RGB(255, 255, 255);
-	cr8 = RGB(48,192,255);
-	cr9 = RGB(255,48,168);
-	cr10 = RGB(116,64,125);
+	cr8 = RGB(48, 192, 255);
+	cr9 = RGB(255, 48, 168);
+	cr10 = RGB(116, 64, 125);
 
-	cr11 = RGB(85,64,166);
-	cr12 = RGB(0,48,110);
-	cr13 = RGB(100,0,40);
-	cr14 = RGB(33,48,123);
-	cr15 = RGB(100,16,76);
+	cr11 = RGB(85, 64, 166);
+	cr12 = RGB(0, 48, 110);
+	cr13 = RGB(100, 0, 40);
+	cr14 = RGB(33, 48, 123);
+	cr15 = RGB(100, 16, 76);
 	cr16 = RGB(0, 0, 0);
-
 
 	c_fShowHScale = 1;
 	c_fShowHGrid = 1;
@@ -1351,7 +1323,6 @@ WSpectrum::WSpectrum()
 
 	c_fShowVScale = 1;
 	c_fShowVGrid = 1;
-
 
 	c_fShowBgBitmap = 0;
 
@@ -1362,10 +1333,8 @@ WSpectrum::WSpectrum()
 	c_nBitmapWidth = BITMAP_WIDTH1;
 	c_nBitmapHeight = BITMAP_HEIGHT1;
 
-
 	c_fStretchBgBitmap = 0;
 	c_bgExternBitmap = 0;
-	
 
 	c_pnSamplesBuffer = 0;
 	c_nLogarithmicOffset = 1;
@@ -1375,12 +1344,10 @@ WSpectrum::WSpectrum()
 	c_nBitsPerSample = 0;
 	c_nFFTPoints = 0;
 
-
 	// transparency
 	c_nAreaTransparency = 25;
 	c_nAlpha = (100 - c_nAreaTransparency) * 255 / 100;
 	c_nInvAlpha = 255 - c_nAlpha;
-	
 
 	c_nHarmonicsNumber = 0;
 	c_pnLeftAmplitude = 0;
@@ -1392,9 +1359,9 @@ WSpectrum::WSpectrum()
 
 	FFT_Left = 0;
 	FFT_Right = 0;
-	FFT_Tmp = 0;	
-	FFT_Tmp1 = 0;	
-	FFT_Tmp2 = 0;	
+	FFT_Tmp = 0;
+	FFT_Tmp1 = 0;
+	FFT_Tmp2 = 0;
 	FFT_Tmp3 = 0;
 
 	c_BmpFont = 0;
@@ -1413,12 +1380,10 @@ WSpectrum::WSpectrum()
 	c_nHeight = 0;
 
 	c_fLinear = 0;
-	
+
 	c_nSpectrumType = GRAPH_TYPE_LINE_LEFT;
 
 	c_nFFTWindow = FFT_WINDOW_BLACKMAN_HARRIS;
-
-
 }
 
 WSpectrum::~WSpectrum()
@@ -1426,80 +1391,76 @@ WSpectrum::~WSpectrum()
 	_FreeFFTMemory();
 	_FreeFFTGDI();
 
-	if(c_bgBitmap)
+	if (c_bgBitmap)
 		DeleteObject(c_bgBitmap);
 
-	if(c_bgExternBitmap)
+	if (c_bgExternBitmap)
 		DeleteObject(c_bgExternBitmap);
-
 }
-
 
 int WSpectrum::_AllocateFFTMemory()
 {
 	ASSERT_W(c_nFFTPoints);
 	ASSERT_W(c_nHarmonicsNumber);
-	
+
 	// allocate memory
-	c_pnLeftAmplitude = (int*) malloc(c_nHarmonicsNumber * sizeof(int));
-	c_pnRightAmplitude = (int*) malloc(c_nHarmonicsNumber * sizeof(int));
-	c_pnSamplesBuffer = (int*) malloc(c_nFFTPoints * sizeof(int));
-	c_pnReductionTable = (unsigned int*) malloc(c_nHarmonicsNumber * sizeof(unsigned int));
+	c_pnLeftAmplitude = (int*)malloc(c_nHarmonicsNumber * sizeof(int));
+	c_pnRightAmplitude = (int*)malloc(c_nHarmonicsNumber * sizeof(int));
+	c_pnSamplesBuffer = (int*)malloc(c_nFFTPoints * sizeof(int));
+	c_pnReductionTable = (unsigned int*)malloc(c_nHarmonicsNumber * sizeof(unsigned int));
 
-
-	FFT_Left = (POINT*) malloc((c_nHarmonicsNumber  + 4) * sizeof(POINT));
-	FFT_Right = (POINT*) malloc((c_nHarmonicsNumber + 4) * sizeof(POINT));
-	FFT_Tmp = (POINT*) malloc((c_nHarmonicsNumber  + 4) * sizeof(POINT));	
-	FFT_Tmp1 = (POINT*) malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));	
-	FFT_Tmp2 = (POINT*) malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));	
-	FFT_Tmp3 = (POINT*) malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));
+	FFT_Left = (POINT*)malloc((c_nHarmonicsNumber + 4) * sizeof(POINT));
+	FFT_Right = (POINT*)malloc((c_nHarmonicsNumber + 4) * sizeof(POINT));
+	FFT_Tmp = (POINT*)malloc((c_nHarmonicsNumber + 4) * sizeof(POINT));
+	FFT_Tmp1 = (POINT*)malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));
+	FFT_Tmp2 = (POINT*)malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));
+	FFT_Tmp3 = (POINT*)malloc((c_nHarmonicsNumber * 2 + 6) * sizeof(POINT));
 
 	// check memory
-	if(c_pnLeftAmplitude == 0 || c_pnRightAmplitude == 0 || c_pnReductionTable == 0 || c_pnSamplesBuffer == 0 ||FFT_Left == 0 || FFT_Right == 0 ||
+	if (c_pnLeftAmplitude == 0 || c_pnRightAmplitude == 0 || c_pnReductionTable == 0 || c_pnSamplesBuffer == 0 || FFT_Left == 0 || FFT_Right == 0 ||
 		FFT_Tmp == 0 || FFT_Tmp1 == 0 || FFT_Tmp2 == 0 || FFT_Tmp3 == 0)
 	{
 		_FreeFFTMemory();
-		return 0;	
+		return 0;
 	}
 
-	c_fInitalizeY = 1;		 
+	c_fInitalizeY = 1;
 
 	return 1;
 }
 
-
 void WSpectrum::_FreeFFTMemory()
 {
 
-	if(c_pnLeftAmplitude)
+	if (c_pnLeftAmplitude)
 		free(c_pnLeftAmplitude);
-			
-	if(c_pnRightAmplitude)
+
+	if (c_pnRightAmplitude)
 		free(c_pnRightAmplitude);
 
-	if(c_pnSamplesBuffer)
+	if (c_pnSamplesBuffer)
 		free(c_pnSamplesBuffer);
 
-	if(c_pnReductionTable)
+	if (c_pnReductionTable)
 		free(c_pnReductionTable);
-				
-	if(FFT_Left)
+
+	if (FFT_Left)
 		free(FFT_Left);
 
-	if(FFT_Right)
+	if (FFT_Right)
 		free(FFT_Right);
 
-	if(FFT_Tmp)
+	if (FFT_Tmp)
 		free(FFT_Tmp);
 
-	if(FFT_Tmp1)
+	if (FFT_Tmp1)
 		free(FFT_Tmp1);
-			
-	if(FFT_Tmp2)
-		free(FFT_Tmp2);	
 
-	if(FFT_Tmp3)
-		free(FFT_Tmp3);	
+	if (FFT_Tmp2)
+		free(FFT_Tmp2);
+
+	if (FFT_Tmp3)
+		free(FFT_Tmp3);
 
 	c_pnLeftAmplitude = 0;
 	c_pnRightAmplitude = 0;
@@ -1507,13 +1468,11 @@ void WSpectrum::_FreeFFTMemory()
 	c_pnSamplesBuffer = 0;
 	FFT_Left = 0;
 	FFT_Right = 0;
-	FFT_Tmp = 0;	
-	FFT_Tmp1 = 0;	
-	FFT_Tmp2 = 0;	
-	FFT_Tmp3 = 0;	
-
+	FFT_Tmp = 0;
+	FFT_Tmp1 = 0;
+	FFT_Tmp2 = 0;
+	FFT_Tmp3 = 0;
 }
-
 
 void WSpectrum::Free()
 {
@@ -1527,15 +1486,13 @@ void WSpectrum::Free()
 	c_nFFTPoints = 0;
 }
 
-
 int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitsPerSample)
 {
 
-	if(nFFTPoints == c_nFFTPoints && nSampleRate == c_nSampleRate && nChannel == c_nChannel && nBitsPerSample == c_nBitsPerSample)
+	if (nFFTPoints == c_nFFTPoints && nSampleRate == c_nSampleRate && nChannel == c_nChannel && nBitsPerSample == c_nBitsPerSample)
 		return 1; // nothing to do
 
 	c_fInitalizeY = 1;
-
 
 	c_fft.Free();
 	_FreeFFTMemory();
@@ -1544,7 +1501,7 @@ int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, uns
 	c_nPointsNumber = 0;
 
 	// initialize FFT memory with new parameters
-	if(c_fft.Initialize(nFFTPoints, nSampleRate, nChannel, nBitsPerSample) == 0)
+	if (c_fft.Initialize(nFFTPoints, nSampleRate, nChannel, nBitsPerSample) == 0)
 		return 0;
 
 	c_fft.SetWindow(c_nFFTWindow);
@@ -1553,9 +1510,9 @@ int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, uns
 
 	unsigned int i;
 	unsigned int power = 2;
-	for(i = 0; i < LOGARITHMIC_OFFSET_NUM; i++)
+	for (i = 0; i < LOGARITHMIC_OFFSET_NUM; i++)
 	{
-		if(power == nFFTPoints)
+		if (power == nFFTPoints)
 		{
 			c_nLogarithmicOffset = LogarithmicOffset[i];
 			break;
@@ -1564,17 +1521,14 @@ int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, uns
 		power <<= 1;
 	}
 
-
-
 	c_nFFTPoints = nFFTPoints;
 	c_nHarmonicsNumber = c_fft.GetNumberOfHarmonics();
 
 	c_nBitsPerSample = nBitsPerSample;
 	c_nSampleRate = nSampleRate;
 	c_nChannel = nChannel;
-	
 
-	if(_AllocateFFTMemory() == 0)
+	if (_AllocateFFTMemory() == 0)
 	{
 		c_nFFTPoints = 0;
 		c_nHarmonicsNumber = 0;
@@ -1584,13 +1538,11 @@ int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, uns
 		return 0;
 	}
 
-
 	c_nPointsNumber = c_nHarmonicsNumber;
 	c_fNeedReduction = 0;
 
 	return 1;
 }
-
 
 int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeight)
 {
@@ -1598,22 +1550,21 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	ASSERT_W(c_nSampleRate);
 	ASSERT_W(c_nHarmonicsNumber);
 
-
 	// load bitmap with font
 	HBITMAP hbm = CreateBitmapFromMemory(hdc, BITMAP_WIDTH, BITMAP_HEIGHT, BITMAP_BIT_PER_PIXEL, pColorTable, BITMAP_COLOR_USED, bitMap, BITMAP_ARRAY_SIZE);
-	if(hbm == 0)
+	if (hbm == 0)
 		return 0;
-	
+
 	// create font class
 	c_BmpFont = new WBmpFont();
-	if(c_BmpFont == 0)
+	if (c_BmpFont == 0)
 	{
 		DeleteObject(hbm);
 		return 0;
 	}
 
 	// open font
-	if(c_BmpFont->Open(hbm, "06 H4\r\n05 503\r\n05 dB8\r\n05 67\r\n05 29\r\n04 z\r\n03 1\0", 7) == 0)
+	if (c_BmpFont->Open(hbm, "06 H4\r\n05 503\r\n05 dB8\r\n05 67\r\n05 29\r\n04 z\r\n03 1\0", 7) == 0)
 	{
 		DeleteObject(hbm);
 		delete c_BmpFont;
@@ -1628,7 +1579,7 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 	// load inverse bitmap
 	hbm = CreateBitmapFromMemory(hdc, BITMAP_WIDTH, BITMAP_HEIGHT, BITMAP_BIT_PER_PIXEL, pColorTableInverse, BITMAP_COLOR_USED, bitMap, BITMAP_ARRAY_SIZE);
-	if(hbm == 0)
+	if (hbm == 0)
 	{
 		delete c_BmpFont;
 		c_BmpFont = 0;
@@ -1636,7 +1587,7 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	}
 
 	c_BmpFontInverse = new WBmpFont();
-	if(c_BmpFont == 0)
+	if (c_BmpFont == 0)
 	{
 		DeleteObject(hbm);
 		delete c_BmpFont;
@@ -1644,7 +1595,7 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		return 0;
 	}
 
-	if(c_BmpFontInverse->Open(hbm, "06 H4\r\n05 503\r\n05 dB8\r\n05 67\r\n05 29\r\n04 z\r\n03 1\0", 7) == 0)
+	if (c_BmpFontInverse->Open(hbm, "06 H4\r\n05 503\r\n05 dB8\r\n05 67\r\n05 29\r\n04 z\r\n03 1\0", 7) == 0)
 	{
 		DeleteObject(hbm);
 		delete c_BmpFont;
@@ -1659,14 +1610,13 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	// CREATE WORKING DEVICE CONTEXT
 
 	c_hdcSrc = CreateCompatibleDC(hdc);
-	c_hdcDest = CreateCompatibleDC(hdc); 
+	c_hdcDest = CreateCompatibleDC(hdc);
 
-	if(c_hdcSrc == 0 || c_hdcDest == 0)
+	if (c_hdcSrc == 0 || c_hdcDest == 0)
 	{
 		_FreeFFTGDI();
 		return 0;
 	}
-
 
 	BITMAPINFOHEADER bmhInfo;
 	// prepare data for alpha blending
@@ -1675,47 +1625,41 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	bmhInfo.biHeight = nHeight;
 	bmhInfo.biPlanes = 1;
 	bmhInfo.biBitCount = 32;
-	bmhInfo.biCompression = BI_RGB;   // No compression
+	bmhInfo.biCompression = BI_RGB; // No compression
 	bmhInfo.biSizeImage = 0;
 	bmhInfo.biXPelsPerMeter = 0;
 	bmhInfo.biYPelsPerMeter = 0;
-	bmhInfo.biClrUsed = 0;           // Always use the whole palette.
+	bmhInfo.biClrUsed = 0; // Always use the whole palette.
 	bmhInfo.biClrImportant = 0;
 
+	c_hbmSrc = CreateDIBSection(hdc, (BITMAPINFO*)&bmhInfo,
+		DIB_RGB_COLORS, (void**)&c_pSrcBits, 0, 0);
 
-	c_hbmSrc = CreateDIBSection (hdc, (BITMAPINFO *)&bmhInfo,
-		DIB_RGB_COLORS, (void **)&c_pSrcBits, 0, 0);
+	c_hbmDest = CreateDIBSection(hdc, (BITMAPINFO*)&bmhInfo,
+		DIB_RGB_COLORS, (void**)&c_pDestBits, 0, 0);
 
+	c_hbmBgBitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bmhInfo,
+		DIB_RGB_COLORS, (void**)&c_pBgBits, 0, 0);
 
-	c_hbmDest = CreateDIBSection (hdc, (BITMAPINFO *)&bmhInfo,
-		DIB_RGB_COLORS, (void **)&c_pDestBits, 0, 0);
-
-	c_hbmBgBitmap = CreateDIBSection (hdc, (BITMAPINFO *)&bmhInfo,
-		DIB_RGB_COLORS, (void **)&c_pBgBits, 0, 0);
-
-
-
-	if(c_hbmSrc == 0 || c_hbmDest == 0 || c_hbmBgBitmap == 0)
+	if (c_hbmSrc == 0 || c_hbmDest == 0 || c_hbmBgBitmap == 0)
 	{
 		_FreeFFTGDI();
 		return 0;
 	}
 
-
-	hPenLeft = CreatePen(PS_SOLID, 1, cr8); 
-	hPenLeftOverlap = CreatePen(PS_SOLID, 1, cr10); 
+	hPenLeft = CreatePen(PS_SOLID, 1, cr8);
+	hPenLeftOverlap = CreatePen(PS_SOLID, 1, cr10);
 
 	hPenRight = CreatePen(PS_SOLID, 1, cr9);
 	hPenRightOverlap = CreatePen(PS_SOLID, 1, cr11);
 
-
-	hBrushFFTLeft = CreateSolidBrush(cr12); 
+	hBrushFFTLeft = CreateSolidBrush(cr12);
 	hBrushFFTLeftOverlap = CreateSolidBrush(cr14);
 
-	hBrushFFTRight = CreateSolidBrush(cr13); 
-	hBrushFFTRightOverlap = CreateSolidBrush(cr15); 
+	hBrushFFTRight = CreateSolidBrush(cr13);
+	hBrushFFTRightOverlap = CreateSolidBrush(cr15);
 
-	if(hPenLeft == 0 || hPenLeftOverlap == 0 || hPenRight == 0 || hPenRightOverlap == 0 ||
+	if (hPenLeft == 0 || hPenLeftOverlap == 0 || hPenRight == 0 || hPenRightOverlap == 0 ||
 		hBrushFFTLeft == 0 || hBrushFFTLeftOverlap == 0 || hBrushFFTRight == 0 || hBrushFFTRightOverlap == 0)
 	{
 
@@ -1723,25 +1667,22 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		return 0;
 	}
 
-	if(_CreateBgBitmap(hdc, nWidth, nHeight) == 0)
+	if (_CreateBgBitmap(hdc, nWidth, nHeight) == 0)
 	{
 		_FreeFFTGDI();
 		return 0;
 	}
 
-
 	// select bitmap into DC
-	c_hbmSrcOld = (HBITMAP) SelectObject(c_hdcSrc, c_hbmSrc);
-	c_hbmDestOld = (HBITMAP) SelectObject(c_hdcDest, c_hbmDest);
+	c_hbmSrcOld = (HBITMAP)SelectObject(c_hdcSrc, c_hbmSrc);
+	c_hbmDestOld = (HBITMAP)SelectObject(c_hdcDest, c_hbmDest);
 
 	c_hdc = hdc;
 	c_nWidth = nWidth;
 	c_nHeight = nHeight;
 
 	return 1;
-
 }
-
 
 int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeight)
 {
@@ -1749,55 +1690,48 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	c_spectrum_pos = 0;
 
 	// now we have GDI allocated, create background bitmap
-// ==================================================================================
-
+	// ==================================================================================
 
 	unsigned int i;
-	unsigned int nFreqNum =  c_nSampleRate / 2  + 1;
+	unsigned int nFreqNum = c_nSampleRate / 2 + 1;
 
 	// calculate harminic frequencies
-	REAL *rHarmonicFrequency = (REAL*) malloc(c_nHarmonicsNumber * sizeof(REAL));
-	if(rHarmonicFrequency == 0)
+	REAL* rHarmonicFrequency = (REAL*)malloc(c_nHarmonicsNumber * sizeof(REAL));
+	if (rHarmonicFrequency == 0)
 		return 0;
-
 
 	// calculate harmonics frequencies
 
-
-	REAL fFirstHarmonic = (REAL) c_nSampleRate / (REAL) c_nFFTPoints; 
-	for(i = 0; i < c_nHarmonicsNumber; i++)
-		rHarmonicFrequency[i] =  fFirstHarmonic * (REAL) i;
-	
+	REAL fFirstHarmonic = (REAL)c_nSampleRate / (REAL)c_nFFTPoints;
+	for (i = 0; i < c_nHarmonicsNumber; i++)
+		rHarmonicFrequency[i] = fFirstHarmonic * (REAL)i;
 
 	// allocate memory for frequency table
-	FREQUENCY_TABLE *freq_table = (FREQUENCY_TABLE*) malloc(nFreqNum * sizeof(FREQUENCY_TABLE));
-	if(freq_table == 0)
+	FREQUENCY_TABLE* freq_table = (FREQUENCY_TABLE*)malloc(nFreqNum * sizeof(FREQUENCY_TABLE));
+	if (freq_table == 0)
 	{
 		free(rHarmonicFrequency);
 		return 0;
 	}
-
 
 	c_InnerRect.left = 0;
 	c_InnerRect.top = 0;
 	c_InnerRect.right = nWidth - 1;
 	c_InnerRect.bottom = nHeight - 1;
 
-
 	// === CREATE BACKGROUND BITMAP ===
 
 	HDC hdcmem = CreateCompatibleDC(hdc);
-	if(hdcmem == 0)
+	if (hdcmem == 0)
 	{
 		free(rHarmonicFrequency);
 		free(freq_table);
 		return 0;
 	}
 
+	HBITMAP old = (HBITMAP)SelectObject(hdcmem, c_hbmBgBitmap);
 
-	HBITMAP old = (HBITMAP) SelectObject(hdcmem, c_hbmBgBitmap);
-
-// ===================================================
+	// ===================================================
 	// fill all with background color, background for frequency and decibel scale
 	RECT rc;
 	rc.left = 0;
@@ -1808,7 +1742,7 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	FillRect(hdcmem, &rc, hBgBrush);
 	DeleteObject(hBgBrush);
 
-// ===================================================
+	// ===================================================
 	// draw black frame
 	POINT pt[5];
 	pt[0].x = c_InnerRect.left;
@@ -1821,13 +1755,13 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	pt[3].y = c_InnerRect.top;
 	pt[4].x = c_InnerRect.left;
 	pt[4].y = c_InnerRect.top;
-	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0,0,0));
-	HPEN hOldPen = (HPEN) SelectObject(hdcmem, hPen);
+	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+	HPEN hOldPen = (HPEN)SelectObject(hdcmem, hPen);
 	Polyline(hdcmem, pt, 5);
 	SelectObject(hdcmem, hOldPen);
 	DeleteObject(hPen);
 
-// ===================================================
+	// ===================================================
 	// draw white frame
 	pt[0].x++;
 	pt[0].y++;
@@ -1840,26 +1774,26 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	pt[4].x++;
 	pt[4].y++;
 	hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
-	hOldPen = (HPEN) SelectObject(hdcmem, hPen);
+	hOldPen = (HPEN)SelectObject(hdcmem, hPen);
 	Polyline(hdcmem, pt, 5);
 	SelectObject(hdcmem, hOldPen);
 	DeleteObject(hPen);
-// ===================================================
-// exclude frame from drawinf surface
+	// ===================================================
+	// exclude frame from drawinf surface
 
 	c_InnerRect.left += 3;
 	c_InnerRect.top += 3;
 	c_InnerRect.right -= 3;
 	c_InnerRect.bottom -= 3;
 
-// ===================================================
-// make space for frequancy and decibel scales
+	// ===================================================
+	// make space for frequancy and decibel scales
 
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-		c_InnerRect.bottom -= ( LetterHeight + 2 * BottomVSpace);
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+		c_InnerRect.bottom -= (LetterHeight + 2 * BottomVSpace);
 
 	unsigned int nMaxTextWidthDecibel = 0;
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 	{
 		char tmp[10];
 		sprintf(tmp, "%u", MaxDecibel);
@@ -1868,35 +1802,34 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		c_InnerRect.right -= (nMaxTextWidthDecibel + 2 * RightHSpace);
 	}
 
-// ===================================================
-// background color of working space
+	// ===================================================
+	// background color of working space
 	RECT rc1;
 	CopyRect(&rc1, &c_InnerRect);
 	rc1.bottom++;
 	rc1.right++;
 
 	HBRUSH hb = CreateSolidBrush(cr2);
-	FillRect(hdcmem, &rc1, (HBRUSH) hb);
+	FillRect(hdcmem, &rc1, (HBRUSH)hb);
 	DeleteObject(hb);
 
-// ====================================================================
-// DRAW background bitmap
+	// ====================================================================
+	// DRAW background bitmap
 
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowBgBitmap)
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowBgBitmap)
 	{
 		HBITMAP hbm = c_bgBitmap;
-		if(c_bgExternBitmap)
-			hbm = c_bgExternBitmap;	
-
+		if (c_bgExternBitmap)
+			hbm = c_bgExternBitmap;
 
 		HDC hdcBpm = CreateCompatibleDC(hdc);
-		HBITMAP hOldBpm = (HBITMAP) SelectObject(hdcBpm, hbm);
+		HBITMAP hOldBpm = (HBITMAP)SelectObject(hdcBpm, hbm);
 		int w = c_InnerRect.right - c_InnerRect.left + 1;
 		int h = c_InnerRect.bottom - c_InnerRect.top;
-		
-		if(c_fStretchBgBitmap)
+
+		if (c_fStretchBgBitmap)
 		{
-			StretchBlt(hdcmem, c_InnerRect.left ,c_InnerRect.top, w, h, hdcBpm, 0, 0, c_nBitmapWidth, c_nBitmapHeight, SRCCOPY);
+			StretchBlt(hdcmem, c_InnerRect.left, c_InnerRect.top, w, h, hdcBpm, 0, 0, c_nBitmapWidth, c_nBitmapHeight, SRCCOPY);
 		}
 		else
 		{
@@ -1905,50 +1838,45 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 			int w1;
 			int h1;
 
-			if(c_nBitmapWidth > w)
+			if (c_nBitmapWidth > w)
 			{
 				x = c_InnerRect.left;
 				w1 = w;
 			}
 			else
 			{
-				x = w/2 - c_nBitmapWidth/2;
+				x = w / 2 - c_nBitmapWidth / 2;
 				w1 = min(c_nBitmapWidth, w);
 			}
 
-			if(c_nBitmapHeight > h)
+			if (c_nBitmapHeight > h)
 			{
 				y = c_InnerRect.top;
 				h1 = h;
 			}
 			else
 			{
-				y = h/2 - c_nBitmapHeight/2;
-				h1 = min(c_nBitmapHeight, h);	
+				y = h / 2 - c_nBitmapHeight / 2;
+				h1 = min(c_nBitmapHeight, h);
 			}
 
-
 			// center bitmap
-			BitBlt(hdcmem, x ,y, w1, h1, hdcBpm, 0, 0, SRCCOPY);
-
-
+			BitBlt(hdcmem, x, y, w1, h1, hdcBpm, 0, 0, SRCCOPY);
 		}
 
 		SelectObject(hdcBpm, hOldBpm);
 		DeleteDC(hdcBpm);
 	}
 
-
-// =====================================================================
-// SET TEXT COLOR
+	// =====================================================================
+	// SET TEXT COLOR
 
 	c_BmpFont->SetColor(cr7);
 
-// =====================================================================
-// draw frequency and decibel scale
+	// =====================================================================
+	// draw frequency and decibel scale
 
-
-// draw Hz label
+	// draw Hz label
 	unsigned int nBottomTextY = c_InnerRect.bottom + BottomVSpace + 2;
 
 	c_BmpFont->SetText("Hz");
@@ -1959,86 +1887,80 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	rc.bottom = nHeight - rc.top;
 	OffsetRect(&rc, 1, 1);
 
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-		c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255,255,255));
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+		c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255, 255, 255));
 
 	OffsetRect(&rc, -1, -1);
 
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-		c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0,0,0));
-
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+		c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0, 0, 0));
 
 	POINT p[5];
 
 	// calculate scale factors
-	if(c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
+	if (c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
 	{
-		flWidthScale = (float) (c_InnerRect.bottom - c_InnerRect.top ) / (float) ( c_nHarmonicsNumber - 1);
+		flWidthScale = (float)(c_InnerRect.bottom - c_InnerRect.top) / (float)(c_nHarmonicsNumber - 1);
 		flHeightScale = 1.0;
-
 	}
 	else
 	{
-		flWidthScale = (float) (c_InnerRect.right - c_InnerRect.left ) / (float) ( c_nHarmonicsNumber - 1);
-		flHeightScale = (float) (c_InnerRect.bottom - c_InnerRect.top + 1) / (float) MaxDecibel;
+		flWidthScale = (float)(c_InnerRect.right - c_InnerRect.left) / (float)(c_nHarmonicsNumber - 1);
+		flHeightScale = (float)(c_InnerRect.bottom - c_InnerRect.top + 1) / (float)MaxDecibel;
 	}
-
 
 	freq_table[0].nWidth = 0;
 	freq_table[0].nX = c_InnerRect.left;
 
-
-	if(c_fLinear)
+	if (c_fLinear)
 	{
 		// calculate linear distribution
-		
-		if(c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
-		{
-			for(i = 0; i < c_nHarmonicsNumber; i++)
-			{
-				int nNewX = (int) ((float) i * flWidthScale); 
-				FFT_Left[i].x = nNewX; 
-				FFT_Right[i].x = nNewX;
-				FFT_Tmp[i].x = nNewX; 
 
-				if(c_fInitalizeY)
+		if (c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
+		{
+			for (i = 0; i < c_nHarmonicsNumber; i++)
+			{
+				int nNewX = (int)((float)i * flWidthScale);
+				FFT_Left[i].x = nNewX;
+				FFT_Right[i].x = nNewX;
+				FFT_Tmp[i].x = nNewX;
+
+				if (c_fInitalizeY)
 				{
 					FFT_Left[i].y = 0;
 					FFT_Right[i].y = 0;
 					FFT_Tmp[i].y = 0;
-				}	
+				}
 			}
 		}
 		else
 		{
-			for(i = 0; i < c_nHarmonicsNumber; i++)
+			for (i = 0; i < c_nHarmonicsNumber; i++)
 			{
-				int nNewX = c_InnerRect.left + ((int) ((float) i * flWidthScale)); 
-				FFT_Left[i].x = nNewX; 
+				int nNewX = c_InnerRect.left + ((int)((float)i * flWidthScale));
+				FFT_Left[i].x = nNewX;
 				FFT_Right[i].x = nNewX;
-				FFT_Tmp[i].x = nNewX; 
+				FFT_Tmp[i].x = nNewX;
 
-				if(c_fInitalizeY)
+				if (c_fInitalizeY)
 				{
 					FFT_Left[i].y = c_InnerRect.bottom;
 					FFT_Right[i].y = c_InnerRect.bottom;
 					FFT_Tmp[i].y = c_InnerRect.bottom;
-				}	
+				}
 			}
 		}
 
-	
-		
 		// generate frequency table, X coordinates for each Hz
 		unsigned int j = 1;
-		for(i = 1; i < 	nFreqNum; i++)
+		for (i = 1; i < nFreqNum; i++)
 		{
 			freq_table[i].nWidth = 0;
-			for(j; j < c_nHarmonicsNumber; j++)
+			for (j; j < c_nHarmonicsNumber; j++)
 			{
-				if(rHarmonicFrequency[j] >= i)
+				if (rHarmonicFrequency[j] >= i)
 				{
-					if(rHarmonicFrequency[j] == i)
+					if (rHarmonicFrequency[j] == i)
 					{
 						// we have exact match
 						freq_table[i].nX = FFT_Left[j].x;
@@ -2046,15 +1968,13 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 					else
 					{
 						// calculate position based on first lower and first upper frequency
-						float perc = (float) (rHarmonicFrequency[j] - i) / (float) (rHarmonicFrequency[j] - rHarmonicFrequency[j - 1]);
-						freq_table[i].nX = (int) (FFT_Left[j].x - (int)((float)(FFT_Left[j].x - FFT_Left[j - 1].x) * perc));		
-
+						float perc = (float)(rHarmonicFrequency[j] - i) / (float)(rHarmonicFrequency[j] - rHarmonicFrequency[j - 1]);
+						freq_table[i].nX = (int)(FFT_Left[j].x - (int)((float)(FFT_Left[j].x - FFT_Left[j - 1].x) * perc));
 					}
 					break;
 				}
 			}
 		}
-
 
 		// draw frequency scale
 		DrawXLinear(hdcmem, freq_table, 0, nFreqNum - 1, 1, 0, nWidth, nHeight);
@@ -2065,21 +1985,20 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		// calculate logaritmic distribution
 
 		int nW = c_InnerRect.right - c_InnerRect.left;
-		double dStart = log((double) c_nLogarithmicOffset);
-		double dRange = log((double)(c_nHarmonicsNumber - 1 + c_nLogarithmicOffset)) - dStart; 
+		double dStart = log((double)c_nLogarithmicOffset);
+		double dRange = log((double)(c_nHarmonicsNumber - 1 + c_nLogarithmicOffset)) - dStart;
 
-
-		if(c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
+		if (c_nSpectrumType == GRAPH_TYPE_SPECTRUM)
 		{
 			nW = c_InnerRect.bottom - c_InnerRect.top;
-			for(i = 0; i < c_nHarmonicsNumber; i++)
+			for (i = 0; i < c_nHarmonicsNumber; i++)
 			{
 				double dN = (log((double)(i + c_nLogarithmicOffset)) - dStart) / dRange;
-				FFT_Left[i].x =  (int)  ((double) nW * dN); 
+				FFT_Left[i].x = (int)((double)nW * dN);
 				FFT_Right[i].x = FFT_Left[i].x;
-				FFT_Tmp[i].x = FFT_Left[i].x; 
+				FFT_Tmp[i].x = FFT_Left[i].x;
 
-				if(c_fInitalizeY)
+				if (c_fInitalizeY)
 				{
 					FFT_Left[i].y = 0;
 					FFT_Right[i].y = 0;
@@ -2089,14 +2008,14 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		}
 		else
 		{
-			for(i = 0; i < c_nHarmonicsNumber; i++)
+			for (i = 0; i < c_nHarmonicsNumber; i++)
 			{
 				double dN = (log((double)(i + c_nLogarithmicOffset)) - dStart) / dRange;
-				FFT_Left[i].x =  c_InnerRect.left +  (int)  ((double) nW * dN); 
+				FFT_Left[i].x = c_InnerRect.left + (int)((double)nW * dN);
 				FFT_Right[i].x = FFT_Left[i].x;
-				FFT_Tmp[i].x = FFT_Left[i].x; 
+				FFT_Tmp[i].x = FFT_Left[i].x;
 
-				if(c_fInitalizeY)
+				if (c_fInitalizeY)
 				{
 					FFT_Left[i].y = c_InnerRect.bottom;
 					FFT_Right[i].y = c_InnerRect.bottom;
@@ -2105,18 +2024,16 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 			}
 		}
 
-
-		
 		// generate frequency table, X coordinates for each Hz
 		unsigned int j = 1;
-		for(i = 1; i < 	nFreqNum; i++)
+		for (i = 1; i < nFreqNum; i++)
 		{
 			freq_table[i].nWidth = 0;
-			for(j; j < c_nHarmonicsNumber; j++)
+			for (j; j < c_nHarmonicsNumber; j++)
 			{
-				if(rHarmonicFrequency[j] >= i)
+				if (rHarmonicFrequency[j] >= i)
 				{
-					if(rHarmonicFrequency[j] == i)
+					if (rHarmonicFrequency[j] == i)
 					{
 						// we have exact match
 						freq_table[i].nX = FFT_Left[j].x;
@@ -2124,9 +2041,8 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 					else
 					{
 						// calculate position based on first lower and first upper frequency
-						float perc = (float) (rHarmonicFrequency[j] - i) / (float) (rHarmonicFrequency[j] - rHarmonicFrequency[j - 1]);
-						freq_table[i].nX = (int) (FFT_Left[j].x - (int)((float)(FFT_Left[j].x - FFT_Left[j - 1].x) * perc));		
-
+						float perc = (float)(rHarmonicFrequency[j] - i) / (float)(rHarmonicFrequency[j] - rHarmonicFrequency[j - 1]);
+						freq_table[i].nX = (int)(FFT_Left[j].x - (int)((float)(FFT_Left[j].x - FFT_Left[j - 1].x) * perc));
 					}
 					break;
 				}
@@ -2137,19 +2053,16 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		DrawXLogarithmic(hdcmem, freq_table, 0, nFreqNum - 1, 1, 0, nWidth, nHeight);
 	}
 
-	
-
 	free(rHarmonicFrequency);
 	free(freq_table);
 
-// ===================================================
+	// ===================================================
 	// draw DECIBEL GRID
 
 	hPen = CreatePen(PS_SOLID, 1, cr4);
 	HPEN hPen2 = CreatePen(PS_SOLID, 1, cr5);
 	HPEN hPen1 = CreatePen(PS_SOLID, 1, cr6);
-	hOldPen = (HPEN) SelectObject(hdcmem, hPen);
-
+	hOldPen = (HPEN)SelectObject(hdcmem, hPen);
 
 	unsigned int nHeight1 = c_InnerRect.bottom - c_InnerRect.top + 1;
 	unsigned nMaxPart = nHeight1 / MinDecibelGridSpace;
@@ -2158,9 +2071,9 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	unsigned int nMinDecibelResolution = MaxDecibel / nMaxPart;
 
 	// search for first valid resolution
-	for(i = 0; i < DecibelTableSize; i++)
+	for (i = 0; i < DecibelTableSize; i++)
 	{
-		if(DecibelTable[i].Resolution >= nMinDecibelResolution)
+		if (DecibelTable[i].Resolution >= nMinDecibelResolution)
 		{
 			nDecibelResolutionIndex = i;
 			nDecibelResolution = DecibelTable[i].Resolution;
@@ -2168,87 +2081,81 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		}
 	}
 
-	nMaxPart = MaxDecibel / nDecibelResolution ;
+	nMaxPart = MaxDecibel / nDecibelResolution;
 
 	int nPrevY = c_InnerRect.bottom;
 	int nY = c_InnerRect.bottom;
-	for(i = 0; i <= nMaxPart; i++)
+	for (i = 0; i <= nMaxPart; i++)
 	{
-		nY = c_InnerRect.bottom - (int) ((float)i * ((float) (nHeight1 - 1) / (float) nMaxPart));
-
+		nY = c_InnerRect.bottom - (int)((float)i * ((float)(nHeight1 - 1) / (float)nMaxPart));
 
 		// draw grid line
 		p[0].x = c_InnerRect.left;
 		p[0].y = nY;
 		p[1].x = c_InnerRect.right + 1;
 		p[1].y = p[0].y;
-		if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid)
+		if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid)
 		{
 			SelectObject(hdcmem, hPen);
 			Polyline(hdcmem, p, 2);
 		}
 
-
 		// draw scale line
 		p[0].x = c_InnerRect.right + 1;
 		p[1].x = c_InnerRect.right + 5;
-		if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+		if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 		{
 			SelectObject(hdcmem, hPen1);
 			Polyline(hdcmem, p, 2);
 		}
 
-	
-		if(i > 0)
+		if (i > 0)
 		{
 
 			unsigned int nMarkStep = DecibelTable[nDecibelResolutionIndex].MarkStep;
 			unsigned int nMarksNumber = nDecibelResolution / nMarkStep;
-		
+
 			int nSpace = nY - nPrevY;
 			unsigned int j;
 
-		
-			for(j = 1; j < nMarksNumber; j++)
+			for (j = 1; j < nMarksNumber; j++)
 			{
-				
+
 				p[0].x = c_InnerRect.right + 1;
-				p[0].y = nPrevY + MulDiv(nSpace, j,  nMarksNumber);
+				p[0].y = nPrevY + MulDiv(nSpace, j, nMarksNumber);
 				p[1].y = p[0].y;
 
-				if(DecibelTable[nDecibelResolutionIndex].AddOddLines && ((j % 2) == 0))
+				if (DecibelTable[nDecibelResolutionIndex].AddOddLines && ((j % 2) == 0))
 				{
 
 					// draw scale line
 					p[1].x = c_InnerRect.right + 5;
-					if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+					if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 					{
 						SelectObject(hdcmem, hPen1);
 						Polyline(hdcmem, p, 2);
 					}
-
 
 					// draw grid line
 					p[0].x = c_InnerRect.left;
 					p[1].x = c_InnerRect.right + 1;
-					
-					if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid)
+
+					if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid)
 					{
 						SelectObject(hdcmem, hPen);
 						Polyline(hdcmem, p, 2);
 					}
-					
 				}
 				else
 				{
 					p[1].x = c_InnerRect.right + 3;
-					if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+					if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 					{
 						SelectObject(hdcmem, hPen1);
 						Polyline(hdcmem, p, 2);
 					}
-					
-					if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid && c_fDrawSubGrid)	
+
+					if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVGrid && c_fDrawSubGrid)
 					{
 						// draw grid line
 						p[0].x = c_InnerRect.left;
@@ -2256,18 +2163,15 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 						SelectObject(hdcmem, hPen2);
 						Polyline(hdcmem, p, 2);
-
 					}
-
-				}	
+				}
 			}
-		
 
 			// draw decibel text
-		
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 			{
-				if(i != nMaxPart)
+				if (i != nMaxPart)
 				{
 					// draw text
 					char text[10];
@@ -2279,18 +2183,17 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 					rc.right = nWidth - rc.left;
 					rc.bottom = nHeight - rc.top;
 					OffsetRect(&rc, 1, 1);
-					c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255,255,255));
+					c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255, 255, 255));
 					OffsetRect(&rc, -1, -1);
-					c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0,0,0));
+					c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0, 0, 0));
 				}
 			}
-		
 		}
 
 		nPrevY = nY;
 	}
 
-	if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
+	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 	{
 		// display dB label
 		c_BmpFont->SetText("dB");
@@ -2300,11 +2203,10 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 		rc.right = nWidth - rc.left;
 		rc.bottom = nHeight - rc.top;
 		OffsetRect(&rc, 1, 1);
-		c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255,255,255));
+		c_BmpFontInverse->Draw(hdcmem, &rc, 0, 1, RGB(255, 255, 255));
 		OffsetRect(&rc, -1, -1);
-		c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0,0,0));
-}
-
+		c_BmpFont->Draw(hdcmem, &rc, 0, 1, RGB(0, 0, 0));
+	}
 
 	SelectObject(hdcmem, hOldPen);
 	DeleteObject(hPen);
@@ -2313,31 +2215,28 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	SelectObject(hdcmem, old);
 	DeleteDC(hdcmem);
 
-
-// ======================================================================
+	// ======================================================================
 	// reduce frequency POINTS
 	unsigned int nSrcIndex;
-	for(nSrcIndex = 0; nSrcIndex < c_nHarmonicsNumber; nSrcIndex++)
+	for (nSrcIndex = 0; nSrcIndex < c_nHarmonicsNumber; nSrcIndex++)
 		c_pnReductionTable[nSrcIndex] = 1;
 
 	unsigned int nDestIndex = 0;
-	
-	if(flWidthScale < 1.0)
+
+	if (flWidthScale < 1.0)
 	{
-		
-		for(nSrcIndex = 1; nSrcIndex < c_nHarmonicsNumber; nSrcIndex++)
+
+		for (nSrcIndex = 1; nSrcIndex < c_nHarmonicsNumber; nSrcIndex++)
 		{
-			if(FFT_Left[nDestIndex].x != FFT_Left[nSrcIndex].x)
+			if (FFT_Left[nDestIndex].x != FFT_Left[nSrcIndex].x)
 			{
 				nDestIndex++;
 				FFT_Left[nDestIndex].x = FFT_Left[nSrcIndex].x;
 				FFT_Right[nDestIndex].x = FFT_Right[nSrcIndex].x;
 				FFT_Tmp[nDestIndex].x = FFT_Tmp[nSrcIndex].x;
-					
 			}
 			else
 				c_pnReductionTable[nDestIndex]++;
-
 		}
 
 		c_nPointsNumber = nDestIndex + 1;
@@ -2351,107 +2250,104 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 	c_fInitalizeY = 0;
 
-// =====================================================================================
+	// =====================================================================================
 
 	return 1;
 }
 
-
 void WSpectrum::_FreeFFTGDI()
 {
-	if(c_BmpFont)
+	if (c_BmpFont)
 	{
 		delete c_BmpFont;
 		c_BmpFont = 0;
 	}
 
-	if(c_BmpFontInverse)
+	if (c_BmpFontInverse)
 	{
 		delete c_BmpFontInverse;
 		c_BmpFontInverse = 0;
 	}
 
-	if(c_hdcSrc)
+	if (c_hdcSrc)
 	{
-		if(c_hbmSrcOld)
+		if (c_hbmSrcOld)
 			SelectObject(c_hdcSrc, c_hbmSrcOld);
 
 		DeleteDC(c_hdcSrc);
 		c_hdcSrc = 0;
 	}
 
-	if(c_hdcDest)
+	if (c_hdcDest)
 	{
-		if(c_hbmDestOld)
+		if (c_hbmDestOld)
 			SelectObject(c_hdcDest, c_hbmDestOld);
 
 		DeleteDC(c_hdcDest);
 		c_hdcDest = 0;
 	}
 
-	if(c_hbmSrc)
+	if (c_hbmSrc)
 	{
 		DeleteObject(c_hbmSrc);
 		c_hbmSrc = 0;
 	}
 
-	if(c_hbmDest)
+	if (c_hbmDest)
 	{
 		DeleteObject(c_hbmDest);
 		c_hbmDest = 0;
 	}
 
-	if(c_hbmBgBitmap)
+	if (c_hbmBgBitmap)
 	{
 		DeleteObject(c_hbmBgBitmap);
 		c_hbmBgBitmap = 0;
 	}
 
-	if(hPenLeft)
+	if (hPenLeft)
 	{
 		DeleteObject(hPenLeft);
 		hPenLeft = 0;
 	}
 
-	if(hPenLeftOverlap)
+	if (hPenLeftOverlap)
 	{
 		DeleteObject(hPenLeftOverlap);
 		hPenLeftOverlap = 0;
 	}
 
-	if(hPenRight)
+	if (hPenRight)
 	{
 		DeleteObject(hPenRight);
 		hPenRight = 0;
 	}
 
-	if(hPenRightOverlap)
+	if (hPenRightOverlap)
 	{
 		DeleteObject(hPenRightOverlap);
 		hPenRightOverlap = 0;
 	}
 
-
-
-	if(hBrushFFTLeft)
+	if (hBrushFFTLeft)
 	{
 		DeleteObject(hBrushFFTLeft);
 		hBrushFFTLeft = 0;
 	}
 
-	if(hBrushFFTLeftOverlap)
+	if (hBrushFFTLeftOverlap)
 	{
 		DeleteObject(hBrushFFTLeftOverlap);
 		hBrushFFTLeftOverlap = 0;
 	}
 
-	if(hBrushFFTRight)
+	if (hBrushFFTRight)
 	{
 		DeleteObject(hBrushFFTRight);
 		hBrushFFTRight = 0;
 	}
 
-	if(hBrushFFTRightOverlap)
+	if (hBrushFFTRightOverlap)
 	{
 		DeleteObject(hBrushFFTRightOverlap);
 		hBrushFFTRightOverlap = 0;
@@ -2462,743 +2358,683 @@ void WSpectrum::_FreeFFTGDI()
 	c_nHeight = 0;
 }
 
-
-
-int WSpectrum::SetSamples(void *pSamples, unsigned int nSampleNum)
+int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 {
 	// check memory allocation
-	if(c_pnLeftAmplitude == 0)
+	if (c_pnLeftAmplitude == 0)
 		return 0;
 
 	// calculate fft
 	unsigned int i;
 
-
-
-	if(c_fft.CalculateFFT(pSamples, nSampleNum) == 0)
+	if (c_fft.CalculateFFT(pSamples, nSampleNum) == 0)
 	{
 		// fail to calculate samples
-		if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+		if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 		{
-			for(i = 0; i < c_nPointsNumber; i++)
+			for (i = 0; i < c_nPointsNumber; i++)
 			{
 				FFT_Left[i].y = c_InnerRect.bottom;
-				FFT_Right[i].y =  c_InnerRect.bottom;
+				FFT_Right[i].y = c_InnerRect.bottom;
 				FFT_Tmp[i].y = c_InnerRect.bottom;
 			}
 		}
 		else
 		{
-			for(i = 0; i < c_nPointsNumber; i++)
+			for (i = 0; i < c_nPointsNumber; i++)
 			{
 				FFT_Left[i].y = 0;
-				FFT_Right[i].y =  0;
+				FFT_Right[i].y = 0;
 				FFT_Tmp[i].y = 0;
 			}
 		}
 
 		return 0;
 	}
-	
 
-
-	
-	if(c_nChannel == 1)
+	if (c_nChannel == 1)
 	{
-			// stereo
-		if(c_fft.GetAmplitudeInt(c_pnLeftAmplitude, 0) == 0)
+		// stereo
+		if (c_fft.GetAmplitudeInt(c_pnLeftAmplitude, 0) == 0)
 		{
 			// fail to get amplitude
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
+				for (i = 0; i < c_nPointsNumber; i++)
 				{
 					FFT_Left[i].y = c_InnerRect.bottom;
-					FFT_Right[i].y =  c_InnerRect.bottom;
+					FFT_Right[i].y = c_InnerRect.bottom;
 					FFT_Tmp[i].y = c_InnerRect.bottom;
 				}
 			}
 			else
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
+				for (i = 0; i < c_nPointsNumber; i++)
 				{
 					FFT_Left[i].y = 0;
-					FFT_Right[i].y =  0;
+					FFT_Right[i].y = 0;
 					FFT_Tmp[i].y = 0;
 				}
-
 			}
 
 			return 0;
 		}
 
-
-		if(c_fNeedReduction)
+		if (c_fNeedReduction)
 		{
 			unsigned int i;
-			unsigned int j ;
+			unsigned int j;
 			unsigned int index = 0;
 			LONG sumleft;
 			LONG sumright;
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
-				{	
+				for (i = 0; i < c_nPointsNumber; i++)
+				{
 					sumleft = 0;
 					sumright = 0;
-					for(j = 0; j < c_pnReductionTable[i]; j++)
+					for (j = 0; j < c_pnReductionTable[i]; j++)
 					{
-						sumleft += (FFT_Left[i].y + (c_InnerRect.bottom -  (int)((float) c_pnLeftAmplitude[index] * flHeightScale ))) / 2;
+						sumleft += (FFT_Left[i].y + (c_InnerRect.bottom - (int)((float)c_pnLeftAmplitude[index] * flHeightScale))) / 2;
 						index++;
 					}
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
-					FFT_Right[i].y =  FFT_Left[i].y;
+					FFT_Right[i].y = FFT_Left[i].y;
 					FFT_Tmp[i].y = FFT_Left[i].y;
-
 				}
 			}
 			else
 			{
 
-				for(i = 0; i < c_nPointsNumber; i++)
-				{	
+				for (i = 0; i < c_nPointsNumber; i++)
+				{
 					sumleft = 0;
 					sumright = 0;
-					for(j = 0; j < c_pnReductionTable[i]; j++)
+					for (j = 0; j < c_pnReductionTable[i]; j++)
 					{
-						sumleft += (FFT_Left[i].y + ((int)((float) c_pnLeftAmplitude[index] * flHeightScale ))) / 2;
+						sumleft += (FFT_Left[i].y + ((int)((float)c_pnLeftAmplitude[index] * flHeightScale))) / 2;
 						index++;
 					}
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
-					FFT_Right[i].y =  FFT_Left[i].y;
+					FFT_Right[i].y = FFT_Left[i].y;
 					FFT_Tmp[i].y = FFT_Left[i].y;
-
 				}
-
-					
-
 			}
-
 		}
 		else
 		{
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
+				for (i = 0; i < c_nPointsNumber; i++)
 				{
 
-					FFT_Left[i].y =  (FFT_Left[i].y + (c_InnerRect.bottom -  (int)((float) c_pnLeftAmplitude[i] * flHeightScale ))) / 2;
-					FFT_Right[i].y =  c_InnerRect.bottom;
+					FFT_Left[i].y = (FFT_Left[i].y + (c_InnerRect.bottom - (int)((float)c_pnLeftAmplitude[i] * flHeightScale))) / 2;
+					FFT_Right[i].y = c_InnerRect.bottom;
 					FFT_Tmp[i].y = FFT_Left[i].y;
-				}	
+				}
 			}
 			else
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
+				for (i = 0; i < c_nPointsNumber; i++)
 				{
 
-					FFT_Left[i].y =  (FFT_Left[i].y + ((int)((float) c_pnLeftAmplitude[i] * flHeightScale ))) / 2;
-					FFT_Right[i].y =  FFT_Left[i].y;
+					FFT_Left[i].y = (FFT_Left[i].y + ((int)((float)c_pnLeftAmplitude[i] * flHeightScale))) / 2;
+					FFT_Right[i].y = FFT_Left[i].y;
 					FFT_Tmp[i].y = FFT_Left[i].y;
-				}	
-
+				}
 			}
-
 		}
-
 	}
 	else
 	{
 		// stereo
-		if(c_fft.GetAmplitudeInt(c_pnLeftAmplitude, c_pnRightAmplitude) == 0)
+		if (c_fft.GetAmplitudeInt(c_pnLeftAmplitude, c_pnRightAmplitude) == 0)
 		{
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
 				// fail to get amplitude
-				for(i = 0; i < c_nHarmonicsNumber; i++)
+				for (i = 0; i < c_nHarmonicsNumber; i++)
 				{
 					FFT_Left[i].y = c_InnerRect.bottom;
-					FFT_Right[i].y =  c_InnerRect.bottom;
+					FFT_Right[i].y = c_InnerRect.bottom;
 					FFT_Tmp[i].y = c_InnerRect.bottom;
 				}
 			}
 			else
 			{
 				// fail to get amplitude
-				for(i = 0; i < c_nHarmonicsNumber; i++)
+				for (i = 0; i < c_nHarmonicsNumber; i++)
 				{
 					FFT_Left[i].y = 0;
-					FFT_Right[i].y =  0;
+					FFT_Right[i].y = 0;
 					FFT_Tmp[i].y = 0;
 				}
-
 			}
 
 			return 0;
 		}
 
-
-		if(c_fNeedReduction)
+		if (c_fNeedReduction)
 		{
 			unsigned int i;
-			unsigned int j ;
+			unsigned int j;
 			unsigned int index = 0;
 			LONG sumleft;
 			LONG sumright;
 
-
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
-				{	
+				for (i = 0; i < c_nPointsNumber; i++)
+				{
 					sumleft = 0;
 					sumright = 0;
-					for(j = 0; j < c_pnReductionTable[i]; j++)
+					for (j = 0; j < c_pnReductionTable[i]; j++)
 					{
-						sumleft += (FFT_Left[i].y + (c_InnerRect.bottom -  (int)((float) c_pnLeftAmplitude[index] * flHeightScale ))) / 2;
-						sumright += (FFT_Right[i].y + (c_InnerRect.bottom -  (int)((float) c_pnRightAmplitude[index] * flHeightScale ))) / 2;
+						sumleft += (FFT_Left[i].y + (c_InnerRect.bottom - (int)((float)c_pnLeftAmplitude[index] * flHeightScale))) / 2;
+						sumright += (FFT_Right[i].y + (c_InnerRect.bottom - (int)((float)c_pnRightAmplitude[index] * flHeightScale))) / 2;
 						index++;
 					}
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
 					FFT_Right[i].y = sumright / c_pnReductionTable[i];
 					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
-
 				}
 			}
 			else
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
-				{	
+				for (i = 0; i < c_nPointsNumber; i++)
+				{
 					sumleft = 0;
 					sumright = 0;
-					for(j = 0; j < c_pnReductionTable[i]; j++)
+					for (j = 0; j < c_pnReductionTable[i]; j++)
 					{
-						sumleft += (FFT_Left[i].y +  (int)((float) c_pnLeftAmplitude[index] * flHeightScale )) / 2;
-						sumright += (FFT_Right[i].y +  (int)((float) c_pnRightAmplitude[index] * flHeightScale )) / 2;
+						sumleft += (FFT_Left[i].y + (int)((float)c_pnLeftAmplitude[index] * flHeightScale)) / 2;
+						sumright += (FFT_Right[i].y + (int)((float)c_pnRightAmplitude[index] * flHeightScale)) / 2;
 						index++;
 					}
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
 					FFT_Right[i].y = sumright / c_pnReductionTable[i];
 					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
-
 				}
-
 			}
-
 		}
 		else
 		{
 
-			if(flHeightScale != 1.0)
+			if (flHeightScale != 1.0)
 			{
-				for(i = 0; i < c_nPointsNumber; i++)
+				for (i = 0; i < c_nPointsNumber; i++)
 				{
 
-					FFT_Left[i].y =  (FFT_Left[i].y + (c_InnerRect.bottom -  (int)((float) c_pnLeftAmplitude[i] * flHeightScale ))) / 2;
-					FFT_Right[i].y =  (FFT_Right[i].y + (c_InnerRect.bottom -  (int)((float) c_pnRightAmplitude[i] * flHeightScale ))) / 2;
+					FFT_Left[i].y = (FFT_Left[i].y + (c_InnerRect.bottom - (int)((float)c_pnLeftAmplitude[i] * flHeightScale))) / 2;
+					FFT_Right[i].y = (FFT_Right[i].y + (c_InnerRect.bottom - (int)((float)c_pnRightAmplitude[i] * flHeightScale))) / 2;
 					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
 				}
 			}
 			else
 			{
 
-				if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
+				if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 				{
-					for(i = 0; i < c_nPointsNumber; i++)
+					for (i = 0; i < c_nPointsNumber; i++)
 					{
-						FFT_Left[i].y =  (FFT_Left[i].y + (c_InnerRect.bottom -  c_pnLeftAmplitude[i])) / 2;
-						FFT_Right[i].y =  (FFT_Right[i].y + (c_InnerRect.bottom - c_pnRightAmplitude[i])) / 2;
+						FFT_Left[i].y = (FFT_Left[i].y + (c_InnerRect.bottom - c_pnLeftAmplitude[i])) / 2;
+						FFT_Right[i].y = (FFT_Right[i].y + (c_InnerRect.bottom - c_pnRightAmplitude[i])) / 2;
 						FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
 					}
 				}
 				else
 				{
-					for(i = 0; i < c_nPointsNumber; i++)
+					for (i = 0; i < c_nPointsNumber; i++)
 					{
-						FFT_Left[i].y =  (FFT_Left[i].y +  c_pnLeftAmplitude[i]) / 2;
-						FFT_Right[i].y =  (FFT_Right[i].y + c_pnRightAmplitude[i]) / 2;
+						FFT_Left[i].y = (FFT_Left[i].y + c_pnLeftAmplitude[i]) / 2;
+						FFT_Right[i].y = (FFT_Right[i].y + c_pnRightAmplitude[i]) / 2;
 						FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
 					}
 				}
-
 			}
-			
 		}
 	}
 
-
 	return 1;
 }
-
 
 int WSpectrum::DrawOnHDC(HDC hdc, int nX, int nY, int nWidth, int nHeight)
 {
-	if(nWidth < g_FFT_GRAPH_MIN_WIDTH || nHeight < g_FFT_GRAPH_MIN_HEIGHT)
+	if (nWidth < g_FFT_GRAPH_MIN_WIDTH || nHeight < g_FFT_GRAPH_MIN_HEIGHT)
 		return 0;
 
 	// check memory allocation
-	if(c_pnLeftAmplitude == 0)
+	if (c_pnLeftAmplitude == 0)
 		return 0;
 
 	// check if we need to reallocate GDI
-	if(/*c_hdc != hdc || */c_nWidth != nWidth || c_nHeight != nHeight)
+	if (/*c_hdc != hdc || */ c_nWidth != nWidth || c_nHeight != nHeight)
 	{
-		_FreeFFTGDI();	// free old GDI
-		if(_AllocateFFTGDI(hdc, nWidth, nHeight) == 0)	// allocate new GDI
+		_FreeFFTGDI();									// free old GDI
+		if (_AllocateFFTGDI(hdc, nWidth, nHeight) == 0) // allocate new GDI
 			return 0;
-
-		
 	}
 
-
-	switch(c_nSpectrumType)
+	switch (c_nSpectrumType)
 	{
-		case GRAPH_TYPE_LINE_LEFT:
-		case GRAPH_TYPE_LINE_RIGHT:
-		default:
+	case GRAPH_TYPE_LINE_LEFT:
+	case GRAPH_TYPE_LINE_RIGHT:
+	default: {
+		// selct bg bitmap into tmp dc
+		HBITMAP hBmpOld = (HBITMAP)SelectObject(c_hdcSrc, c_hbmBgBitmap);
+		// draw bg bitmap into memory DC
+		BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
+		SelectObject(c_hdcSrc, hBmpOld);
+		HPEN hOldPen;
+		if (c_nSpectrumType == GRAPH_TYPE_LINE_RIGHT)
 		{
-			// selct bg bitmap into tmp dc
-			HBITMAP hBmpOld = (HBITMAP) SelectObject(c_hdcSrc, 	c_hbmBgBitmap);
-			// draw bg bitmap into memory DC
-			BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
-			SelectObject(c_hdcSrc, hBmpOld);
-			HPEN hOldPen;
-			if(c_nSpectrumType == GRAPH_TYPE_LINE_RIGHT)
-			{
-				// draw left channel
-				hOldPen = (HPEN) SelectObject(c_hdcDest, hPenLeft);
-				Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
+			// draw left channel
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
 
-				// draw right channel
-				SelectObject(c_hdcDest, hPenRight);
-				Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
-			}
-			else
-			{
-				// draw right channel
-				SelectObject(c_hdcDest, hPenRight);
-				Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);	
-				
-				// draw left channel
-				hOldPen = (HPEN) SelectObject(c_hdcDest, hPenLeft);
-				Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
-			}
+			// draw right channel
+			SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
+		}
+		else
+		{
+			// draw right channel
+			SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
 
+			// draw left channel
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
+		}
+
+		SelectObject(c_hdcDest, hOldPen);
+	}
+	break;
+
+	case GRAPH_TYPE_AREA_LEFT:
+	case GRAPH_TYPE_AREA_RIGHT: {
+		// seelct bg bitmap into tmp dc
+		HBITMAP hBmpOld = (HBITMAP)SelectObject(c_hdcSrc, c_hbmBgBitmap);
+		// draw bg bitmap into memory DC
+		BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
+		// select temp bitmap into temp hdc
+		SelectObject(c_hdcSrc, hBmpOld);
+
+		// fill temp dc with black color
+		RECT rc;
+		rc.left = 0;
+		rc.top = 0;
+		rc.right = c_nWidth;
+		rc.bottom = c_nHeight;
+		FillRect(c_hdcSrc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+
+		// prepare area bounds
+		FFT_Left[c_nPointsNumber].x = FFT_Left[c_nPointsNumber - 1].x;
+		FFT_Left[c_nPointsNumber].y = c_InnerRect.bottom;
+		FFT_Left[c_nPointsNumber + 1].x = FFT_Left[0].x;
+		FFT_Left[c_nPointsNumber + 1].y = c_InnerRect.bottom;
+
+		FFT_Tmp[c_nPointsNumber].x = FFT_Tmp[c_nPointsNumber - 1].x;
+		FFT_Tmp[c_nPointsNumber].y = c_InnerRect.bottom;
+		FFT_Tmp[c_nPointsNumber + 1].x = FFT_Tmp[0].x;
+		FFT_Tmp[c_nPointsNumber + 1].y = c_InnerRect.bottom;
+
+		FFT_Right[c_nPointsNumber].x = FFT_Right[c_nPointsNumber - 1].x;
+		FFT_Right[c_nPointsNumber].y = c_InnerRect.bottom;
+		FFT_Right[c_nPointsNumber + 1].x = FFT_Right[0].x;
+		FFT_Right[c_nPointsNumber + 1].y = c_InnerRect.bottom;
+
+		HPEN hOldPen;
+		HRGN hRgn;
+
+		if (c_nSpectrumType == GRAPH_TYPE_AREA_RIGHT)
+		{
+			// draw left channel area
+			hRgn = CreatePolygonRgn(FFT_Left, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
+			DeleteObject(hRgn);
+
+			// draw right channel area
+			hRgn = CreatePolygonRgn(FFT_Right, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
+			DeleteObject(hRgn);
+
+			// draw overlaped area
+			hRgn = CreatePolygonRgn(FFT_Tmp, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRightOverlap);
+			DeleteObject(hRgn);
+
+			// alpha blend areas on bg bitmap
+			alpha_blend();
+
+			// draw left channel line
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
+
+			// draw overlaped line
+			SelectObject(c_hdcDest, hPenLeftOverlap);
+			Polyline(c_hdcDest, FFT_Tmp, c_nPointsNumber);
+
+			// draw right channel line
+			SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
+			SelectObject(c_hdcDest, hOldPen);
+		}
+		else
+		{
+
+			// draw right channel area
+			hRgn = CreatePolygonRgn(FFT_Right, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
+			DeleteObject(hRgn);
+
+			// draw left channel area
+			hRgn = CreatePolygonRgn(FFT_Left, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
+			DeleteObject(hRgn);
+
+			// draw overlaped area
+			hRgn = CreatePolygonRgn(FFT_Tmp, c_nPointsNumber + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeftOverlap);
+			DeleteObject(hRgn);
+
+			// alpha blend areas on bg bitmap
+			alpha_blend();
+
+			// draw right channel line
+
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
+
+			// draw overlaped line
+			SelectObject(c_hdcDest, hPenRightOverlap);
+			Polyline(c_hdcDest, FFT_Tmp, c_nPointsNumber);
+
+			// draw left channel line
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
 
 			SelectObject(c_hdcDest, hOldPen);
-
 		}
-		break;
+	}
+	break;
 
-		case GRAPH_TYPE_AREA_LEFT:
-		case GRAPH_TYPE_AREA_RIGHT:
+	case GRAPH_TYPE_BARS_LEFT:
+	case GRAPH_TYPE_BARS_RIGHT: {
+		// select bg bitmap into tmp dc
+		HBITMAP hBmpOld = (HBITMAP)SelectObject(c_hdcSrc, c_hbmBgBitmap);
+		// draw bg bitmap into memory DC
+		BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
+		// select temp bitmap into temp hdc
+		SelectObject(c_hdcSrc, hBmpOld);
+
+		// fill temp dc with black color
+		RECT rc;
+		rc.left = 0;
+		rc.top = 0;
+		rc.right = c_nWidth;
+		rc.bottom = c_nHeight;
+		FillRect(c_hdcSrc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+		unsigned int i;
+		if (c_nSpectrumType == GRAPH_TYPE_BARS_RIGHT)
 		{
-			// seelct bg bitmap into tmp dc
-			HBITMAP hBmpOld = (HBITMAP) SelectObject(c_hdcSrc, c_hbmBgBitmap);
-			// draw bg bitmap into memory DC
-			BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
-			// select temp bitmap into temp hdc
-			SelectObject(c_hdcSrc, hBmpOld);
+			for (i = 0; i < c_nPointsNumber - 1; i++)
+			{
+				FFT_Tmp1[i * 2].x = FFT_Left[i].x;
+				FFT_Tmp1[i * 2].y = FFT_Left[i].y;
+				FFT_Tmp1[i * 2 + 1].x = FFT_Left[i + 1].x;
+				FFT_Tmp1[i * 2 + 1].y = FFT_Left[i].y;
+			}
 
-			// fill temp dc with black color
-			RECT rc;
-			rc.left = 0;
-			rc.top = 0;
-			rc.right = c_nWidth;
-			rc.bottom = c_nHeight;
-			FillRect(c_hdcSrc, &rc, (HBRUSH) GetStockObject(BLACK_BRUSH));
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2].y = FFT_Left[c_nPointsNumber - 1].y;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp1[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp1[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp1[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp1[c_nPointsNumber * 2 + 1].y = FFT_Tmp1[0].y;
 
-
-			// prepare area bounds
-			FFT_Left[c_nPointsNumber].x = FFT_Left[c_nPointsNumber - 1].x;
-			FFT_Left[c_nPointsNumber].y = c_InnerRect.bottom;
-			FFT_Left[c_nPointsNumber + 1].x = FFT_Left[0].x;
-			FFT_Left[c_nPointsNumber + 1].y = c_InnerRect.bottom;
-
-			FFT_Tmp[c_nPointsNumber].x = FFT_Tmp[c_nPointsNumber - 1].x;
-			FFT_Tmp[c_nPointsNumber].y = c_InnerRect.bottom;
-			FFT_Tmp[c_nPointsNumber + 1].x = FFT_Tmp[0].x;
-			FFT_Tmp[c_nPointsNumber + 1].y = c_InnerRect.bottom;
-
-			FFT_Right[c_nPointsNumber].x = FFT_Right[c_nPointsNumber - 1].x;
-			FFT_Right[c_nPointsNumber].y = c_InnerRect.bottom;
-			FFT_Right[c_nPointsNumber + 1].x = FFT_Right[0].x;
-			FFT_Right[c_nPointsNumber + 1].y = c_InnerRect.bottom;
-
-
-			HPEN hOldPen;
 			HRGN hRgn;
 
-			if(c_nSpectrumType == GRAPH_TYPE_AREA_RIGHT)
+			// draw left channel area
+			hRgn = CreatePolygonRgn(FFT_Tmp1, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
+			DeleteObject(hRgn);
+
+			for (i = 0; i < c_nPointsNumber - 1; i++)
 			{
-				// draw left channel area
-				hRgn = CreatePolygonRgn(FFT_Left, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
-				DeleteObject(hRgn);
-							
-				// draw right channel area
-				hRgn = CreatePolygonRgn(FFT_Right, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
-				DeleteObject(hRgn);
-									
-				// draw overlaped area
-				hRgn = CreatePolygonRgn(FFT_Tmp, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTRightOverlap);
-				DeleteObject(hRgn);
-
-				// alpha blend areas on bg bitmap
-				alpha_blend();
-
-				// draw left channel line
-				hOldPen = (HPEN) SelectObject(c_hdcDest, hPenLeft);
-				Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
-
-				// draw overlaped line
-				SelectObject(c_hdcDest, hPenLeftOverlap);
-				Polyline(c_hdcDest, FFT_Tmp, c_nPointsNumber);
-
-				// draw right channel line				
-				SelectObject(c_hdcDest, hPenRight);
-				Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
-				SelectObject(c_hdcDest, hOldPen);
-			
-			}
-			else
-			{
-									
-				// draw right channel area
-				hRgn = CreatePolygonRgn(FFT_Right, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
-				DeleteObject(hRgn);
-
-
-				// draw left channel area
-				hRgn = CreatePolygonRgn(FFT_Left, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
-				DeleteObject(hRgn);
-								
-				// draw overlaped area
-				hRgn = CreatePolygonRgn(FFT_Tmp, c_nPointsNumber + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTLeftOverlap);
-				DeleteObject(hRgn);
-
-				// alpha blend areas on bg bitmap
-				alpha_blend();
-			
-
-				// draw right channel line
-									
-				hOldPen = (HPEN) SelectObject(c_hdcDest, hPenRight);
-				Polyline(c_hdcDest, FFT_Right, c_nPointsNumber);
-
-				// draw overlaped line
-				SelectObject(c_hdcDest, hPenRightOverlap);
-				Polyline(c_hdcDest, FFT_Tmp, c_nPointsNumber);
-
-				// draw left channel line
-				hOldPen = (HPEN) SelectObject(c_hdcDest, hPenLeft);
-				Polyline(c_hdcDest, FFT_Left, c_nPointsNumber);
-
-				SelectObject(c_hdcDest, hOldPen);
-				
+				FFT_Tmp2[i * 2].x = FFT_Right[i].x;
+				FFT_Tmp2[i * 2].y = FFT_Right[i].y;
+				FFT_Tmp2[i * 2 + 1].x = FFT_Right[i + 1].x;
+				FFT_Tmp2[i * 2 + 1].y = FFT_Right[i].y;
 			}
 
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2].x = FFT_Right[c_nPointsNumber - 1].x;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2].y = FFT_Right[c_nPointsNumber - 1].y;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Right[c_nPointsNumber - 1].x;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp2[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp2[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp2[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp2[c_nPointsNumber * 2 + 1].y = FFT_Tmp2[0].y;
+
+			// draw right channel area
+			hRgn = CreatePolygonRgn(FFT_Tmp2, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
+			DeleteObject(hRgn);
+
+			for (i = 0; i < c_nPointsNumber - 1; i++)
+			{
+				FFT_Tmp3[i * 2].x = FFT_Tmp[i].x;
+				FFT_Tmp3[i * 2].y = FFT_Tmp[i].y;
+				FFT_Tmp3[i * 2 + 1].x = FFT_Tmp[i + 1].x;
+				FFT_Tmp3[i * 2 + 1].y = FFT_Tmp[i].y;
+			}
+
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2].x = FFT_Tmp[c_nPointsNumber - 1].x;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2].y = FFT_Tmp[c_nPointsNumber - 1].y;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp3[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp3[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp3[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp3[c_nPointsNumber * 2 + 1].y = FFT_Tmp3[0].y;
+
+			// draw overlap area
+			hRgn = CreatePolygonRgn(FFT_Tmp3, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRightOverlap);
+			DeleteObject(hRgn);
+
+			alpha_blend();
+
+			HPEN hOldPen;
+			// draw left channel line
+			hOldPen = (HPEN)SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Tmp1, c_nPointsNumber * 2 - 1);
+
+			// draw overlaped line
+			SelectObject(c_hdcDest, hPenRightOverlap);
+			Polyline(c_hdcDest, FFT_Tmp3, c_nPointsNumber * 2 - 1);
+
+			// draw right channel line
+			SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Tmp2, c_nPointsNumber * 2 - 1);
+			SelectObject(c_hdcDest, hOldPen);
 		}
-		break;
-
-
-
-		
-		case GRAPH_TYPE_BARS_LEFT:
-		case GRAPH_TYPE_BARS_RIGHT:
+		else
 		{
-			// select bg bitmap into tmp dc
-			HBITMAP hBmpOld = (HBITMAP) SelectObject(c_hdcSrc, c_hbmBgBitmap);
+			for (i = 0; i < c_nPointsNumber - 1; i++)
+			{
+				FFT_Tmp1[i * 2].x = FFT_Right[i].x;
+				FFT_Tmp1[i * 2].y = FFT_Right[i].y;
+				FFT_Tmp1[i * 2 + 1].x = FFT_Right[i + 1].x;
+				FFT_Tmp1[i * 2 + 1].y = FFT_Right[i].y;
+			}
+
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2].x = FFT_Right[c_nPointsNumber - 1].x;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2].y = FFT_Right[c_nPointsNumber - 1].y;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Right[c_nPointsNumber - 1].x;
+			FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp1[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp1[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp1[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp1[c_nPointsNumber * 2 + 1].y = FFT_Tmp1[0].y;
+
+			HRGN hRgn;
+
+			// draw right channel area
+			hRgn = CreatePolygonRgn(FFT_Tmp1, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
+			DeleteObject(hRgn);
+
+			for (i = 0; i < c_nPointsNumber - 1; i++)
+			{
+				FFT_Tmp2[i * 2].x = FFT_Left[i].x;
+				FFT_Tmp2[i * 2].y = FFT_Left[i].y;
+				FFT_Tmp2[i * 2 + 1].x = FFT_Left[i + 1].x;
+				FFT_Tmp2[i * 2 + 1].y = FFT_Left[i].y;
+			}
+
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2].y = FFT_Left[c_nPointsNumber - 1].y;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp2[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp2[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp2[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp2[c_nPointsNumber * 2 + 1].y = FFT_Tmp2[0].y;
+
+			// draw left channel area
+			hRgn = CreatePolygonRgn(FFT_Tmp2, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
+			DeleteObject(hRgn);
+
+			for (i = 0; i < c_nPointsNumber - 1; i++)
+			{
+				FFT_Tmp3[i * 2].x = FFT_Tmp[i].x;
+				FFT_Tmp3[i * 2].y = FFT_Tmp[i].y;
+				FFT_Tmp3[i * 2 + 1].x = FFT_Tmp[i + 1].x;
+				FFT_Tmp3[i * 2 + 1].y = FFT_Tmp[i].y;
+			}
+
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2].x = FFT_Tmp[c_nPointsNumber - 1].x;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2].y = FFT_Tmp[c_nPointsNumber - 1].y;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
+			FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
+			FFT_Tmp3[c_nPointsNumber * 2].x = c_InnerRect.left;
+			FFT_Tmp3[c_nPointsNumber * 2].y = c_InnerRect.bottom;
+			FFT_Tmp3[c_nPointsNumber * 2 + 1].x = c_InnerRect.left;
+			FFT_Tmp3[c_nPointsNumber * 2 + 1].y = FFT_Tmp3[0].y;
+
+			// draw left channel area
+			hRgn = CreatePolygonRgn(FFT_Tmp3, c_nPointsNumber * 2 + 2, ALTERNATE);
+			FillRgn(c_hdcSrc, hRgn, hBrushFFTLeftOverlap);
+			DeleteObject(hRgn);
+
+			alpha_blend();
+
+			// draw right channel line
+
+			HPEN hOldPen = (HPEN)SelectObject(c_hdcDest, hPenRight);
+			Polyline(c_hdcDest, FFT_Tmp1, c_nPointsNumber * 2 - 1);
+
+			// draw overlaped line
+			SelectObject(c_hdcDest, hPenRightOverlap);
+			Polyline(c_hdcDest, FFT_Tmp3, c_nPointsNumber * 2 - 1);
+
+			// draw left channel line
+			SelectObject(c_hdcDest, hPenLeft);
+			Polyline(c_hdcDest, FFT_Tmp2, c_nPointsNumber * 2 - 1);
+
+			SelectObject(c_hdcDest, hOldPen);
+		}
+	}
+	break;
+
+	case GRAPH_TYPE_SPECTRUM: {
+
+		if (c_clearFFTDisplay)
+		{
+			// selct bg bitmap into tmp dc
+			HBITMAP hBmpOld = (HBITMAP)SelectObject(c_hdcSrc, c_hbmBgBitmap);
 			// draw bg bitmap into memory DC
 			BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
-			// select temp bitmap into temp hdc
 			SelectObject(c_hdcSrc, hBmpOld);
-
-
-			// fill temp dc with black color
-			RECT rc;
-			rc.left = 0;
-			rc.top = 0;
-			rc.right = c_nWidth;
-			rc.bottom = c_nHeight;
-			FillRect(c_hdcSrc, &rc, (HBRUSH) GetStockObject(BLACK_BRUSH));
-			unsigned int i;			
-			if(c_nSpectrumType == GRAPH_TYPE_BARS_RIGHT)
-			{
-					for(i = 0; i < c_nPointsNumber - 1; i++)
-					{
-						FFT_Tmp1[i * 2].x = FFT_Left[i].x;
-						FFT_Tmp1[i * 2].y = FFT_Left[i].y;
-						FFT_Tmp1[i * 2 + 1].x = FFT_Left[i + 1].x;
-						FFT_Tmp1[i * 2 + 1].y = FFT_Left[i].y;
-					}
-
-						
-
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2].x = FFT_Left[c_nPointsNumber - 1].x;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2].y = FFT_Left[c_nPointsNumber - 1].y;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-					FFT_Tmp1[c_nPointsNumber  * 2].x = c_InnerRect.left;
-					FFT_Tmp1[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-					FFT_Tmp1[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-					FFT_Tmp1[c_nPointsNumber  * 2 + 1].y = FFT_Tmp1[0].y;
-
-					HRGN hRgn;
-
-					// draw left channel area
-				hRgn = CreatePolygonRgn(FFT_Tmp1, c_nPointsNumber * 2 + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
-				DeleteObject(hRgn);
-
-
-				for(i = 0; i < c_nPointsNumber - 1; i++)
-				{
-					FFT_Tmp2[i * 2].x = FFT_Right[i].x;
-					FFT_Tmp2[i * 2].y = FFT_Right[i].y;
-					FFT_Tmp2[i * 2 + 1].x = FFT_Right[i + 1].x;
-					FFT_Tmp2[i * 2 + 1].y = FFT_Right[i].y;
-				}
-
-				FFT_Tmp2[(c_nPointsNumber - 1) * 2].x = FFT_Right[c_nPointsNumber - 1].x;
-				FFT_Tmp2[(c_nPointsNumber - 1) * 2].y = FFT_Right[c_nPointsNumber - 1].y;
-				FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Right[c_nPointsNumber - 1].x;
-				FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-				FFT_Tmp2[c_nPointsNumber  * 2].x = c_InnerRect.left;
-				FFT_Tmp2[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-				FFT_Tmp2[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-				FFT_Tmp2[c_nPointsNumber  * 2 + 1].y = FFT_Tmp2[0].y;
-
-				// draw right channel area
-				hRgn = CreatePolygonRgn(FFT_Tmp2, c_nPointsNumber * 2 + 2, ALTERNATE);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
-				DeleteObject(hRgn);
-
-				for(i = 0; i < c_nPointsNumber - 1; i++)
-				{
-					FFT_Tmp3[i * 2].x = FFT_Tmp[i].x;
-					FFT_Tmp3[i * 2].y = FFT_Tmp[i].y;
-					FFT_Tmp3[i * 2 + 1].x = FFT_Tmp[i + 1].x;
-					FFT_Tmp3[i * 2 + 1].y = FFT_Tmp[i].y;
-				}
-
-				FFT_Tmp3[(c_nPointsNumber - 1) * 2].x = FFT_Tmp[c_nPointsNumber - 1].x;
-				FFT_Tmp3[(c_nPointsNumber - 1) * 2].y = FFT_Tmp[c_nPointsNumber - 1].y;
-				FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
-				FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-				FFT_Tmp3[c_nPointsNumber  * 2].x = c_InnerRect.left;
-				FFT_Tmp3[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-				FFT_Tmp3[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-				FFT_Tmp3[c_nPointsNumber  * 2 + 1].y = FFT_Tmp3[0].y;
-
-
-				// draw overlap area
-				hRgn = CreatePolygonRgn(FFT_Tmp3, c_nPointsNumber * 2 + 2, ALTERNATE	);
-				FillRgn(c_hdcSrc, hRgn, hBrushFFTRightOverlap);
-				DeleteObject(hRgn);
-
-				alpha_blend();
-				
-				HPEN hOldPen;
-				// draw left channel line
-				hOldPen = (HPEN)  SelectObject(c_hdcDest, hPenLeft);
-				Polyline(c_hdcDest, FFT_Tmp1, c_nPointsNumber * 2 - 1);
-									
-				// draw overlaped line
-				SelectObject(c_hdcDest, hPenRightOverlap);
-				Polyline(c_hdcDest, FFT_Tmp3, c_nPointsNumber * 2 - 1);
-
-				// draw right channel line
-				SelectObject(c_hdcDest, hPenRight);
-				Polyline(c_hdcDest, FFT_Tmp2, c_nPointsNumber * 2 - 1);
-				SelectObject(c_hdcDest, hOldPen);
-			}
-			else
-			{
-					for(i = 0; i < c_nPointsNumber - 1; i++)
-					{
-						FFT_Tmp1[i * 2].x = FFT_Right[i].x;
-						FFT_Tmp1[i * 2].y = FFT_Right[i].y;
-						FFT_Tmp1[i * 2 + 1].x = FFT_Right[i + 1].x;
-						FFT_Tmp1[i * 2 + 1].y = FFT_Right[i].y;
-					}
-
-						
-
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2].x = FFT_Right[c_nPointsNumber - 1].x;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2].y = FFT_Right[c_nPointsNumber - 1].y;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Right[c_nPointsNumber - 1].x;
-					FFT_Tmp1[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-					FFT_Tmp1[c_nPointsNumber  * 2].x = c_InnerRect.left;
-					FFT_Tmp1[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-					FFT_Tmp1[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-					FFT_Tmp1[c_nPointsNumber  * 2 + 1].y = FFT_Tmp1[0].y;
-
-					HRGN hRgn;
-
-					// draw right channel area
-					hRgn = CreatePolygonRgn(FFT_Tmp1, c_nPointsNumber * 2 + 2, ALTERNATE);
-					FillRgn(c_hdcSrc, hRgn, hBrushFFTRight);
-					DeleteObject(hRgn);
-
-
-					for(i = 0; i < c_nPointsNumber - 1; i++)
-					{
-						FFT_Tmp2[i * 2].x = FFT_Left[i].x;
-						FFT_Tmp2[i * 2].y = FFT_Left[i].y;
-						FFT_Tmp2[i * 2 + 1].x = FFT_Left[i + 1].x;
-						FFT_Tmp2[i * 2 + 1].y = FFT_Left[i].y;
-					}
-
-					FFT_Tmp2[(c_nPointsNumber - 1) * 2].x = FFT_Left[c_nPointsNumber - 1].x;
-					FFT_Tmp2[(c_nPointsNumber - 1) * 2].y = FFT_Left[c_nPointsNumber - 1].y;
-					FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
-					FFT_Tmp2[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-					FFT_Tmp2[c_nPointsNumber  * 2].x = c_InnerRect.left;
-					FFT_Tmp2[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-					FFT_Tmp2[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-					FFT_Tmp2[c_nPointsNumber  * 2 + 1].y = FFT_Tmp2[0].y;
-
-
-					// draw left channel area
-					hRgn = CreatePolygonRgn(FFT_Tmp2, c_nPointsNumber * 2 + 2, ALTERNATE);
-					FillRgn(c_hdcSrc, hRgn, hBrushFFTLeft);
-					DeleteObject(hRgn);
-
-					for(i = 0; i < c_nPointsNumber - 1; i++)
-					{
-						FFT_Tmp3[i * 2].x = FFT_Tmp[i].x;
-						FFT_Tmp3[i * 2].y = FFT_Tmp[i].y;
-						FFT_Tmp3[i * 2 + 1].x = FFT_Tmp[i + 1].x;
-						FFT_Tmp3[i * 2 + 1].y = FFT_Tmp[i].y;
-					}
-
-					FFT_Tmp3[(c_nPointsNumber - 1) * 2].x = FFT_Tmp[c_nPointsNumber - 1].x;
-					FFT_Tmp3[(c_nPointsNumber - 1) * 2].y = FFT_Tmp[c_nPointsNumber - 1].y;
-					FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].x = FFT_Left[c_nPointsNumber - 1].x;
-					FFT_Tmp3[(c_nPointsNumber - 1) * 2 + 1].y = c_InnerRect.bottom;
-					FFT_Tmp3[c_nPointsNumber  * 2].x = c_InnerRect.left;
-					FFT_Tmp3[c_nPointsNumber  * 2].y = c_InnerRect.bottom;
-					FFT_Tmp3[c_nPointsNumber  * 2 + 1].x = c_InnerRect.left;
-					FFT_Tmp3[c_nPointsNumber  * 2 + 1].y = FFT_Tmp3[0].y;
-
-
-					// draw left channel area
-					hRgn = CreatePolygonRgn(FFT_Tmp3, c_nPointsNumber * 2 + 2, ALTERNATE);
-					FillRgn(c_hdcSrc, hRgn, hBrushFFTLeftOverlap);
-					DeleteObject(hRgn);
-
-					alpha_blend();
-
-					// draw right channel line
-									
-					HPEN hOldPen = (HPEN) SelectObject(c_hdcDest, hPenRight);
-					Polyline(c_hdcDest, FFT_Tmp1, c_nPointsNumber * 2 - 1);
-
-					// draw overlaped line
-					SelectObject(c_hdcDest, hPenRightOverlap);
-					Polyline(c_hdcDest, FFT_Tmp3, c_nPointsNumber * 2 - 1);
-
-					// draw left channel line
-					SelectObject(c_hdcDest, hPenLeft);
-					Polyline(c_hdcDest, FFT_Tmp2, c_nPointsNumber * 2 - 1);
-
-					SelectObject(c_hdcDest, hOldPen);
-			}
-								
-
+			c_clearFFTDisplay = 0;
 		}
-		break;
 
-
-		case GRAPH_TYPE_SPECTRUM:
+		int i = 0;
+		register BYTE* pbDestRGB;
+		int height = c_InnerRect.bottom - c_InnerRect.top + 1;
+		int k;
+		int pos = c_spectrum_pos + 1;
+		if (pos >= c_nWidth - 4)
+			pos = 0;
+		for (k = 0; k < c_nPointsNumber; k++)
 		{
+			int value = (FFT_Left[k].y + FFT_Right[k].y) / 2;
 
-			if(c_clearFFTDisplay)
+			value = sqrt((double)value) * 10;
+
+			if (value >= 120)
+				value = 120;
+
+			for (i; i <= FFT_Left[k].x; i++)
 			{
-				// selct bg bitmap into tmp dc
-				HBITMAP hBmpOld = (HBITMAP) SelectObject(c_hdcSrc, 	c_hbmBgBitmap);
-				// draw bg bitmap into memory DC
-				BitBlt(c_hdcDest, 0, 0, c_nWidth, c_nHeight, c_hdcSrc, 0, 0, SRCCOPY);
-				SelectObject(c_hdcSrc, hBmpOld);
-				c_clearFFTDisplay = 0;
+				pbDestRGB = (BYTE*)((DWORD*)c_pDestBits + ((i + 2) * c_nWidth) + 2 + c_spectrum_pos);
+				pbDestRGB[0] = g_spectrum_map[value].rgbRed;
+				pbDestRGB[1] = g_spectrum_map[value].rgbGreen;
+				pbDestRGB[2] = g_spectrum_map[value].rgbBlue;
+
+				pbDestRGB = (BYTE*)((DWORD*)c_pDestBits + ((i + 2) * c_nWidth) + 2 + pos);
+
+				pbDestRGB[0] = 200;
+				pbDestRGB[1] = 200;
+				pbDestRGB[2] = 200;
 			}
-
-
-			int i = 0;
-			register BYTE *pbDestRGB;
-			int height = c_InnerRect.bottom - c_InnerRect.top + 1;
-			int k;
-			int pos = c_spectrum_pos + 1;
-			if(pos >= c_nWidth - 4)
-				pos = 0;
-			for(k = 0; k < c_nPointsNumber; k++)
-			{
-				int value = (FFT_Left[k].y + FFT_Right[k].y) / 2;
-
-				value = sqrt((double) value) * 10;
-
-				if(value >= 120)
-					value = 120;
-
-				for(i; i <= FFT_Left[k].x; i++)
-				{
-					pbDestRGB = (BYTE*) ((DWORD*) c_pDestBits + ( (i + 2)  * c_nWidth) + 2 + c_spectrum_pos);		
-					pbDestRGB[0] = g_spectrum_map[value].rgbRed;
-					pbDestRGB[1] = g_spectrum_map[value].rgbGreen;
-					pbDestRGB[2] = g_spectrum_map[value].rgbBlue;
-
-					pbDestRGB = (BYTE*) ((DWORD*) c_pDestBits + ( (i + 2)  * c_nWidth) + 2 + pos);
-									
-					pbDestRGB[0]= 200;
-					pbDestRGB[1] = 200;
-					pbDestRGB[2] = 200;
-				}
-			}
-
-
-			c_spectrum_pos = pos;
 		}
-		break;
+
+		c_spectrum_pos = pos;
+	}
+	break;
 	}
 
-	BitBlt(hdc, nX, nY, nWidth, nHeight, c_hdcDest, 0, 0, SRCCOPY); 
+	BitBlt(hdc, nX, nY, nWidth, nHeight, c_hdcDest, 0, 0, SRCCOPY);
 
 	return 1;
 }
 
-
-
-HBITMAP CreateBitmapFromMemory(HDC hdc, int nWidth, int nHeight, unsigned int nBitPerPixel, RGBQUAD *rgbColorTable, unsigned int nColorUsed, VOID *pBitmapBitsArray, unsigned int nSizeOfBitmapArray)
+HBITMAP CreateBitmapFromMemory(HDC hdc, int nWidth, int nHeight, unsigned int nBitPerPixel, RGBQUAD* rgbColorTable, unsigned int nColorUsed, VOID* pBitmapBitsArray, unsigned int nSizeOfBitmapArray)
 {
 	unsigned int fDeleteDC = 0;
-	if(hdc == 0) {
+	if (hdc == 0)
+	{
 		hdc = CreateCompatibleDC(NULL);
-		if(hdc == 0) return 0;
+		if (hdc == 0)
+			return 0;
 		fDeleteDC = 1;
-	}			
-	if(nWidth == 0 ||nHeight == 0 || nBitPerPixel == 0) return 0;
-	if(nColorUsed != 0 && rgbColorTable == 0) return 0;
+	}
+	if (nWidth == 0 || nHeight == 0 || nBitPerPixel == 0)
+		return 0;
+	if (nColorUsed != 0 && rgbColorTable == 0)
+		return 0;
 	// allocate memory for BITMAPINFO + memory for RGBQUAD color table
-	BITMAPINFO *pBitmapInfo = (BITMAPINFO*) malloc(sizeof(BITMAPINFO) + nColorUsed * sizeof(RGBQUAD));
-	if(pBitmapInfo == 0) return 0;
+	BITMAPINFO* pBitmapInfo = (BITMAPINFO*)malloc(sizeof(BITMAPINFO) + nColorUsed * sizeof(RGBQUAD));
+	if (pBitmapInfo == 0)
+		return 0;
 	// set BITMAPINFO VALUES
 	pBitmapInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	pBitmapInfo->bmiHeader.biWidth = nWidth;
 	pBitmapInfo->bmiHeader.biHeight = nHeight;
 	pBitmapInfo->bmiHeader.biPlanes = 1;
-	pBitmapInfo->bmiHeader.biBitCount = nBitPerPixel; 
+	pBitmapInfo->bmiHeader.biBitCount = nBitPerPixel;
 	pBitmapInfo->bmiHeader.biCompression = BI_RGB;
 	pBitmapInfo->bmiHeader.biSizeImage = nSizeOfBitmapArray;
 	pBitmapInfo->bmiHeader.biXPelsPerMeter = 0;
@@ -3206,61 +3042,58 @@ HBITMAP CreateBitmapFromMemory(HDC hdc, int nWidth, int nHeight, unsigned int nB
 	pBitmapInfo->bmiHeader.biClrUsed = nColorUsed;
 	pBitmapInfo->bmiHeader.biClrImportant = 0;
 	unsigned int i;
-	for(i = 0; i < nColorUsed; i++) {
+	for (i = 0; i < nColorUsed; i++)
+	{
 		pBitmapInfo->bmiColors[i].rgbBlue = rgbColorTable[i].rgbBlue;
 		pBitmapInfo->bmiColors[i].rgbGreen = rgbColorTable[i].rgbGreen;
 		pBitmapInfo->bmiColors[i].rgbRed = rgbColorTable[i].rgbRed;
 		pBitmapInfo->bmiColors[i].rgbReserved = 0;
 	}
 	// create bitmap
-	VOID *pBits;
-	HBITMAP hbm = CreateDIBSection(hdc, pBitmapInfo, DIB_RGB_COLORS, &pBits, NULL, 0); 
-	if(fDeleteDC)
+	VOID* pBits;
+	HBITMAP hbm = CreateDIBSection(hdc, pBitmapInfo, DIB_RGB_COLORS, &pBits, NULL, 0);
+	if (fDeleteDC)
 		DeleteDC(hdc);
 	free(pBitmapInfo);
-	if(hbm == 0) return 0;
+	if (hbm == 0)
+		return 0;
 	// copy data to bitmap
 	memcpy(pBits, pBitmapBitsArray, nSizeOfBitmapArray);
 	return hbm;
 }
 
-
-
-
-
-void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int nStartFreq, unsigned int nEndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight)
+void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int nStartFreq, unsigned int nEndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight)
 {
-	// calculate resolution 
+	// calculate resolution
 
 	int nWidth1 = c_InnerRect.right - c_InnerRect.left + 1;
 	unsigned int i;
 	unsigned int j;
-		
+
 	unsigned int nResolutionStep = 0;
 	unsigned int nResolutionTableIndex = 0;
 
-	for(i = 0; i < ResolutionTableSize; i++)
+	for (i = 0; i < ResolutionTableSize; i++)
 	{
 		unsigned int nSumSize = 0;
 		nResolutionStep = ResolutionTableLinear[i].Resolution;
 		// calculate sum size of all text labels
-		for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+		for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 		{
 
 			// calculate text width
-			if(freq_table[j].nWidth == 0)
+			if (freq_table[j].nWidth == 0)
 			{
 				char tmp[10];
 				sprintf(tmp, "%u", j);
 				freq_table[j].nWidth = c_BmpFont->GetTextWidth(tmp);
 			}
 
-
-			nSumSize += (freq_table[j].nWidth  + SpaceBetweenText);	
+			nSumSize += (freq_table[j].nWidth + SpaceBetweenText);
 		}
 
 		// if all text labels fits, this is our resolution
-		if(nSumSize <= nWidth1)
+		if (nSumSize <= nWidth1)
 		{
 			nResolutionTableIndex = i;
 			break;
@@ -3268,42 +3101,41 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 	}
 
 	// if some error, set maximal resolution
-	if(nResolutionStep == 0)
+	if (nResolutionStep == 0)
 	{
 		nResolutionTableIndex = ResolutionTableSize - 1;
 		nResolutionStep = ResolutionTableLinear[ResolutionTableSize - 1].Resolution;
 	}
 
-
 	// draw grid lines
 	HPEN hGridPen = CreatePen(PS_SOLID, 1, cr3);
 	HPEN hSubGridPen = CreatePen(PS_SOLID, 1, cr5);
 	HPEN hMainMarkPen = CreatePen(PS_SOLID, 1, cr6);
-	HPEN hOldPen = (HPEN) SelectObject(hdc, hGridPen);
+	HPEN hOldPen = (HPEN)SelectObject(hdc, hGridPen);
 
-	POINT p[5];	
-	for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+	POINT p[5];
+	for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 	{
-		if(j !=  nStartFreq ||  fDrawZerroGrid == 1) 
+		if (j != nStartFreq || fDrawZerroGrid == 1)
 		{
-			
+
 			// draw grid line
 			p[0].x = freq_table[j].nX;
 			p[0].y = c_InnerRect.top;
 			p[1].x = p[0].x;
 			p[1].y = c_InnerRect.bottom;
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
 			{
 				SelectObject(hdc, hGridPen);
 				Polyline(hdc, p, 2);
 			}
 
-			// draw main marker 
+			// draw main marker
 			p[0].y = c_InnerRect.bottom + 1;
 			p[1].y = c_InnerRect.bottom + 5;
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 			{
 				SelectObject(hdc, hMainMarkPen);
 				Polyline(hdc, p, 2);
@@ -3311,35 +3143,34 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 		}
 
 		// draw middle marks and subgrid lines
-		if(j > nStartFreq)
+		if (j > nStartFreq)
 		{
-			if( freq_table[j - nResolutionStep].nX + MinMiddleMarksFrameWidthLinear <= freq_table[j].nX)
+			if (freq_table[j - nResolutionStep].nX + MinMiddleMarksFrameWidthLinear <= freq_table[j].nX)
 			{
 				unsigned int nMarkStep = ResolutionTableLinear[nResolutionTableIndex].MarkStep;
 				unsigned int nMarksNumber = nResolutionStep / nMarkStep;
-				for(i = 1; i < nMarksNumber; i++)
+				for (i = 1; i < nMarksNumber; i++)
 				{
 					p[0].x = freq_table[j - nResolutionStep + i * nMarkStep].nX;
 					p[1].x = p[0].x;
 					p[0].y = c_InnerRect.bottom + 1;
 
-					
-					if(ResolutionTableLinear[nResolutionTableIndex].AddOddLines && ((i % 2) == 0))
+					if (ResolutionTableLinear[nResolutionTableIndex].AddOddLines && ((i % 2) == 0))
 					{
 						p[1].y = c_InnerRect.bottom + 5;
 
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 						{
 							SelectObject(hdc, hMainMarkPen);
 							Polyline(hdc, p, 2);
 						}
 
 						// draw subgrid line
-						
+
 						p[0].y = c_InnerRect.top;
 						p[1].y = c_InnerRect.bottom;
 
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
 						{
 							SelectObject(hdc, hGridPen);
 							Polyline(hdc, p, 2);
@@ -3348,14 +3179,14 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 					else
 					{
 						p[1].y = c_InnerRect.bottom + 3;
-						
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 						{
 							SelectObject(hdc, hMainMarkPen);
 							Polyline(hdc, p, 2);
 						}
 
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid && c_fDrawSubGrid)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid && c_fDrawSubGrid)
 						{
 							// draw subgrid line
 							SelectObject(hdc, hSubGridPen);
@@ -3366,8 +3197,7 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 					}
 				}
 			}
-		}	
-			
+		}
 	}
 
 	SelectObject(hdc, hOldPen);
@@ -3378,10 +3208,10 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 	RECT rc;
 
 	// draw text
-	for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+	for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 	{
-		if(j == nStartFreq && fDrawZerroText == 0)
-			continue; 
+		if (j == nStartFreq && fDrawZerroText == 0)
+			continue;
 
 		// draw text
 		char text[10];
@@ -3389,167 +3219,158 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int n
 		c_BmpFont->SetText(text);
 		c_BmpFontInverse->SetText(text);
 		rc.left = freq_table[j].nX - freq_table[j].nWidth / 2;
-		rc.top = c_InnerRect.bottom + BottomVSpace + 2;;
+		rc.top = c_InnerRect.bottom + BottomVSpace + 2;
+		;
 		rc.right = nWidth - rc.left;
 		rc.bottom = nHeight - rc.top;
 		OffsetRect(&rc, 1, 1);
-		if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-			c_BmpFontInverse->Draw(hdc, &rc, 0, 1, RGB(255,255,255));
+		if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+			c_BmpFontInverse->Draw(hdc, &rc, 0, 1, RGB(255, 255, 255));
 
 		OffsetRect(&rc, -1, -1);
-		if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-			c_BmpFont->Draw(hdc, &rc, 0, 1, RGB(0,0,0));	
+		if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+			c_BmpFont->Draw(hdc, &rc, 0, 1, RGB(0, 0, 0));
 	}
 }
 
-
-
-void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned int nStartFreq, unsigned int nEndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight)
+void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int nStartFreq, unsigned int nEndFreq, int fDrawZerroGrid, int fDrawZerroText, unsigned int nWidth, unsigned int nHeight)
 {
-	// calculate resolution 
+	// calculate resolution
 
 	int nWidth1 = c_InnerRect.right - c_InnerRect.left + 1;
 	unsigned int i;
 	unsigned int j;
-		
+
 	unsigned int nResolutionStep = 0;
 	unsigned int nResolutionTableIndex = 0;
 
 	// determine best resulution step, start with smallest step and go to bigger step
-	for(i = 0; i < ResolutionTableSize; i++)
+	for (i = 0; i < ResolutionTableSize; i++)
 	{
 		unsigned int nSumSize = 0;
 		nResolutionStep = ResolutionTableLogarithmic[i].Resolution;
-		if(nResolutionStep >= nEndFreq)
+		if (nResolutionStep >= nEndFreq)
 			return;
 
 		// calculate sum size of all text labels
-		for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+		for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 		{
 			// calculate text width
-			if(freq_table[j].nWidth == 0)
+			if (freq_table[j].nWidth == 0)
 			{
 				char tmp[10];
 				sprintf(tmp, "%u", j);
 				freq_table[j].nWidth = c_BmpFont->GetTextWidth(tmp);
 			}
 
-			nSumSize += (freq_table[j].nWidth  + SpaceBetweenText);	
+			nSumSize += (freq_table[j].nWidth + SpaceBetweenText);
 		}
 
 		// if all text labels fits, this is our resolution
-		if(nSumSize <= nWidth1)
+		if (nSumSize <= nWidth1)
 		{
 			nResolutionTableIndex = i;
 			break;
 		}
 	}
 
-
 	// if some error, set maximal resolution
-	if(nResolutionStep == 0)
+	if (nResolutionStep == 0)
 	{
 		nResolutionTableIndex = ResolutionTableSize - 1;
 		nResolutionStep = ResolutionTableLogarithmic[ResolutionTableSize - 1].Resolution;
 	}
 
-	if(nResolutionStep >= nEndFreq)
+	if (nResolutionStep >= nEndFreq)
 		return;
-
 
 	// draw grid lines for main resolution step
 	HPEN hGridPen = CreatePen(PS_SOLID, 1, cr3);
 	HPEN hSubGridPen = CreatePen(PS_SOLID, 1, cr5);
 	HPEN hMainMarkPen = CreatePen(PS_SOLID, 1, cr6);
-	HPEN hOldPen = (HPEN) SelectObject(hdc, hGridPen);
+	HPEN hOldPen = (HPEN)SelectObject(hdc, hGridPen);
 
-	POINT p[5];	
-	for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+	POINT p[5];
+	for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 	{
-		
-		if(j !=  nStartFreq ||  fDrawZerroGrid == 1) 
+
+		if (j != nStartFreq || fDrawZerroGrid == 1)
 		{
-			
+
 			// draw grid line
 			p[0].x = freq_table[j].nX;
 			p[0].y = c_InnerRect.top;
 			p[1].x = p[0].x;
 			p[1].y = c_InnerRect.bottom;
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
 			{
 				SelectObject(hdc, hGridPen);
 				Polyline(hdc, p, 2);
 			}
 
-			// draw main marker 
-			
+			// draw main marker
+
 			p[0].y = c_InnerRect.bottom + 1;
 			p[1].y = c_InnerRect.bottom + 5;
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 			{
 				SelectObject(hdc, hMainMarkPen);
 				Polyline(hdc, p, 2);
 			}
 		}
-		
 
 		// draw middle marks
-		if(j > nStartFreq)
+		if (j > nStartFreq)
 		{
-			//if( freq_table[j - nResolutionStep].nX + MinMiddleMarksFrameWidthLogarithmic <= freq_table[j].nX)
+			// if( freq_table[j - nResolutionStep].nX + MinMiddleMarksFrameWidthLogarithmic <= freq_table[j].nX)
 			{
 				unsigned int nMarkStep = ResolutionTableLogarithmic[nResolutionTableIndex].MarkStep;
 				unsigned int nMarksNumber = nResolutionStep / nMarkStep;
 
-
-				while(freq_table[j].nX - freq_table[j - nResolutionStep].nX < nMarksNumber * 4 && nMarksNumber > 1)
+				while (freq_table[j].nX - freq_table[j - nResolutionStep].nX < nMarksNumber * 4 && nMarksNumber > 1)
 				{
-					nMarkStep *= 2; 
+					nMarkStep *= 2;
 					nMarksNumber /= 2;
 				}
 
-		
-				
-
-				for(i = 1; i < nMarksNumber; i++)
+				for (i = 1; i < nMarksNumber; i++)
 				{
 					p[0].x = freq_table[j - nResolutionStep + i * nMarkStep].nX;
 					p[1].x = p[0].x;
 					p[0].y = c_InnerRect.bottom + 1;
 
-					if(ResolutionTableLogarithmic[nResolutionTableIndex].AddOddLines && ((i % 2) == 0))
+					if (ResolutionTableLogarithmic[nResolutionTableIndex].AddOddLines && ((i % 2) == 0))
 					{
 						p[1].y = c_InnerRect.bottom + 5;
 
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 						{
 							SelectObject(hdc, hMainMarkPen);
 							Polyline(hdc, p, 2);
 						}
 
 						// draw subgrid line
-						
+
 						p[0].y = c_InnerRect.top;
 						p[1].y = c_InnerRect.bottom;
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid)
 						{
 							SelectObject(hdc, hGridPen);
 							Polyline(hdc, p, 2);
 						}
-
 					}
 					else
 					{
-					
+
 						p[1].y = c_InnerRect.bottom + 3;
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
 						{
 							SelectObject(hdc, hMainMarkPen);
 							Polyline(hdc, p, 2);
 						}
-						
-						if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid && c_fDrawSubGrid)
+
+						if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHGrid && c_fDrawSubGrid)
 						{
 							// draw subgrid line
 							SelectObject(hdc, hSubGridPen);
@@ -3558,11 +3379,9 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned 
 							Polyline(hdc, p, 2);
 						}
 					}
-		
 				}
 			}
 		}
-					
 	}
 
 	SelectObject(hdc, hOldPen);
@@ -3574,10 +3393,10 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned 
 
 	// draw text
 	unsigned int nLastX = freq_table[0].nX;
-	for(j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
+	for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 	{
-		if(j == nStartFreq && fDrawZerroText == 0)
-			continue; 
+		if (j == nStartFreq && fDrawZerroText == 0)
+			continue;
 
 		// draw text
 		char text[10];
@@ -3585,22 +3404,23 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE *freq_table, unsigned 
 		c_BmpFont->SetText(text);
 		c_BmpFontInverse->SetText(text);
 		rc.left = freq_table[j].nX - freq_table[j].nWidth / 2;
-		if(rc.left >= nLastX + SpaceBetweenText)
+		if (rc.left >= nLastX + SpaceBetweenText)
 		{
-			rc.top = c_InnerRect.bottom + BottomVSpace + 2;;
+			rc.top = c_InnerRect.bottom + BottomVSpace + 2;
+			;
 			rc.right = nWidth - rc.left;
 			rc.bottom = nHeight - rc.top;
 			OffsetRect(&rc, 1, 1);
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-				c_BmpFontInverse->Draw(hdc, &rc, 0, 1, RGB(255,255,255));
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+				c_BmpFontInverse->Draw(hdc, &rc, 0, 1, RGB(255, 255, 255));
 
 			OffsetRect(&rc, -1, -1);
 
-			if(c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
-				c_BmpFont->Draw(hdc, &rc, 0, 1, RGB(0,0,0));
+			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowHScale)
+				c_BmpFont->Draw(hdc, &rc, 0, 1, RGB(0, 0, 0));
 
 			nLastX = freq_table[j].nX + freq_table[j].nWidth / 2;
-		}		
+		}
 	}
 }
 
@@ -3609,20 +3429,20 @@ void WSpectrum::alpha_blend()
 	int i;
 	int j;
 	for (j = 0; j < c_nHeight; ++j)
-	{															
-		register BYTE *pbDestRGB = (BYTE*) ((DWORD*) c_pDestBits + ( j * c_nWidth));
-		register BYTE *pbSrcRGB = (BYTE*) ((DWORD*) c_pSrcBits + ( j * c_nWidth));
+	{
+		register BYTE* pbDestRGB = (BYTE*)((DWORD*)c_pDestBits + (j * c_nWidth));
+		register BYTE* pbSrcRGB = (BYTE*)((DWORD*)c_pSrcBits + (j * c_nWidth));
 
 		for (i = 0; i < c_nWidth; ++i)
 		{
 			// apply mask RGB
 			if (pbSrcRGB[0] != MASK_RED || pbSrcRGB[1] != MASK_GREEN || pbSrcRGB[2] != MASK_BLUE)
-			{	
-				pbDestRGB[0]=(pbDestRGB[0] * c_nInvAlpha + pbSrcRGB[0] * c_nAlpha)>>8;
-				pbDestRGB[1]=(pbDestRGB[1] * c_nInvAlpha + pbSrcRGB[1] * c_nAlpha)>>8;
-				pbDestRGB[2]=(pbDestRGB[2] * c_nInvAlpha + pbSrcRGB[2] * c_nAlpha)>>8;
+			{
+				pbDestRGB[0] = (pbDestRGB[0] * c_nInvAlpha + pbSrcRGB[0] * c_nAlpha) >> 8;
+				pbDestRGB[1] = (pbDestRGB[1] * c_nInvAlpha + pbSrcRGB[1] * c_nAlpha) >> 8;
+				pbDestRGB[2] = (pbDestRGB[2] * c_nInvAlpha + pbSrcRGB[2] * c_nAlpha) >> 8;
 			}
-																		
+
 			pbSrcRGB += 4;
 			pbDestRGB += 4;
 		}
@@ -3645,7 +3465,7 @@ int WSpectrum::SetGraphType(unsigned int nType)
 	c_nSpectrumType = nType;
 	c_clearFFTDisplay = 1;
 	c_spectrum_pos = 0;
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 
 	return 1;
 }
@@ -3655,11 +3475,10 @@ int WSpectrum::GetGraphType()
 	return c_nSpectrumType;
 }
 
-
 int WSpectrum::SetLinearGraph(unsigned int fLinear)
 {
 	c_fLinear = fLinear;
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
@@ -3668,17 +3487,16 @@ int WSpectrum::IsLinearGraph()
 	return c_fLinear;
 }
 
-void *WSpectrum::GetSamplesBuffer()
+void* WSpectrum::GetSamplesBuffer()
 {
 	return c_pnSamplesBuffer;
 }
 
-
 int WSpectrum::EnableSubGrid(int fEnable)
 {
 	c_fDrawSubGrid = fEnable;
-	c_nWidth = 0;	// force creation of new background bitmap
-	return 1; 
+	c_nWidth = 0; // force creation of new background bitmap
+	return 1;
 }
 
 int WSpectrum::IsSubGridEnabled()
@@ -3688,10 +3506,10 @@ int WSpectrum::IsSubGridEnabled()
 
 int WSpectrum::SetTransparency(int nTransparency)
 {
-	if(nTransparency < 0)
+	if (nTransparency < 0)
 		nTransparency = 0;
 
-	if(nTransparency > 100)
+	if (nTransparency > 100)
 		nTransparency = 100;
 
 	c_nAreaTransparency = nTransparency;
@@ -3699,8 +3517,6 @@ int WSpectrum::SetTransparency(int nTransparency)
 	c_nInvAlpha = 255 - c_nAlpha;
 	return 1;
 }
-
-
 
 int WSpectrum::GetTransparency()
 {
@@ -3710,133 +3526,119 @@ int WSpectrum::GetTransparency()
 int WSpectrum::ShowFrequencyScale(int fShow)
 {
 
-	if(fShow == -1)
+	if (fShow == -1)
 		return c_fShowHScale;
 
 	c_fShowHScale = fShow;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
-
 }
-
-
 
 int WSpectrum::ShowDecibelScale(int fShow)
 {
-	if(fShow == -1)
+	if (fShow == -1)
 		return c_fShowVScale;
 
 	c_fShowVScale = fShow;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
-
 int WSpectrum::ShowFrequencyGrid(int fShow)
 {
-	if(fShow == -1)
+	if (fShow == -1)
 		return c_fShowHGrid;
 
 	c_fShowHGrid = fShow;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
-
-
 int WSpectrum::ShowDecibelGrid(int fShow)
 {
-	if(fShow == -1)
+	if (fShow == -1)
 		return c_fShowVGrid;
 
 	c_fShowVGrid = fShow;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
-
-
-
 int WSpectrum::ShowBgBitmap(int fShow)
 {
-	if(fShow == -1)
+	if (fShow == -1)
 		return c_fShowBgBitmap;
 
 	c_fShowBgBitmap = fShow;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
-
 int WSpectrum::StretchBgBitmap(int fStretch)
 {
-	if(fStretch == -1)
+	if (fStretch == -1)
 		return c_fStretchBgBitmap;
 
 	c_fStretchBgBitmap = fStretch;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
 
-
 int WSpectrum::SetBgBitmap(HBITMAP hbm)
 {
-	if((int) hbm == -1)
+	if ((int)hbm == -1)
 	{
-		if(c_bgExternBitmap)
-			return (int) c_bgExternBitmap;
+		if (c_bgExternBitmap)
+			return (int)c_bgExternBitmap;
 
-		return (int) c_bgBitmap;
+		return (int)c_bgBitmap;
 	}
 
-	if((int) hbm == 0)
+	if ((int)hbm == 0)
 	{
-		if(c_bgExternBitmap)
+		if (c_bgExternBitmap)
 			DeleteObject(c_bgExternBitmap);
 
 		c_bgExternBitmap = 0;
 		c_nBitmapWidth = BITMAP_WIDTH1;
 		c_nBitmapHeight = BITMAP_HEIGHT1;
 
-		c_nWidth = 0;	// force creation of new background bitmap
+		c_nWidth = 0; // force creation of new background bitmap
 		return 1;
-
 	}
 
-
-// copy bitmap to internal structure
+	// copy bitmap to internal structure
 
 	HDC hdcMem1, hdcMem2;
-    HBITMAP hbmDest = 0;
-    BITMAP bm = {0};
-  
+	HBITMAP hbmDest = 0;
+	BITMAP bm = { 0 };
+
 	hdcMem1 = CreateCompatibleDC(0);
 	hdcMem2 = CreateCompatibleDC(0);
 
-    GetObject(hbm, sizeof(BITMAP), &bm);
-	
-    hbmDest = CreateBitmap(bm.bmWidth, bm.bmHeight, bm.bmPlanes,
-			bm.bmBitsPixel,NULL);
+	GetObject(hbm, sizeof(BITMAP), &bm);
 
-    
-    HBITMAP hbmOld1 = (HBITMAP)SelectObject(hdcMem1, hbm);
-    HBITMAP hbmOld2 = (HBITMAP)SelectObject(hdcMem2, hbmDest);
-    
-    BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem1, 0, 0, SRCCOPY);
-  
-    SelectObject(hdcMem1, hbmOld1);
-    SelectObject(hdcMem2, hbmOld2);
+	hbmDest = CreateBitmap(bm.bmWidth, bm.bmHeight, bm.bmPlanes,
+		bm.bmBitsPixel, NULL);
 
-    DeleteDC(hdcMem1);
-    DeleteDC(hdcMem2);
+	HBITMAP hbmOld1 = (HBITMAP)SelectObject(hdcMem1, hbm);
+	HBITMAP hbmOld2 = (HBITMAP)SelectObject(hdcMem2, hbmDest);
 
-	if(c_bgExternBitmap)
+	BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem1, 0, 0, SRCCOPY);
+
+	SelectObject(hdcMem1, hbmOld1);
+	SelectObject(hdcMem2, hbmOld2);
+
+	DeleteDC(hdcMem1);
+	DeleteDC(hdcMem2);
+
+	if (c_bgExternBitmap)
 		DeleteObject(c_bgExternBitmap);
 
 	c_bgExternBitmap = hbmDest;
@@ -3844,88 +3646,86 @@ int WSpectrum::SetBgBitmap(HBITMAP hbm)
 	c_nBitmapWidth = bm.bmWidth;
 	c_nBitmapHeight = bm.bmHeight;
 
-	c_nWidth = 0;	// force creation of new background bitmap
+	c_nWidth = 0; // force creation of new background bitmap
 	return 1;
 }
-
 
 int WSpectrum::SetColor(int nIndex, COLORREF color)
 {
 
-	switch(nIndex)
+	switch (nIndex)
 	{
-		case 0:
-			cr1 = color;
+	case 0:
+		cr1 = color;
 		break;
 
-		case 1:
-			cr2 = color;
+	case 1:
+		cr2 = color;
 		break;
 
-		case 2:
-			cr3 = color;
+	case 2:
+		cr3 = color;
 		break;
 
-		case 3:
-			cr4 = color;
+	case 3:
+		cr4 = color;
 		break;
 
-		case 4:
-			cr5 = color;
+	case 4:
+		cr5 = color;
 		break;
 
-		case 5:
-			cr6 = color;
+	case 5:
+		cr6 = color;
 		break;
 
-		case 6:
-			cr7 = color;
+	case 6:
+		cr7 = color;
 		break;
 
-		case 7:
-			cr8 = color;
+	case 7:
+		cr8 = color;
 		break;
 
-		case 8:
-			cr9 = color;
+	case 8:
+		cr9 = color;
 		break;
 
-		case 9:
-			cr10 = color;
+	case 9:
+		cr10 = color;
 		break;
 
-		case 10:
-			cr11 = color;
+	case 10:
+		cr11 = color;
 		break;
 
-		case 11:
-			cr12 = color;
+	case 11:
+		cr12 = color;
 		break;
 
-		case 12:
-			cr13 = color;
+	case 12:
+		cr13 = color;
 		break;
 
-		case 13:
-			cr14 = color;
+	case 13:
+		cr14 = color;
 		break;
 
-		case 14:
-			cr15 = color;
+	case 14:
+		cr15 = color;
 		break;
 
-		case 15:
-			cr16 = color;
+	case 15:
+		cr16 = color;
 		break;
 
-		default:
+	default:
 		return 0;
 	}
 
 	c_nWidth = 0;
 	return 1;
 }
-
 
 COLORREF WSpectrum::GetColor(int nIndex)
 {

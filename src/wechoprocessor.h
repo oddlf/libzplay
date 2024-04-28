@@ -22,7 +22,7 @@
  * ver: 1.14
  * date: 15. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_ECHO_H_
 #define _W_ECHO_H_
@@ -32,14 +32,13 @@
 #include "waudioprocessor.h"
 #include "wqueue.h"
 
-
 typedef struct {
-	int nLeftDelay;				// delay of left channel in milliseconds
-	int nLeftSrcVolume;			// percent of original volume for left channel
-	int nLeftEchoVolume;		// percent of echo volume for left channel
-	int nRightDelay;			// delay of right channel in milliseconds
-	int nRightSrcVolume;		// percent of original volume for right channel
-	int nRightEchoVolume;		// percent of echo volume for right channel
+	int nLeftDelay;		  // delay of left channel in milliseconds
+	int nLeftSrcVolume;	  // percent of original volume for left channel
+	int nLeftEchoVolume;  // percent of echo volume for left channel
+	int nRightDelay;	  // delay of right channel in milliseconds
+	int nRightSrcVolume;  // percent of original volume for right channel
+	int nRightEchoVolume; // percent of echo volume for right channel
 } ECHO_DELAY_EFFECT;
 
 typedef struct {
@@ -49,26 +48,27 @@ typedef struct {
 	int nRightDelay;
 	int nRightSrcVolume;
 	int nRightEchoVolume;
-	char *int_buffer_left;
-	char *int_buffer_right;
+	char* int_buffer_left;
+	char* int_buffer_right;
 	int nLeftDelayBackup;
 	int nRightDelayBackup;
 } ECHO_EFFECT_INTERNAL;
 
-class WEchoProcessor : public WAudioProcessor {
+class WEchoProcessor : public WAudioProcessor
+{
 public:
 	WEchoProcessor();
 	~WEchoProcessor();
 
-	int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	int PushSamples(PROCESSOR_AUDIO_DATA* data);
 	int Clear(int fBroadcast);
 	int Flush(int fBroadcast);
 	int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
 	int Enable(int fBroadcast, int fEnable);
 
-// ============================================================================================================
-//	configure echo
-	int SetParameters(ECHO_DELAY_EFFECT *pEchoEffect, int nNumberOfEffects); 
+	// ============================================================================================================
+	//	configure echo
+	int SetParameters(ECHO_DELAY_EFFECT* pEchoEffect, int nNumberOfEffects);
 
 	//	PARAMETERS:
 	//
@@ -82,11 +82,11 @@ public:
 	//		1	- all OK
 	//		0	- error
 
-// =============================================================================================================
-// ============================================================================================================
-//	get echo parameters
+	// =============================================================================================================
+	// ============================================================================================================
+	//	get echo parameters
 
-	int GetParameters(ECHO_DELAY_EFFECT *pEchoEffect, int nNumberOfEffects); 
+	int GetParameters(ECHO_DELAY_EFFECT* pEchoEffect, int nNumberOfEffects);
 
 	//	PARAMETERS:
 	//
@@ -97,13 +97,12 @@ public:
 	//		Number of echo parameters.
 
 private:
-
 	// max echo delay in milliseconds
 	unsigned int c_nEchoMaxDelay;
 	// number of echo effects
 	unsigned int c_nEchoEffectsNumber;
 	// array of echo effects
-	ECHO_EFFECT_INTERNAL *c_echoEffects;
+	ECHO_EFFECT_INTERNAL* c_echoEffects;
 	// delay line
 	DelayLine c_dlEchoDelayLine;
 	// control echo processing in thread
@@ -114,18 +113,9 @@ private:
 	unsigned int c_nOldEchoMaxDelay;
 
 	// output buffer
-	char *c_pchOutput;
+	char* c_pchOutput;
 	// output buffer size
 	unsigned int c_nOutputBufferSize;
-
- 
-
 };
-
-
-
-
-
-
 
 #endif

@@ -22,43 +22,38 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_WAVEENCODER_H_
 #define _W_WAVEENCODER_H_
 
 #include "wencoder.h"
 
-
-class WWaveEncoder : public WAudioEncoder {
+class WWaveEncoder : public WAudioEncoder
+{
 public:
-
 	WWaveEncoder();
 	~WWaveEncoder();
 	WWaveEncoder(int fRawPCM);
-int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			);
+	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback);
 
 	int Uninitialize();
-	int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples);
-	void  Release();
-	DECODER_ERROR_MESSAGE * GetError();
-
+	int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples);
+	void Release();
+	DECODER_ERROR_MESSAGE* GetError();
 
 private:
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 	unsigned int c_nBlockAlign;
 
 	int c_fReady;
-	void *c_user_data;
-
+	void* c_user_data;
 
 	int c_fRaw;
 
@@ -68,12 +63,6 @@ private:
 	TEncoderTellCallback c_tell_callback;
 
 	unsigned int c_nDataSize;
-
-
-
 };
-
-
-
 
 #endif

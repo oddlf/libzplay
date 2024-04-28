@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_AACENCODER_H_
 #define _W_AACENCODER_H_
@@ -31,37 +31,31 @@
 #include "wqueue.h"
 #include <faac.h>
 
-
-class WAACEncoder : public WAudioEncoder {
+class WAACEncoder : public WAudioEncoder
+{
 public:
-
 	WAACEncoder();
 	~WAACEncoder();
 
-int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			);
-
+	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback);
 
 	int Uninitialize();
-	int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples);
-	void  Release();
-	DECODER_ERROR_MESSAGE * GetError();
-
+	int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples);
+	void Release();
+	DECODER_ERROR_MESSAGE* GetError();
 
 private:
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 	unsigned int c_nBlockAlign;
 
 	int c_fReady;
-	void *c_user_data;
-
+	void* c_user_data;
 
 	faacEncHandle c_encoder;
 
@@ -74,22 +68,15 @@ private:
 	unsigned int c_nBlockAlling;
 	unsigned int c_nNeedBytes;
 
-	unsigned char *c_out_buffer;
-	int32_t *c_in_buffer;
+	unsigned char* c_out_buffer;
+	int32_t* c_in_buffer;
 
 	WQueue queue;
-
 
 	TEncoderReadCallback c_read_calllback;
 	TEncoderWriteCallback c_write_callback;
 	TEncoderSeekCallback c_seek_callback;
 	TEncoderTellCallback c_tell_callback;
-
-
-
 };
-
-
-
 
 #endif

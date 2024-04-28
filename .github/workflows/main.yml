@@ -1,42 +1,69 @@
 name: Build
 
-on:
-  push:
-    branches: [ main ]
+on: [push, pull_request]
+
+env:
+    VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
 jobs:
   build:
-    name: Build
-    runs-on: windows-2022
+    name: ${{ matrix.preset }}
+    runs-on: windows-latest
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations.
+      # Consider changing this to true when your workflow is stable.
+      fail-fast: false
+
+      # Set up a matrix to run the following configurations:
+      matrix:
+        preset:
+          - windows-x64-release
+          - windows-x64-release-static
+          - windows-x86-release
+          - windows-x86-release-static
+        include:
+          - preset: windows-x64-release
+            triplet: x64-windows
+          - preset: windows-x64-release-static
+            triplet: x64-windows-static
+          - preset: windows-x86-release
+            triplet: x86-windows
+          - preset: windows-x86-release-static
+            triplet: x86-windows-static
+
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Install cmake pkgconfig
+      run: choco install pkgconfiglite
+
+    - name: Enable GitHub Actions cache
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+    - name: Setup MSVC
+      uses: TheMrMilchmann/setup-msvc-dev@v3
+      with:
+        arch: x64
+
+    - name: Setup Ninja
+      uses: turtlesec-no/get-ninja@main
 
     - name: Install dependencies
-      run: |
-        vcpkg install faac:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install faad2:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install liba52:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libflac:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libjpeg-turbo:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libmad:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libogg:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libpng:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install libvorbis:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install mp3lame:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install soundtouch[integer]:x86-windows-static --overlay-ports=vcpkg-ports
-        vcpkg install zlib:x86-windows-static --overlay-ports=vcpkg-ports
+      run: vcpkg install faac faad2 liba52 libflac libjpeg-turbo libmad libogg libpng libvorbis mp3lame soundtouch[integer] zlib --overlay-ports=./vcpkg-ports --triplet=${{ matrix.triplet }}
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-
-    - name: Run MSBuild
+    - name: Build
       run: |
-        vcpkg integrate install
-        msbuild vc++\libzplay_dynamic\libzplay_dynamic.vcxproj /p:Configuration="Release" /p:Platform=Win32
+        cmake --preset ${{ matrix.preset }} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake --build --preset ${{ matrix.preset }}
 
     - name: Create artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: libzplay
-        path: binary/libzplay.dll
+        name: libzplay-${{ matrix.preset }}
+        path: ./out/${{ matrix.preset }}/

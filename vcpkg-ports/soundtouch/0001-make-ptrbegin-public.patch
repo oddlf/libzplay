@@ -1,4 +1,5 @@
 diff --git a/include/FIFOSamplePipe.h b/include/FIFOSamplePipe.h
+index 93b6bf4..b137a61 100644
 --- a/include/FIFOSamplePipe.h
 +++ b/include/FIFOSamplePipe.h
 @@ -168,6 +168,8 @@ protected:
@@ -7,8 +8,8 @@ diff --git a/include/FIFOSamplePipe.h b/include/FIFOSamplePipe.h
  
 +public:
 +
-     /// Returns a pointer to the beginning of the output samples. 
-     /// This function is provided for accessing the output samples directly. 
+     /// Returns a pointer to the beginning of the output samples.
+     /// This function is provided for accessing the output samples directly.
      /// Please be careful for not to corrupt the book-keeping!
 @@ -180,8 +182,6 @@ protected:
          return output->ptrBegin();
@@ -16,6 +17,6 @@ diff --git a/include/FIFOSamplePipe.h b/include/FIFOSamplePipe.h
  
 -public:
 -
-     /// Output samples from beginning of the sample buffer. Copies requested samples to 
-     /// output buffer and removes them from the sample buffer. If there are less than 
+     /// Output samples from beginning of the sample buffer. Copies requested samples to
+     /// output buffer and removes them from the sample buffer. If there are less than
      /// 'numsample' samples in the buffer, returns all that available.

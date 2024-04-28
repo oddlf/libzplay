@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_WMP3ENCODER_H_
 #define _W_WMP3ENCODER_H_
@@ -30,30 +30,25 @@
 #include "wencoder.h"
 #include <lame/lame.h>
 
-
-class WMp3Encoder : public WAudioEncoder {
+class WMp3Encoder : public WAudioEncoder
+{
 public:
-
 	WMp3Encoder();
 	~WMp3Encoder();
 
-int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			);
-
+	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback);
 
 	int Uninitialize();
-	int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples);
-	void  Release();
-	DECODER_ERROR_MESSAGE * GetError();
-
+	int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples);
+	void Release();
+	DECODER_ERROR_MESSAGE* GetError();
 
 private:
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 
@@ -65,24 +60,17 @@ private:
 	unsigned int c_nBlockAllign;
 
 	unsigned int c_nSamplesBufferSizeInBytes;
-	unsigned char *c_pWorkingBuffer;
+	unsigned char* c_pWorkingBuffer;
 	unsigned int c_NumberOfInputSamples;
 
-	void *c_user_data;
+	void* c_user_data;
 
-
-	lame_global_flags *gfp;
+	lame_global_flags* gfp;
 
 	TEncoderReadCallback c_read_calllback;
 	TEncoderWriteCallback c_write_callback;
 	TEncoderSeekCallback c_seek_callback;
 	TEncoderTellCallback c_tell_callback;
-
-
-
 };
-
-
-
 
 #endif

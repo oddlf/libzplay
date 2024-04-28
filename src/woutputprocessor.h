@@ -22,34 +22,29 @@
  * ver: 1.14
  * date: 15. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_OUTPUT_PROCESSOR_H_
 #define _W_OUTPUT_PROCESSOR_H_
 
 #include "waudioprocessor.h"
 
-
-
-
-class WOutputProcessor : public WAudioProcessor {
+class WOutputProcessor : public WAudioProcessor
+{
 public:
 	WOutputProcessor();
 	~WOutputProcessor();
 
-	int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	int PushSamples(PROCESSOR_AUDIO_DATA* data);
 	int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
 	int Enable(int fBroadcast, int fEnable);
 
 	int Flush(int fBroadcast);
 	int Clear(int fBroadcast);
 
-	unsigned int PullSamples(PROCESSOR_AUDIO_DATA *data);
+	unsigned int PullSamples(PROCESSOR_AUDIO_DATA* data);
 
 private:
-	
 };
-
-
 
 #endif

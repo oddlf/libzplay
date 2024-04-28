@@ -23,31 +23,26 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #include "wbpmdetect.h"
 #include "wbpmdetect1.h"
 #include "wbpmdetect2.h"
 #include "wbpmdetect3.h"
 
-
-WBPMDetect * CreateBPMDetect(unsigned int nMethod)
+WBPMDetect* CreateBPMDetect(unsigned int nMethod)
 {
-	switch(nMethod)
+	switch (nMethod)
 	{
 
-		case BPM_DETECT_USING_WAVELETS:
-		return (WBPMDetect*) new WBPMDetect2();
+	case BPM_DETECT_USING_WAVELETS:
+		return (WBPMDetect*)new WBPMDetect2();
 
-		case BPM_DETECT_USING_AUTOCORRELATION:
-		return (WBPMDetect*) new WBPMDetect1();
+	case BPM_DETECT_USING_AUTOCORRELATION:
+		return (WBPMDetect*)new WBPMDetect1();
 
-		case BPM_DETECT_USING_PEAKS:
-		default:
-		return (WBPMDetect*) new WBPMDetect3();
+	case BPM_DETECT_USING_PEAKS:
+	default:
+		return (WBPMDetect*)new WBPMDetect3();
 	}
 }
-
-
-
-

@@ -23,7 +23,7 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -33,7 +33,6 @@
 
 #include "waudioprocessor.h"
 #include "debug.h"
-
 
 WAudioProcessor::WAudioProcessor()
 {
@@ -47,19 +46,15 @@ WAudioProcessor::WAudioProcessor()
 	c_nBitPerSample = 0;
 	c_nBlockAlign = 0;
 	c_fEnable = 0;
-
 }
 
 WAudioProcessor::~WAudioProcessor()
-{	
-
+{
 }
 
-
-
-int WAudioProcessor::SetOutputProcessor(WAudioProcessor *instance)
+int WAudioProcessor::SetOutputProcessor(WAudioProcessor* instance)
 {
-	if(c_next)
+	if (c_next)
 		c_next->c_pchReturnError = 0;
 
 	c_output = 0;
@@ -69,7 +64,7 @@ int WAudioProcessor::SetOutputProcessor(WAudioProcessor *instance)
 
 int WAudioProcessor::SetOutputFunction(t_audio_processor_output output_func)
 {
-	if(c_next)
+	if (c_next)
 		c_next->c_pchReturnError = 0;
 
 	c_output = output_func;
@@ -77,14 +72,10 @@ int WAudioProcessor::SetOutputFunction(t_audio_processor_output output_func)
 	return 1;
 }
 
-
-char *WAudioProcessor::GetError()
+char* WAudioProcessor::GetError()
 {
 	return c_pchErrorMessageStr;
 }
-
-
-
 
 int WAudioProcessor::Clear(int fBroadcast)
 {
@@ -98,11 +89,6 @@ int WAudioProcessor::Flush(int fBroadcast)
 	return 0;
 }
 
-
-
-
-
-
 int WAudioProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample)
 {
 	strcpy(c_pchErrorMessageStr, "WAudioEffect::Flush->Not implemented in this class.");
@@ -115,15 +101,11 @@ int WAudioProcessor::Enable(int fBroadcast, int fEnable)
 	return 0;
 }
 
-
-
-
-int WAudioProcessor::PushSamples(PROCESSOR_AUDIO_DATA *data)
+int WAudioProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 {
 	ASSERT_W(0);
 	return 0;
 }
-
 
 WAudioQueue::WAudioQueue()
 {
@@ -138,15 +120,14 @@ WAudioQueue::~WAudioQueue()
 	Clear();
 }
 
-
 void WAudioQueue::Clear()
 {
 
-	AUDIO_QUEUE_ELEM *elem = c_first;
-	while(elem)
+	AUDIO_QUEUE_ELEM* elem = c_first;
+	while (elem)
 	{
 		free(elem->pAllocatedBuffer);
-		AUDIO_QUEUE_ELEM *tmp = elem;
+		AUDIO_QUEUE_ELEM* tmp = elem;
 		elem = elem->next;
 		free(tmp);
 	}
@@ -157,26 +138,25 @@ void WAudioQueue::Clear()
 	c_nSumOfSamples = 0;
 }
 
-
-unsigned int WAudioQueue::PushSamples(PROCESSOR_AUDIO_DATA *data)
+unsigned int WAudioQueue::PushSamples(PROCESSOR_AUDIO_DATA* data)
 {
-	if(data == NULL)
+	if (data == NULL)
 		return 0;
 
-	AUDIO_QUEUE_ELEM *elem = (AUDIO_QUEUE_ELEM*) malloc(sizeof(AUDIO_QUEUE_ELEM));
-	if(elem == NULL)
+	AUDIO_QUEUE_ELEM* elem = (AUDIO_QUEUE_ELEM*)malloc(sizeof(AUDIO_QUEUE_ELEM));
+	if (elem == NULL)
 		return 0;
 
 	unsigned int nNumberOfBytes = data->nNumberOfSamples * data->nBlockAllign;
 	elem->pAllocatedBuffer = malloc(sizeof(PROCESSOR_AUDIO_DATA) + nNumberOfBytes);
-	if(elem->pAllocatedBuffer == NULL)
+	if (elem->pAllocatedBuffer == NULL)
 	{
 		free(elem);
 		return 0;
 	}
 
 	memcpy(elem->pAllocatedBuffer, data, sizeof(PROCESSOR_AUDIO_DATA));
-	elem->pDataBuffer = (char*) elem->pAllocatedBuffer + sizeof(PROCESSOR_AUDIO_DATA);
+	elem->pDataBuffer = (char*)elem->pAllocatedBuffer + sizeof(PROCESSOR_AUDIO_DATA);
 	memcpy(elem->pDataBuffer, data->pSamples, nNumberOfBytes);
 
 	c_nNumberOfElements++;
@@ -184,11 +164,11 @@ unsigned int WAudioQueue::PushSamples(PROCESSOR_AUDIO_DATA *data)
 
 	elem->next = NULL;
 
-	if(c_first == NULL) // add first element in queue
-	{	
+	if (c_first == NULL) // add first element in queue
+	{
 		c_first = elem;
 		c_last = elem;
-		return  data->nNumberOfSamples;
+		return data->nNumberOfSamples;
 	}
 
 	c_last->next = elem;
@@ -196,31 +176,28 @@ unsigned int WAudioQueue::PushSamples(PROCESSOR_AUDIO_DATA *data)
 	return data->nNumberOfSamples;
 }
 
-
-unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA *data)
+unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA* data)
 {
-	if(data == NULL)
+	if (data == NULL)
 		return 0;
 
-	if(c_nSumOfSamples == 0 || data->nNumberOfSamples == 0)
+	if (c_nSumOfSamples == 0 || data->nNumberOfSamples == 0)
 		return 0;
-
 
 	unsigned int nSamplesRead = 0;
 	unsigned int nSamplesNeed = data->nNumberOfSamples;
-	char *pBuffer = (char*) data->pSamples;
+	char* pBuffer = (char*)data->pSamples;
 
-
-	PROCESSOR_AUDIO_DATA *d = (PROCESSOR_AUDIO_DATA*) c_first->pAllocatedBuffer;
+	PROCESSOR_AUDIO_DATA* d = (PROCESSOR_AUDIO_DATA*)c_first->pAllocatedBuffer;
 	data->nStartPosition = d->nStartPosition;
 	data->nEndPosition = d->nEndPosition;
 
-	while(1)
+	while (1)
 	{
 
-		d = (PROCESSOR_AUDIO_DATA*) c_first->pAllocatedBuffer;
+		d = (PROCESSOR_AUDIO_DATA*)c_first->pAllocatedBuffer;
 
-		if(d->nNumberOfSamples >= nSamplesNeed) // we have enough data
+		if (d->nNumberOfSamples >= nSamplesNeed) // we have enough data
 		{
 			memcpy(pBuffer, c_first->pDataBuffer, nSamplesNeed * d->nBlockAllign);
 
@@ -230,27 +207,23 @@ unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA *data)
 			c_nSumOfSamples -= nSamplesNeed;
 
 			// check if buffer is empty
-			if(d->nNumberOfSamples == 0)	// remove this element from queue
+			if (d->nNumberOfSamples == 0) // remove this element from queue
 			{
 				data->nEndPosition = d->nEndPosition;
 
-				AUDIO_QUEUE_ELEM *elem = c_first->next;
+				AUDIO_QUEUE_ELEM* elem = c_first->next;
 				free(c_first->pAllocatedBuffer);
 				free(c_first);
 				c_first = elem;
 				c_nNumberOfElements--;
-					
-
 			}
-			else	// element isn't empty, but we have removed some data from element
+			else // element isn't empty, but we have removed some data from element
 			{
 
-
-				if(d->nEndPosition >= d->nStartPosition)
+				if (d->nEndPosition >= d->nStartPosition)
 				{
-					data->nEndPosition = d->nStartPosition +  (nSamplesNeed * (d->nEndPosition - d->nStartPosition) / s);
-					d->nStartPosition = data->nEndPosition;		
-
+					data->nEndPosition = d->nStartPosition + (nSamplesNeed * (d->nEndPosition - d->nStartPosition) / s);
+					d->nStartPosition = data->nEndPosition;
 				}
 				else
 				{
@@ -258,15 +231,12 @@ unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA *data)
 					d->nStartPosition = data->nEndPosition;
 				}
 
-
-				c_first->pDataBuffer = (char*) c_first->pDataBuffer +  nSamplesNeed * d->nBlockAllign;	
-					
+				c_first->pDataBuffer = (char*)c_first->pDataBuffer + nSamplesNeed * d->nBlockAllign;
 			}
 
 			return nSamplesRead;
-		
 		}
-		else	// we don't have enough data in this element, use what you have
+		else // we don't have enough data in this element, use what you have
 		{
 			memcpy(pBuffer, c_first->pDataBuffer, d->nNumberOfSamples * d->nBlockAllign);
 
@@ -277,21 +247,19 @@ unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA *data)
 
 			nSamplesNeed -= d->nNumberOfSamples;
 
-			AUDIO_QUEUE_ELEM *elem = c_first->next;
+			AUDIO_QUEUE_ELEM* elem = c_first->next;
 			free(c_first->pAllocatedBuffer);
 			free(c_first);
 			c_first = elem;
 			c_nNumberOfElements--;
 		}
 
-		if(nSamplesNeed == 0 || c_nSumOfSamples == 0)
+		if (nSamplesNeed == 0 || c_nSumOfSamples == 0)
 			return nSamplesRead;
 	}
-
 }
 
-
-int WAudioProcessor::PushData(char *pchData, unsigned int nDataSize, unsigned int nUserData)
+int WAudioProcessor::PushData(char* pchData, unsigned int nDataSize, unsigned int nUserData)
 {
 	return 0;
 }
