@@ -19,9 +19,10 @@ vcpkg_cmake_configure(
 )
 
 vcpkg_cmake_install()
-
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 vcpkg_copy_pdbs()
 
 file(INSTALL "${SOURCE_PATH}/include" DESTINATION "${CURRENT_PACKAGES_DIR}")
 file(INSTALL "${SOURCE_PATH}/COPYING" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+
+file(REMOVE "${CURRENT_PACKAGES_DIR}/include/Makefile.am")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")

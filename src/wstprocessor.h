@@ -24,11 +24,11 @@
  *
  * SUPPORTED BY:
  * ============================================================================
- * SoundTouch library Copyright (c) Olli Parviainen 2002-2009 
+ * SoundTouch library Copyright (c) Olli Parviainen 2002-2009
  * http://www.surina.net/soundtouch
  * GNU Lesser General Public License vesrion 2.1 (LGPL.TXT )
  * ============================================================================
-*/
+ */
 
 #ifndef _W_STPROCESSOR_H_
 #define _W_STPROCESSOR_H_
@@ -38,25 +38,22 @@
 #include "waudioprocessor.h"
 #include <soundtouch/SoundTouch.h>
 
-
-
 using namespace soundtouch;
 
-
-class WSoundTouchProcessor : public WAudioProcessor {
+class WSoundTouchProcessor : public WAudioProcessor
+{
 public:
 	WSoundTouchProcessor();
 	~WSoundTouchProcessor();
 
-	int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	int PushSamples(PROCESSOR_AUDIO_DATA* data);
 
-// change virtual functions
+	// change virtual functions
 	int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
-	int  Enable(int fBroadcast, int fEnable);
+	int Enable(int fBroadcast, int fEnable);
 
-
-// ===================================================================
-//	SET RATE
+	// ===================================================================
+	//	SET RATE
 
 	int SetRate(unsigned int nRate);
 
@@ -64,14 +61,14 @@ public:
 	//
 	//		nRate
 	//			Rate parameter. Normal rate = 100, smaller values
-    //			represent slower rate, larger faster rate.
+	//			represent slower rate, larger faster rate.
 	//
 	//	RETURN VALUES:
 	//			1	- all OK
 	//			0	- error
 	//
-// =========================================================================
-//	SET PITCH
+	// =========================================================================
+	//	SET PITCH
 
 	int SetPitch(unsigned int nPitch);
 
@@ -79,14 +76,14 @@ public:
 	//
 	//		nPitch
 	//			Rate parameter. Original pitch = 100, smaller values
-    //			represent lower pitches, larger values higher pitch.
+	//			represent lower pitches, larger values higher pitch.
 	//
 	//	RETURN VALUES:
 	//			1	- all OK
 	//			0	- error
 	//
-// =========================================================================
-//	SET TEMPO
+	// =========================================================================
+	//	SET TEMPO
 
 	int SetTempo(unsigned int nTempo);
 
@@ -94,45 +91,39 @@ public:
 	//
 	//		nTempo
 	//			Rate parameter. Normal tempo = 100, smaller values
-    //			represent slower tempo, larger faster tempo.
+	//			represent slower tempo, larger faster tempo.
 	//
 	//	RETURN VALUES:
 	//			1	- all OK
 	//			0	- error
 	//
-// =========================================================================
-//	GET RATE
+	// =========================================================================
+	//	GET RATE
 
 	unsigned int GetRate() { return c_nRate; };
 
-// =========================================================================
-//	GET PITCH
+	// =========================================================================
+	//	GET PITCH
 
 	unsigned int GetPitch() { return c_nPitch; };
 
-// =========================================================================
-//	GET TEMPO
+	// =========================================================================
+	//	GET TEMPO
 
 	unsigned int GetTempo() { return c_nTempo; };
 
-// =========================================================================
+	// =========================================================================
 
 	int Flush(int fBroadcast);
 	int Clear(int fBroadcast);
 
-
-	
-
-
-// ===========================================================================================================================
+	// ===========================================================================================================================
 private:
-
 	PROCESSOR_AUDIO_DATA c_LastData;
 	// control echo processing in thread
 	CRITICAL_SECTION c_CriticalSection;
 
 	SoundTouch st;
-
 
 	// current rate
 	unsigned int c_nRate;
@@ -140,7 +131,6 @@ private:
 	unsigned int c_nPitch;
 	// current tempo
 	unsigned int c_nTempo;
-
 };
 
 #endif

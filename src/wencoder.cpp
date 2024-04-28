@@ -22,58 +22,70 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include "wencoder.h"
-#include "wwaveencoder.h"
-#include "wflacencoder.h"
-#include "wvorbisencoder.h"
-#include "wmp3encoder.h"
-#include "waacencoder.h"
 
-
-
-WAudioEncoder * CreateWaveEncoder()
-{
-	return (WAudioEncoder*)  new WWaveEncoder(0);
-}
-
-WAudioEncoder * CreatePCMEncoder()
-{
-	return (WAudioEncoder*)  new WWaveEncoder(1);
-}
-
-#ifndef LIBZPLAY_PF_VERSION
-
-WAudioEncoder * CreateMp3Encoder()
-{
-	return (WAudioEncoder*)  new WMp3Encoder();
-}
-
-WAudioEncoder * CreateAacEncoder()
-{
-	return (WAudioEncoder*)  new WAACEncoder();
-}
-
+#if defined(LIBZPLAY_OUTPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+	#include "waacencoder.h"
+#endif
+#ifdef LIBZPLAY_OUTPUT_FLAC
+	#include "wflacencoder.h"
+#endif
+#ifdef LIBZPLAY_OUTPUT_MP3
+	#include "wmp3encoder.h"
+#endif
+#ifdef LIBZPLAY_OUTPUT_VORBIS
+	#include "wvorbisencoder.h"
+#endif
+#ifdef LIBZPLAY_OUTPUT_WAV
+	#include "wwaveencoder.h"
 #endif
 
-
-WAudioEncoder * CreateFLACEncoder()
+#if defined(LIBZPLAY_OUTPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+WAudioEncoder* CreateAacEncoder()
 {
-	return (WAudioEncoder*)  new WFLACEncoder(0);
+	return (WAudioEncoder*)new WAACEncoder();
+}
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_FLAC
+WAudioEncoder* CreateFLACEncoder()
+{
+	return (WAudioEncoder*)new WFLACEncoder(0);
 }
 
-
-WAudioEncoder * CreateFLACOggEncoder()
+WAudioEncoder* CreateFLACOggEncoder()
 {
-	return (WAudioEncoder*)  new WFLACEncoder(1);
+	return (WAudioEncoder*)new WFLACEncoder(1);
+}
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_MP3
+WAudioEncoder* CreateMp3Encoder()
+{
+	return (WAudioEncoder*)new WMp3Encoder();
+}
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_VORBIS
+WAudioEncoder* CreateVorbisOggEncoder()
+{
+	return (WAudioEncoder*)new WVorbisEncoder();
+}
+#endif
+
+#ifdef LIBZPLAY_OUTPUT_WAV
+WAudioEncoder* CreatePCMEncoder()
+{
+	return (WAudioEncoder*)new WWaveEncoder(1);
 }
 
-
-WAudioEncoder * CreateVorbisOggEncoder()
+WAudioEncoder* CreateWaveEncoder()
 {
-	return (WAudioEncoder*)  new WVorbisEncoder();
+	return (WAudioEncoder*)new WWaveEncoder(0);
 }
+#endif

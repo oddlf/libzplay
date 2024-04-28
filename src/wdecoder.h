@@ -22,19 +22,21 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
-
+ */
 
 #ifndef _W_DECODER_H_
 #define _W_DECODER_H_
-
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "debug.h"
 #include "wqueue.h"
 
-#define WAVE_IN_NUM 15
+#ifdef LIBZPLAY_INPUT_WAVEIN
+	#define WAVE_IN_NUM 15
+#else
+	#define WAVE_IN_NUM 0
+#endif
 
 typedef struct {
 	char string_id[20];
@@ -45,20 +47,19 @@ typedef struct {
 } WAVEIN_ID;
 
 typedef struct {
-	wchar_t *errorW;
+	wchar_t* errorW;
 } DECODER_ERROR_MESSAGE;
 
 typedef struct {
-	unsigned int nSampleRate;		// PCM samplerate
-	unsigned int nChannel;			// number of PCM channels ( decoder must output always 2 channel data )
-	unsigned int nBitPerSample;		// PCM bit per sample ( decoder must output always 16 bit per sample data )
-	unsigned int nBlockAlign;		// Block alignment, in bytes. ( decoder must output always 4 byte block align )
-	unsigned int nFileBitrate;		// file bitrate in bits per second
-	unsigned int fVbr;				// variable or constant bitrate
-	unsigned int nLength;			// length of stream in PCM samples
-	char *pchStreamDescription;		// stream description
+	unsigned int nSampleRate;	// PCM samplerate
+	unsigned int nChannel;		// number of PCM channels ( decoder must output always 2 channel data )
+	unsigned int nBitPerSample; // PCM bit per sample ( decoder must output always 16 bit per sample data )
+	unsigned int nBlockAlign;	// Block alignment, in bytes. ( decoder must output always 4 byte block align )
+	unsigned int nFileBitrate;	// file bitrate in bits per second
+	unsigned int fVbr;			// variable or constant bitrate
+	unsigned int nLength;		// length of stream in PCM samples
+	char* pchStreamDescription; // stream description
 } INPUT_STREAM_INFO;
-
 
 #define ID3_FIELD_NUMBER 7
 
@@ -86,8 +87,6 @@ typedef struct {
 #define ID3_INFO_PICTURE_DATA 18
 #define ID3_INFO_PICTURE_DATA_SIZE 19
 
-
-
 // decoder error codes
 
 #define DECODER_OK 0
@@ -95,16 +94,15 @@ typedef struct {
 #define DECODER_FATAL_ERROR 2
 #define DECODER_MANAGED_NEED_MORE_DATA 3
 
-
 typedef struct {
 	unsigned int msgFromDecoder;
 	unsigned int nBufferInQueue;
 	unsigned int nBytesInQueue;
 	unsigned int nBufferDone;
 
-	short *pSamples;			// pointer to buffer for samples, user need to allocate this buffer
-	unsigned int nSamplesNum;	// number of samples user need from buffer
-								// on return this value contains number of samples retreived from buffer
+	short* pSamples;		  // pointer to buffer for samples, user need to allocate this buffer
+	unsigned int nSamplesNum; // number of samples user need from buffer
+							  // on return this value contains number of samples retreived from buffer
 
 	unsigned int nStartPosition;
 	unsigned int nEndPosition;
@@ -116,21 +114,17 @@ typedef struct {
 
 } DECODER_DATA;
 
-
-
-
 typedef struct {
-	unsigned int nDeviceID;	// Identifier of the waveform-audio input device to open.
-	unsigned int nMixerInputLineIndex;	// index of mixer input line from g_wavein_id table
-	char *sMixerInputLineName;	// mixer line name
-	unsigned int nVolume;	// volume of input line
-	unsigned int nWaveBufferSize;	// size of wave buffer(max latency) in milliseconds
+	unsigned int nDeviceID;			   // Identifier of the waveform-audio input device to open.
+	unsigned int nMixerInputLineIndex; // index of mixer input line from g_wavein_id table
+	char* sMixerInputLineName;		   // mixer line name
+	unsigned int nVolume;			   // volume of input line
+	unsigned int nWaveBufferSize;	   // size of wave buffer(max latency) in milliseconds
 } WAVEIN_INIT_DATA;
-
 
 // ===================================================================================================
 // convert ANSI to UTF-16
-int ANSIToUTF16(char *src, int nCharacterNumber, wchar_t *dest, int nDestSizeInBytes); 
+int ANSIToUTF16(char* src, int nCharacterNumber, wchar_t* dest, int nDestSizeInBytes);
 
 // PARAMETERS:
 //		src
@@ -154,10 +148,9 @@ int ANSIToUTF16(char *src, int nCharacterNumber, wchar_t *dest, int nDestSizeInB
 //	REMARKS:
 //		Returned string is always null terminated.
 
-
 // ===================================================================================================
 // convert UTF-8 to UTF-16
-int UTF8ToUNICODE(char *src, int nBytes, wchar_t *dest, int nDestSizeInBytes); 
+int UTF8ToUNICODE(char* src, int nBytes, wchar_t* dest, int nDestSizeInBytes);
 
 // PARAMETERS:
 //		src
@@ -183,7 +176,7 @@ int UTF8ToUNICODE(char *src, int nBytes, wchar_t *dest, int nDestSizeInBytes);
 
 // ===================================================================================================
 // convert UTF-16 string to ANSI string using ANSI code page
-int UTF16ToANSI(wchar_t *src, int nCharacterNumber, char *dest, int nDestSizeInBytes); 
+int UTF16ToANSI(wchar_t* src, int nCharacterNumber, char* dest, int nDestSizeInBytes);
 
 // PARAMETERS:
 //		src
@@ -205,12 +198,11 @@ int UTF16ToANSI(wchar_t *src, int nCharacterNumber, char *dest, int nDestSizeInB
 //		If nDestSizeInBytes is 0, function returns number of bytes needed for dest buffer.
 //
 //	REMARKS:
-//		Returned string is always null terminated.	
-
+//		Returned string is always null terminated.
 
 // ===================================================================================================
 // convert UFF-8 string to ANSI string using ANSI code page
-int UTF8ToANSI(char *src, int nBytes, char *dest, int nDestSizeInBytes); 
+int UTF8ToANSI(char* src, int nBytes, char* dest, int nDestSizeInBytes);
 
 // PARAMETERS:
 //		src
@@ -232,14 +224,12 @@ int UTF8ToANSI(char *src, int nBytes, char *dest, int nDestSizeInBytes);
 //		If nDestSizeInBytes is 0, function returns number of bytes needed for dest buffer.
 //
 //	REMARKS:
-//		Returned string is always null terminated.	
-
-
+//		Returned string is always null terminated.
 
 // ===================================================================================================
 
 // reverse PCM 16 bit stereo
-void PCM16StereoReverse(int *inSamples, unsigned int inSampleNum, int *outSamples);
+void PCM16StereoReverse(int* inSamples, unsigned int inSampleNum, int* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -258,11 +248,10 @@ void PCM16StereoReverse(int *inSamples, unsigned int inSampleNum, int *outSample
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 
-
 // ===================================================================================================
 
 // convert PCM 16 bit mono to PCM 16 bit stereo
-void PCM16MonoToPCM16Stereo(short *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM16MonoToPCM16Stereo(short* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -281,12 +270,10 @@ void PCM16MonoToPCM16Stereo(short *inSamples, unsigned int inSampleNum, short *o
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 
-
-
 // ===================================================================================================
 
 // convert PCM 16 bit stereo unsigned to PCM 16 bit stereo
-void PCM8StereoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM8StereoUnsignedToPCM16Stereo(unsigned char* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -305,11 +292,10 @@ void PCM8StereoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSa
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 
-
 // ===================================================================================================
 
 // convert PCM 16 bit stereo signed to PCM 16 bit stereo
-void PCM8StereoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM8StereoSignedToPCM16Stereo(char* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -331,7 +317,7 @@ void PCM8StereoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, sh
 // ===================================================================================================
 
 // convert PCM 8 bit mono unsigned to PCM 16 bit stereo
-void PCM8MonoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM8MonoUnsignedToPCM16Stereo(unsigned char* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -349,12 +335,11 @@ void PCM8MonoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSamp
 //
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
-
 
 // ===================================================================================================
 
 // convert PCM 8 bit mono signed to PCM 16 bit stereo
-void PCM8MonoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM8MonoSignedToPCM16Stereo(char* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -373,11 +358,10 @@ void PCM8MonoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, shor
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 
-
 // ===================================================================================================
 
 // convert PCM 32 bit stereo to PCM 16 bit stereo
-void PCM32StereoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM32StereoToPCM16Stereo(int* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -399,7 +383,7 @@ void PCM32StereoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *o
 // ===================================================================================================
 
 // convert PCM 32 bit mono to PCM 16 bit stereo
-void PCM32MonoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM32MonoToPCM16Stereo(int* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -420,7 +404,7 @@ void PCM32MonoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *out
 
 // =================================================================================
 // convert PCM 16 bit stereo big-endian to PCM 16 bit stereo little-endian
-void PCM16StereoBEToPCM16StereoLE(short *inSamples, unsigned int inSampleNum, short *outSamples);
+void PCM16StereoBEToPCM16StereoLE(short* inSamples, unsigned int inSampleNum, short* outSamples);
 //
 //	PARAMETERS:
 //		inSamples
@@ -439,18 +423,15 @@ void PCM16StereoBEToPCM16StereoLE(short *inSamples, unsigned int inSampleNum, sh
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 
-
-
 // ===================================================================================================
 // ===================================================================================================
 
-
-
-class WAudioDecoder {
+class WAudioDecoder
+{
 public:
-//==============================================
+	//==============================================
 	// initialize decoder, call before you use decoder
-	virtual int  Initialize(int param1, int param2, int param3, int param4) = 0;
+	virtual int Initialize(int param1, int param2, int param3, int param4) = 0;
 
 	// PARAMETERS:
 	//		param1	- decoder specific value, depends on decoder type
@@ -465,9 +446,8 @@ public:
 	//	REMARKS:
 	//		Each decoder has it's own parameters.
 
-
-//==============================================
-//	uninitialize decoder, call when you don't need decoder anymore
+	//==============================================
+	//	uninitialize decoder, call when you don't need decoder anymore
 
 	virtual int Uninitialize() = 0;
 
@@ -477,32 +457,31 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-// ====================================================================
+	// ====================================================================
 
-// open stream
-//
-//	PARAMETERS:
-//		pQueue		- queue with stream data
-//		fDynamic	- indicate dynamic or static stream
-//		fLite		- indicate lite or full opening
-//		param2		- unused, reserved for future use
-//
-//	RETURN VALUES:
-//		1	- all OK
-//		0	- error
-//
-//	REMARKS:
-//		User is responsible for pQueue. This function only reads data from queue in
-//		dynamic stream.
-//		With lite opening function will not chack if stream is valid stream. Uee lite
-//		opening for access to ID3 data only.
+	// open stream
+	//
+	//	PARAMETERS:
+	//		pQueue		- queue with stream data
+	//		fDynamic	- indicate dynamic or static stream
+	//		fLite		- indicate lite or full opening
+	//		param2		- unused, reserved for future use
+	//
+	//	RETURN VALUES:
+	//		1	- all OK
+	//		0	- error
+	//
+	//	REMARKS:
+	//		User is responsible for pQueue. This function only reads data from queue in
+	//		dynamic stream.
+	//		With lite opening function will not chack if stream is valid stream. Uee lite
+	//		opening for access to ID3 data only.
 
-	virtual int OpenStream(WQueue *pQueue, int fDynamic, int fLite, int param2) = 0;
+	virtual int OpenStream(WQueue* pQueue, int fDynamic, int fLite, int param2) = 0;
 
+	// ======================================================================================
 
-// ======================================================================================
-
-//	close decoder, stream
+	//	close decoder, stream
 	virtual int Close() = 0;
 
 	// PARAMETERS:
@@ -511,10 +490,10 @@ public:
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-//==============================================
-//	get stream info, samplerate, channels, ...
+	//==============================================
+	//	get stream info, samplerate, channels, ...
 
-	virtual INPUT_STREAM_INFO *GetStreamInfo() = 0;
+	virtual INPUT_STREAM_INFO* GetStreamInfo() = 0;
 
 	// PARAMETERS:
 	//		None.
@@ -522,25 +501,24 @@ public:
 	//	RETURN VALUES:
 	//		Pointer to INPUT_STREAM_INFO structure.
 	//		0	- error
-//==============================================
+	//==============================================
 
-// Get ID3 info array
-//
-//  PARAMETERS:
-//		version - ID3 version
-//
-//	RETURN VALUES:
-//		pointer to ID3 info array
-//		NULL - error
+	// Get ID3 info array
+	//
+	//  PARAMETERS:
+	//		version - ID3 version
+	//
+	//	RETURN VALUES:
+	//		pointer to ID3 info array
+	//		NULL - error
 
-virtual wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSize, int param1, int param2) = 0;
+	virtual wchar_t** GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2) = 0;
 
+	//==============================================
 
-//==============================================
+	//	get data from decoder
 
-//	get data from decoder
-
-	virtual int GetData(DECODER_DATA *pDecoderData) = 0;
+	virtual int GetData(DECODER_DATA* pDecoderData) = 0;
 
 	// PARAMETERS:
 	//		pDecoderData
@@ -556,10 +534,10 @@ virtual wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSiz
 	//
 	//	REMARKS:
 	//		DECODER MUST ALWAYS RETURN 2 CHANNEL ( STEREO ) 16 BIT PCM DATA.
-	//		
 	//
-//==============================================
-//	seek stream position
+	//
+	//==============================================
+	//	seek stream position
 
 	virtual int Seek(unsigned int nSamples) = 0;
 
@@ -570,43 +548,41 @@ virtual wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSiz
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error
-//==============================================
-//	free class instance
+	//==============================================
+	//	free class instance
 
-	virtual void  Release() = 0;
+	virtual void Release() = 0;
 
-
-//==============================================
-// get current bitrate
+	//==============================================
+	// get current bitrate
 
 	virtual int GetBitrate(int fAverage) = 0;
 
 	// PARAMETERS:
 	//		fAverage
 	//			Specifies if we need average bitrate or real bitrate.
-	//		
+	//
 	//
 	//	RETURN VALUES:
 	//		Bitrate in bits per second.
 
-//==============================================
-// set reverse mode
+	//==============================================
+	// set reverse mode
 	virtual int SetReverseMode(int fReverse) = 0;
 
 	// PARAMETERS:
 	//		fReverse
 	//			Srecifying reverse mode.
-	//		
+	//
 	//
 	//	RETURN VALUES:
 	//		1	- all OK
 	//		0	- error.
 
-
-//==============================================
+	//==============================================
 
 	// get error messages from decoder
-	virtual DECODER_ERROR_MESSAGE * GetError() = 0;
+	virtual DECODER_ERROR_MESSAGE* GetError() = 0;
 
 	// PARAMETERS:
 	//		None.
@@ -614,34 +590,40 @@ virtual wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSiz
 	//	RETURN VALUES:
 	//		Pointer to DECODER_ERROR_MESSAGE structure.
 
-// ======================================================
-
+	// ======================================================
 };
-
 
 void RemoveEndingSpaces(char* buff);
 void RemoveEndingSpacesEx(char* buff, int size);
 
-
-#ifndef LIBZPLAY_PF_VERSION
-WAudioDecoder *  CreateMp3Decoder();
-WAudioDecoder *  CreateAACDecoder();
+#if defined(LIBZPLAY_INPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+WAudioDecoder* CreateAACDecoder();
 #endif
 
-
-WAudioDecoder *  CreateWaveDecoder(); 
-WAudioDecoder *  CreateOggDecoder();
-WAudioDecoder *  CreatePCMDecoder();
-WAudioDecoder *  CreateFLACDecoder();
-WAudioDecoder *  CreateFLACOggDecoder();
-WAudioDecoder *  CreateAC3Decoder();
-WAudioDecoder *  CreateWaveIn();
-
-
-
-
-
-
-
+#ifdef LIBZPLAY_INPUT_AC3
+WAudioDecoder* CreateAC3Decoder();
 #endif
 
+#ifdef LIBZPLAY_INPUT_FLAC
+WAudioDecoder* CreateFLACDecoder();
+WAudioDecoder* CreateFLACOggDecoder();
+#endif
+
+#ifdef LIBZPLAY_INPUT_MP3
+WAudioDecoder* CreateMp3Decoder();
+#endif
+
+#ifdef LIBZPLAY_INPUT_VORBIS
+WAudioDecoder* CreateOggDecoder();
+#endif
+
+#ifdef LIBZPLAY_INPUT_WAV
+WAudioDecoder* CreatePCMDecoder();
+WAudioDecoder* CreateWaveDecoder();
+#endif
+
+#ifdef LIBZPLAY_INPUT_WAVEIN
+WAudioDecoder* CreateWaveIn();
+#endif
+
+#endif

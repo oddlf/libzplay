@@ -22,63 +22,57 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_WAVEDECODER_H_
 #define _W_WAVEDECODER_H_
 
 #include "wdecoder.h"
 
-
-
-class WWaveDecoder : public WAudioDecoder {
+class WWaveDecoder : public WAudioDecoder
+{
 public:
-
 	WWaveDecoder();
 	~WWaveDecoder();
 
-	int OpenStream(WQueue *pQueue, int fDynamic, int param1, int param2);
+	int OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2);
 
-	INPUT_STREAM_INFO *GetStreamInfo();
+	INPUT_STREAM_INFO* GetStreamInfo();
 
-	wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSize, int param1, int param2);
+	wchar_t** GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2);
 
 	int Close();
-	int  Initialize(int param1, int param2, int param3, int param4);
+	int Initialize(int param1, int param2, int param3, int param4);
 	int Uninitialize();
-	void  Release();
+	void Release();
 
-
-	int GetData(DECODER_DATA *pDecoderData);
+	int GetData(DECODER_DATA* pDecoderData);
 
 	// seek current position
 	int Seek(unsigned int nSamples);
 
 	int GetBitrate(int fAverage);
 
-	DECODER_ERROR_MESSAGE *GetError();
+	DECODER_ERROR_MESSAGE* GetError();
 
 	int SetReverseMode(int fReverse);
 
 private:
-
-
 	// pointer to first byte of input  data stream
-	unsigned char *c_pchStreamStart;
+	unsigned char* c_pchStreamStart;
 	// pointer to last byte of input data stream
-	unsigned char *c_pchStreamEnd;
+	unsigned char* c_pchStreamEnd;
 	// size of input data stream
 	unsigned int c_nStreamSize;
 
 	// pointer to first byte of input data
-	unsigned char *c_pchStart;
+	unsigned char* c_pchStart;
 	// pointer to last byte of input data
-	unsigned char *c_pchEnd;
+	unsigned char* c_pchEnd;
 	// input data size in bytes
 	unsigned int c_nSize;
 	// current position within data stream, decoder
-	unsigned char *c_pchPosition;
-
+	unsigned char* c_pchPosition;
 
 	// indicates that stream is ready
 	unsigned int c_fReady;
@@ -89,9 +83,7 @@ private:
 	char c_pchDesc[128];
 
 	// ID3 INFO
-	wchar_t *c_fields[ID3_FIELD_NUMBER_EX];
-
-
+	wchar_t* c_fields[ID3_FIELD_NUMBER_EX];
 
 	// bit per sample, need this to convert 8 bit to 16 bit
 	unsigned int c_nBitPerSample;
@@ -105,23 +97,15 @@ private:
 	// end of stream indicator
 	unsigned int c_fEndOfStream;
 
-
-
 	int _OpenFile(unsigned int fSkipExtraChecking);
 
-	WQueue *c_Queue;
+	WQueue* c_Queue;
 
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 
-
 	unsigned int c_nCurrentPosition;
 	unsigned int c_nSeekPosition;
-
-
 };
-
-
-
 
 #endif

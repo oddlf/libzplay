@@ -22,15 +22,12 @@
  * ver: 1.15
  * date: 12. April, 2010.
  *
-*/
-
+ */
 
 #ifndef _W_TAGS_H_
 #define _W_TAGS_H_
 
 #include "wtools.h"
-
-
 
 // allocate space for each field and initialize to null terminated string
 //  PARAMETES:
@@ -41,9 +38,7 @@
 //  RETURN VALUES:
 //     1 - all OK
 //     0 - memory allocation errro
-int AllocateID3Fields(wchar_t **fields, unsigned int number_of_fields, unsigned int field_size_in_wchar);
-
-
+int AllocateID3Fields(wchar_t** fields, unsigned int number_of_fields, unsigned int field_size_in_wchar);
 
 // free fields
 //  PARAMETES:
@@ -52,24 +47,20 @@ int AllocateID3Fields(wchar_t **fields, unsigned int number_of_fields, unsigned 
 //
 //  RETURN VALUES:
 //     None.
-void FreeID3Fields(wchar_t **fields, unsigned int number_of_fields);
+void FreeID3Fields(wchar_t** fields, unsigned int number_of_fields);
 
-
-class ID3Tag {
+class ID3Tag
+{
 public:
 	ID3Tag();
 	~ID3Tag();
 
-	wchar_t **LoadID3Info(unsigned char *buffer, unsigned int buffer_size, int version);
+	wchar_t** LoadID3Info(unsigned char* buffer, unsigned int buffer_size, int version);
 
 private:
-	wchar_t *c_fields[ID3_FIELD_NUMBER_EX];
+	wchar_t* c_fields[ID3_FIELD_NUMBER_EX];
 
 protected:
-
-
-
 };
-
 
 #endif

@@ -22,68 +22,49 @@
  * ver: 1.14
  * date: 15. April, 2010.
  *
-*/
- 
- 
- 
+ */
+
 #ifndef _W_WAVELET_H_
 #define _W_WAVELET_H_
-
 
 #define HAAR_WAVELET 0
 #define D4_WAVELET 1
 
-
 #define WAVELET_REAL float
 
+typedef void (*forward_step_func)(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
+typedef void (*inverse_step_func)(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
 
-typedef void (* forward_step_func)(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);
-typedef void (* inverse_step_func)(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);
-
-class WWavelet  {
+class WWavelet
+{
 public:
 	WWavelet(unsigned int WaveletType);
 	~WWavelet();
 
-
 	// transform data into 2 subsets ( low pass filter and high pass filter )
 	int ForwardTrans(WAVELET_REAL* data, unsigned int N, unsigned int Level);
-	
+
 	// combine low pass filter and high pass filter data to original data
 	int InverseTrans(WAVELET_REAL* data, unsigned int N, unsigned int Level);
 
-
-
 private:
-	WAVELET_REAL *c_buff;
+	WAVELET_REAL* c_buff;
 	unsigned int c_nBuffSize;
-
 
 	forward_step_func forward_step;
 	inverse_step_func inverse_step;
 
-
 	// Haar wavelet inverse packet transform ( frequency ordered )
-	static void haar_inverse_step(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);
+	static void haar_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
 
 	// Haar wavelet packet transform ( frequency ordered )
-	static void haar_forward_step(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);
+	static void haar_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
 
 	// Daubechies D4
-	static void daubechies4_forward_step(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);	
-	
+	static void daubechies4_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
+
 	// Daubechies D4 inverse packet transform ( frequency ordered )
-	static void daubechies4_inverse_step(WAVELET_REAL *src, WAVELET_REAL *dest, unsigned int N, unsigned int reverse);
-
-
+	static void daubechies4_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse);
 };
 
-
-
-
-
-
-
-
 #endif
-

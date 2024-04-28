@@ -23,11 +23,10 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #ifndef _W_BPM_DETECT_H_
 #define _W_BPM_DETECT_H_
-
 
 #define BPM_DETECT_USING_PEAKS 0
 #define BPM_DETECT_USING_AUTOCORRELATION 1
@@ -35,10 +34,10 @@
 // datection with wavelets isn't working
 #define BPM_DETECT_USING_WAVELETS 2
 
-class WBPMDetect {
+class WBPMDetect
+{
 public:
-
-// ==============================================================================================
+	// ==============================================================================================
 	// initialize class, call this before you put samples into class
 	virtual int Initialize(unsigned int nSampleRate, unsigned int nChannel) = 0;
 	//
@@ -57,17 +56,12 @@ public:
 	//		Call this function before you put samples. Also call this function before processing
 	//		new song to clear internal buffers and initialize all to starting positions.
 
-// ================================================================================================
+	// ================================================================================================
 	// set frequency band for searching beats
 
 	virtual int SetFrequencyBand(unsigned int nLowLimit, unsigned int nHighLimit) = 0;
 
-
-
-
-
-
-// ===============================================================================================
+	// ===============================================================================================
 
 	// get number of samples needed for PutSamples function.
 	virtual unsigned int NumOfSamples() = 0;
@@ -80,10 +74,10 @@ public:
 	//
 	//	REMARKS:
 	//		Use this function to get number of samples you need to feed with PutSamples function
-// ===============================================================================================
+	// ===============================================================================================
 
 	// put samples into processing
-	virtual int PutSamples(short *pSamples, unsigned int nSampleNum) = 0;
+	virtual int PutSamples(short* pSamples, unsigned int nSampleNum) = 0;
 	//
 	//	PARAMETERS:
 	//		pSamples
@@ -99,10 +93,10 @@ public:
 	//	REMARKS:
 	//		Call this function with new samples until function returns 1 or you are out of data.
 	//		If function returns 1, detection is done and we have BPM value, so we don't need more data.
-// ================================================================================================	
-	
+	// ================================================================================================
+
 	// get BPM value
-	virtual unsigned int GetBPM() = 0; 
+	virtual unsigned int GetBPM() = 0;
 	//
 	//	PARAMETERS:
 	//		None.
@@ -114,10 +108,10 @@ public:
 	//	REMARKS:
 	//		There can be case that class can't detect beat value. Maybe is song too short, or has
 	//		no beat, or is too much noise
-// ====================================================================================================	
+	// ====================================================================================================
 	//
 	//	destroy class
-	virtual void  Release() = 0;
+	virtual void Release() = 0;
 	//
 	//	PARAMETERS:
 	//		None.
@@ -127,15 +121,9 @@ public:
 	//
 	//	REMARKS:
 	//		Call this function to destroy class instance.
-// =====================================================================================================
+	// =====================================================================================================
 };
 
-
-WBPMDetect * CreateBPMDetect(unsigned int nMethod);
-
-
-
-
-
+WBPMDetect* CreateBPMDetect(unsigned int nMethod);
 
 #endif

@@ -22,106 +22,120 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include "wdecoder.h"
-#include "wwavedecoder.h"
-#include "wmp3decoder.h"
-#include "woggdecoder.h"
-#include "wpcmdecoder.h"
-#include "wflacdecoder.h"
-#include "wac3decoder.h"
-#include "waacdecoder.h"
-#include "wwavein.h"
+#include <cstdlib>
 
-
-WAVEIN_ID g_wavein_id[WAVE_IN_NUM] = {
-	{"line", MIXERLINE_COMPONENTTYPE_SRC_LINE, "Line In", "Line", "Line Input"},
-	{"line-in", MIXERLINE_COMPONENTTYPE_SRC_LINE, "Line In", "Line", "Line Input"},
-	{"mic", MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE, "Microphone", "Mic", "Ext Mic"},
-	{"microphone", MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE, "Microphone", "Mic", "Ext Mic"},
-	{"analog", MIXERLINE_COMPONENTTYPE_SRC_ANALOG, "Analog", "Analog Src", "Analog In"},
-	{"aux", MIXERLINE_COMPONENTTYPE_SRC_AUXILIARY, "Auxiliary", "Aux", "Aux In"},
-	{"cd", MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC, "CD Player", "CD Audio", "CD"},
-	{"digital", MIXERLINE_COMPONENTTYPE_SRC_DIGITAL, "Digital", "Digital In", "DigitalIn"},
-	{"pcspeaker", MIXERLINE_COMPONENTTYPE_SRC_PCSPEAKER, "Speaker", "PC Speaker", "PC Speaker"},
-	{"synthesizer", MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER, "Midi", "Midi Out", "SW Synth"},
-	{"midi", MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER, "Midi", "Midi Out", "SW Synth"},
-	{"phone", MIXERLINE_COMPONENTTYPE_SRC_TELEPHONE, "Telephony", "Telephone", "Phone"},
-	{"waveout", MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT, "Stereo Out", "Wave Out Mix", "Wave Out"},
-	{"undefined", MIXERLINE_COMPONENTTYPE_SRC_UNDEFINED, "", "", ""},
-	{"user", 0xFFFFFFFF, "", "", ""},
-};
-
-
-WAudioDecoder *  CreateWaveDecoder()
-{
-	return (WAudioDecoder*) new WWaveDecoder();
-}
-
-
-#ifndef LIBZPLAY_PF_VERSION
-
-WAudioDecoder *  CreateMp3Decoder()
-{
-	return (WAudioDecoder*)  new WMp3Decoder();
-}
-
-WAudioDecoder *  CreateAACDecoder()
-{
-	return (WAudioDecoder*) new WAACDecoder();
-}
-
+#if defined(LIBZPLAY_INPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+	#include "waacdecoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_AC3
+	#include "wac3decoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_FLAC
+	#include "wflacdecoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_MP3
+	#include "wmp3decoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_VORBIS
+	#include "woggdecoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_WAV
+	#include "wwavedecoder.h"
+	#include "wpcmdecoder.h"
+#endif
+#ifdef LIBZPLAY_INPUT_WAVEIN
+	#include "wwavein.h"
 #endif
 
-WAudioDecoder *  CreateOggDecoder()
+#ifdef LIBZPLAY_INPUT_WAVEIN
+WAVEIN_ID g_wavein_id[WAVE_IN_NUM] = {
+	{ "line", MIXERLINE_COMPONENTTYPE_SRC_LINE, "Line In", "Line", "Line Input" },
+	{ "line-in", MIXERLINE_COMPONENTTYPE_SRC_LINE, "Line In", "Line", "Line Input" },
+	{ "mic", MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE, "Microphone", "Mic", "Ext Mic" },
+	{ "microphone", MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE, "Microphone", "Mic", "Ext Mic" },
+	{ "analog", MIXERLINE_COMPONENTTYPE_SRC_ANALOG, "Analog", "Analog Src", "Analog In" },
+	{ "aux", MIXERLINE_COMPONENTTYPE_SRC_AUXILIARY, "Auxiliary", "Aux", "Aux In" },
+	{ "cd", MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC, "CD Player", "CD Audio", "CD" },
+	{ "digital", MIXERLINE_COMPONENTTYPE_SRC_DIGITAL, "Digital", "Digital In", "DigitalIn" },
+	{ "pcspeaker", MIXERLINE_COMPONENTTYPE_SRC_PCSPEAKER, "Speaker", "PC Speaker", "PC Speaker" },
+	{ "synthesizer", MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER, "Midi", "Midi Out", "SW Synth" },
+	{ "midi", MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER, "Midi", "Midi Out", "SW Synth" },
+	{ "phone", MIXERLINE_COMPONENTTYPE_SRC_TELEPHONE, "Telephony", "Telephone", "Phone" },
+	{ "waveout", MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT, "Stereo Out", "Wave Out Mix", "Wave Out" },
+	{ "undefined", MIXERLINE_COMPONENTTYPE_SRC_UNDEFINED, "", "", "" },
+	{ "user", 0xFFFFFFFF, "", "", "" },
+};
+#endif
+
+#if defined(LIBZPLAY_INPUT_AAC) && !defined(LIBZPLAY_PF_VERSION)
+WAudioDecoder* CreateAACDecoder()
 {
-	return (WAudioDecoder*) new WOggDecoder();
+	return (WAudioDecoder*)new WAACDecoder();
+}
+#endif
+
+#ifdef LIBZPLAY_INPUT_AC3
+WAudioDecoder* CreateAC3Decoder()
+{
+	return (WAudioDecoder*)new WAC3Decoder();
+}
+#endif
+
+#ifdef LIBZPLAY_INPUT_FLAC
+WAudioDecoder* CreateFLACDecoder()
+{
+	return (WAudioDecoder*)new WFLACDecoder();
 }
 
-WAudioDecoder *  CreatePCMDecoder()
+WAudioDecoder* CreateFLACOggDecoder()
 {
-	return (WAudioDecoder*) new WPCMDecoder();
+	return (WAudioDecoder*)new WFLACDecoder(1);
+}
+#endif
+
+#ifdef LIBZPLAY_INPUT_MP3
+WAudioDecoder* CreateMp3Decoder()
+{
+	return (WAudioDecoder*)new WMp3Decoder();
+}
+#endif
+
+#ifdef LIBZPLAY_INPUT_VORBIS
+WAudioDecoder* CreateOggDecoder()
+{
+	return (WAudioDecoder*)new WOggDecoder();
+}
+#endif
+
+#ifdef LIBZPLAY_INPUT_WAV
+WAudioDecoder* CreatePCMDecoder()
+{
+	return (WAudioDecoder*)new WPCMDecoder();
 }
 
-
-WAudioDecoder *  CreateFLACDecoder()
+WAudioDecoder* CreateWaveDecoder()
 {
-	return (WAudioDecoder*) new WFLACDecoder();
+	return (WAudioDecoder*)new WWaveDecoder();
 }
+#endif
 
-
-WAudioDecoder *  CreateFLACOggDecoder()
+#ifdef LIBZPLAY_INPUT_WAVEIN
+WAudioDecoder* CreateWaveIn()
 {
-	return (WAudioDecoder*) new WFLACDecoder(1);
+	return (WAudioDecoder*)new WWaveIn();
 }
-
-
-WAudioDecoder *  CreateAC3Decoder()
-{
-	return (WAudioDecoder*) new WAC3Decoder();
-}
-
-
-WAudioDecoder *  CreateWaveIn()
-{
-	return (WAudioDecoder*) new WWaveIn();
-}
-
-
-
-
-
-
+#endif
 
 // ==========================================================================================
 
-
 // convert PCM 16 bit mono to PCM 16 bit stereo
-void PCM16MonoToPCM16Stereo(short *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM16MonoToPCM16Stereo(short* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -143,18 +157,16 @@ void PCM16MonoToPCM16Stereo(short *inSamples, unsigned int inSampleNum, short *o
 
 	unsigned int i;
 	unsigned int index;
-	for(i = 1; i <= inSampleNum; i++)
+	for (i = 1; i <= inSampleNum; i++)
 	{
 		index = inSampleNum - i;
-		outSamples[2 * index] = inSamples[index];	
+		outSamples[2 * index] = inSamples[index];
 		outSamples[2 * index + 1] = inSamples[index];
 	}
-
 }
 
-
 // convert PCM 16 bit stereo to PCM 16 bit stereo
-void PCM8StereoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM8StereoUnsignedToPCM16Stereo(unsigned char* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -178,18 +190,15 @@ void PCM8StereoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSa
 	unsigned int i;
 	unsigned int index;
 
-	for(i = 1; i <= inSampleNum; i++)
+	for (i = 1; i <= inSampleNum; i++)
 	{
 		index = inSampleNum - i;
 		outSamples[index] = ((short)inSamples[index] - 128) << 8;
 	}
-
 }
 
-
-
 // convert PCM 16 bit stereo signed to PCM 16 bit stereo
-void PCM8StereoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM8StereoSignedToPCM16Stereo(char* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -213,18 +222,15 @@ void PCM8StereoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, sh
 	unsigned int index;
 
 	inSampleNum *= 2;
-	for(i = 1; i <= inSampleNum ; i++)
+	for (i = 1; i <= inSampleNum; i++)
 	{
-		index = inSampleNum - i; 
-		outSamples[index] = (short) (((short) inSamples[index]) << 8) ;
+		index = inSampleNum - i;
+		outSamples[index] = (short)(((short)inSamples[index]) << 8);
 	}
-
 }
 
-
-
 // convert PCM 8 bit mono unsigned to PCM 16 bit stereo
-void PCM8MonoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM8MonoUnsignedToPCM16Stereo(unsigned char* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -247,19 +253,17 @@ void PCM8MonoUnsignedToPCM16Stereo(unsigned char *inSamples, unsigned int inSamp
 	unsigned int index;
 	short sample;
 
-	for(i = 1; i <= inSampleNum ; i++)
+	for (i = 1; i <= inSampleNum; i++)
 	{
-		index = inSampleNum - i; 
+		index = inSampleNum - i;
 		sample = ((short)inSamples[index] - 128) << 8;
-		outSamples[2 * index    ] = sample;
+		outSamples[2 * index] = sample;
 		outSamples[2 * index + 1] = sample;
 	}
-
 }
 
-
 // convert PCM 8 bit mono signed to PCM 16 bit stereo
-void PCM8MonoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM8MonoSignedToPCM16Stereo(char* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -281,19 +285,16 @@ void PCM8MonoSignedToPCM16Stereo(char *inSamples, unsigned int inSampleNum, shor
 	unsigned int i;
 	unsigned int index;
 
-
-	for(i = 1; i <= inSampleNum ; i++)
+	for (i = 1; i <= inSampleNum; i++)
 	{
-		index = inSampleNum - i; 
-		outSamples[2 * index    ] = (short) (((short) inSamples[index]) << 8) ;
-		outSamples[2 * index + 1] = (short) (((short) inSamples[index]) << 8) ;
+		index = inSampleNum - i;
+		outSamples[2 * index] = (short)(((short)inSamples[index]) << 8);
+		outSamples[2 * index + 1] = (short)(((short)inSamples[index]) << 8);
 	}
-
 }
 
-
 // convert PCM 32 bit stereo to PCM 16 bit stereo
-void PCM32StereoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM32StereoToPCM16Stereo(int* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -314,15 +315,12 @@ void PCM32StereoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *o
 {
 
 	unsigned int i;
-	for(i = 0; i < inSampleNum * 2; i++)
+	for (i = 0; i < inSampleNum * 2; i++)
 		outSamples[i] = inSamples[i] >> 16;
-
 }
 
-
-
 // convert PCM 32 bit mono to PCM 16 bit stereo
-void PCM32MonoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM32MonoToPCM16Stereo(int* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -343,20 +341,18 @@ void PCM32MonoToPCM16Stereo(int *inSamples, unsigned int inSampleNum, short *out
 {
 	unsigned int i;
 	short sample;
-	for(i = 0; i < inSampleNum; i++)
+	for (i = 0; i < inSampleNum; i++)
 	{
 		sample = inSamples[i] >> 16;
 		outSamples[i * 2] = sample;
 		outSamples[i * 2 + 1] = sample;
 	}
-
 }
-
 
 // ===================================================================================================
 
 // reverse PCM 16 bit stereo
-void PCM16StereoReverse(int *inSamples, unsigned int inSampleNum, int *outSamples)
+void PCM16StereoReverse(int* inSamples, unsigned int inSampleNum, int* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -376,26 +372,25 @@ void PCM16StereoReverse(int *inSamples, unsigned int inSampleNum, int *outSample
 //		Buffer inSamples and outSamples can be the same buffer.
 {
 
-	if(inSampleNum < 2)
+	if (inSampleNum < 2)
 		return;
 
 	int sample;
 	unsigned int heigh = inSampleNum - 1;
 	unsigned int low = 0;
-	while(low < heigh)
+	while (low < heigh)
 	{
 		sample = inSamples[low];
 		outSamples[low] = inSamples[heigh];
-		outSamples[heigh] = sample;	
+		outSamples[heigh] = sample;
 		low++;
-		heigh--;		
+		heigh--;
 	}
 }
 
-
 // =================================================================================
 // convert PCM 16 bit stereo big-endian to PCM 16 bit stereo little-endian
-void PCM16StereoBEToPCM16StereoLE(short *inSamples, unsigned int inSampleNum, short *outSamples)
+void PCM16StereoBEToPCM16StereoLE(short* inSamples, unsigned int inSampleNum, short* outSamples)
 //
 //	PARAMETERS:
 //		inSamples
@@ -416,50 +411,45 @@ void PCM16StereoBEToPCM16StereoLE(short *inSamples, unsigned int inSampleNum, sh
 {
 	unsigned int i;
 	short sample;
-	for(i = 0; i < inSampleNum * 2; i++)
+	for (i = 0; i < inSampleNum * 2; i++)
 	{
 		sample = inSamples[i];
-		outSamples[i] = (short) ( ((sample >> 8) & 0xFF) + ((sample & 0xFF) << 8) );
+		outSamples[i] = (short)(((sample >> 8) & 0xFF) + ((sample & 0xFF) << 8));
 	}
-
 }
 
-
-int UTF16ToANSI(wchar_t *src, int nCharacterNumber, char *dest, int nDestSizeInBytes)
+int UTF16ToANSI(wchar_t* src, int nCharacterNumber, char* dest, int nDestSizeInBytes)
 {
 
-	if((char*) src != dest)
+	if ((char*)src != dest)
 	{
 		int ret = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, src, nCharacterNumber, dest, nDestSizeInBytes, NULL, NULL);
-		if(nDestSizeInBytes && ret)
+		if (nDestSizeInBytes && ret)
 		{
 			// null terminate string
-			if(dest[ret - 1] != 0) // string isn't null terminated
+			if (dest[ret - 1] != 0) // string isn't null terminated
 			{
-				if(nDestSizeInBytes > ret)
+				if (nDestSizeInBytes > ret)
 					dest[ret] = 0;
 				else
 					dest[ret - 1] = 0;
-
 			}
 		}
 
 		return ret;
-
 	}
 
 	// src and dest are the same, use internal buffer
 
-	if(nDestSizeInBytes == 0)
+	if (nDestSizeInBytes == 0)
 		return WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, src, nCharacterNumber, dest, nDestSizeInBytes, NULL, NULL);
-	
 
-	char *buff = (char*) malloc(nDestSizeInBytes);
-	if(buff == 0)
+	char* buff = (char*)malloc(nDestSizeInBytes);
+	if (buff == 0)
 		return 0;
 
 	int ret = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, src, nCharacterNumber, buff, nDestSizeInBytes, NULL, NULL);
-	if(ret == 0)
+	if (ret == 0)
 	{
 		free(buff);
 		return 0;
@@ -469,74 +459,69 @@ int UTF16ToANSI(wchar_t *src, int nCharacterNumber, char *dest, int nDestSizeInB
 	memcpy(dest, buff, ret);
 	// null terminate dest buffer
 	// null terminate string
-	if(dest[ret - 1] != 0) // string isn't null terminated
+	if (dest[ret - 1] != 0) // string isn't null terminated
 	{
-		if(nDestSizeInBytes > ret)
+		if (nDestSizeInBytes > ret)
 			dest[ret] = 0;
 		else
 			dest[ret - 1] = 0;
-
 	}
 
 	free(buff);
-	
+
 	return ret;
 }
 
-
-int UTF8ToANSI(char *src, int nBytes, char *dest, int nDestSizeInBytes)
+int UTF8ToANSI(char* src, int nBytes, char* dest, int nDestSizeInBytes)
 {
 
 	// convert UTF-8 to UTF-16
 	int size = MultiByteToWideChar(CP_UTF8, 0, src, nBytes, NULL, 0);
-	if(size == 0)
+	if (size == 0)
 		return 0;
 
-	wchar_t *wide = (wchar_t*) malloc(size * 2);
-	if(wide == 0)
+	wchar_t* wide = (wchar_t*)malloc(size * 2);
+	if (wide == 0)
 		return 0;
 
-	if(MultiByteToWideChar(CP_UTF8, 0, src, nBytes, (LPWSTR) wide, size) == 0)
+	if (MultiByteToWideChar(CP_UTF8, 0, src, nBytes, (LPWSTR)wide, size) == 0)
 	{
 		free(wide);
 		return 0;
 	}
 
-	if((char*) src != dest)
+	if ((char*)src != dest)
 	{
 		// convert UTF-16 to ANSI
-				
-		int ret = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) wide, size, dest, nDestSizeInBytes, NULL, NULL);				
-		if(nDestSizeInBytes && ret)
+
+		int ret = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wide, size, dest, nDestSizeInBytes, NULL, NULL);
+		if (nDestSizeInBytes && ret)
 		{
 			// null terminate string
-			if(dest[ret - 1] != 0) // string isn't null terminated
+			if (dest[ret - 1] != 0) // string isn't null terminated
 			{
-				if(nDestSizeInBytes > ret)
+				if (nDestSizeInBytes > ret)
 					dest[ret] = 0;
 				else
 					dest[ret - 1] = 0;
-
 			}
 		}
 
 		free(wide);
 		return ret;
-
 	}
 
 	// src and dest are the same, use internal buffer
 
-	if(nDestSizeInBytes == 0)
+	if (nDestSizeInBytes == 0)
 	{
 		int ret = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wide, size, dest, nDestSizeInBytes, NULL, NULL);
 		free(wide);
 		return ret;
 	}
-	
 
-	char *buff = (char*) malloc(nDestSizeInBytes);
-	if(buff == 0)
+	char* buff = (char*)malloc(nDestSizeInBytes);
+	if (buff == 0)
 	{
 		free(wide);
 		return 0;
@@ -544,7 +529,7 @@ int UTF8ToANSI(char *src, int nBytes, char *dest, int nDestSizeInBytes)
 
 	int ret = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wide, size, buff, nDestSizeInBytes, NULL, NULL);
 	free(wide);
-	if(ret == 0)
+	if (ret == 0)
 	{
 		free(buff);
 		return 0;
@@ -553,130 +538,119 @@ int UTF8ToANSI(char *src, int nBytes, char *dest, int nDestSizeInBytes)
 	// copy data from internal buffer into dest buffer
 	memcpy(dest, buff, ret);
 	// null terminate string
-	if(dest[ret - 1] != 0) // string isn't null terminated
+	if (dest[ret - 1] != 0) // string isn't null terminated
 	{
-		if(nDestSizeInBytes > ret)
+		if (nDestSizeInBytes > ret)
 			dest[ret] = 0;
 		else
 			dest[ret - 1] = 0;
-
 	}
 
 	free(buff);
-	
+
 	return ret;
 }
 
-
-
-int ANSIToUTF16(char *src, int nCharacterNumber, wchar_t *dest, int nDestSizeInBytes)
+int ANSIToUTF16(char* src, int nCharacterNumber, wchar_t* dest, int nDestSizeInBytes)
 {
-	if(src != (char*) dest)
+	if (src != (char*)dest)
 	{
 		int ret = MultiByteToWideChar(CP_ACP, 0, src, nCharacterNumber, dest, nDestSizeInBytes);
-		if(nDestSizeInBytes && ret)
+		if (nDestSizeInBytes && ret)
 		{
-		// null terminate string
-			if(dest[ret - 1] != 0) // string isn't null terminated
+			// null terminate string
+			if (dest[ret - 1] != 0) // string isn't null terminated
 			{
-				if(nDestSizeInBytes > ret)
+				if (nDestSizeInBytes > ret)
 					dest[ret] = 0;
 				else
 					dest[ret - 1] = 0;
-
 			}
 		}
-			
-		return ret;
 
+		return ret;
 	}
 
-	if(nDestSizeInBytes == 0)
+	if (nDestSizeInBytes == 0)
 		return MultiByteToWideChar(CP_ACP, 0, src, nCharacterNumber, dest, nDestSizeInBytes);
-		
+
 	// allocate internal memory
-	wchar_t *mem = (wchar_t*) malloc(nDestSizeInBytes);
-	if(mem == 0)
+	wchar_t* mem = (wchar_t*)malloc(nDestSizeInBytes);
+	if (mem == 0)
 		return 0;
 
 	// convert ANSI to UNICODE using internal buffer
 	int ret = MultiByteToWideChar(CP_ACP, 0, src, nCharacterNumber, mem, nDestSizeInBytes);
-	if(ret)
+	if (ret)
 	{
 		// copy data from internal buffer to dest buffer
 		memcpy(dest, mem, ret * 2);
 		// null terminate dest buffer
-		if(dest[ret - 1] != 0) // string isn't null terminated
+		if (dest[ret - 1] != 0) // string isn't null terminated
 		{
-			if(nDestSizeInBytes > ret)
+			if (nDestSizeInBytes > ret)
 				dest[ret] = 0;
 			else
 				dest[ret - 1] = 0;
-
 		}
 	}
 
 	return ret;
 }
 
-
-int UTF8ToUTF16(char *src, int nCharacterNumber, wchar_t *dest, int nDestSizeInBytes)
+int UTF8ToUTF16(char* src, int nCharacterNumber, wchar_t* dest, int nDestSizeInBytes)
 {
-	if(src != (char*) dest)
+	if (src != (char*)dest)
 	{
 		int ret = MultiByteToWideChar(CP_UTF8, 0, src, nCharacterNumber, dest, nDestSizeInBytes);
-		if(nDestSizeInBytes && ret)
+		if (nDestSizeInBytes && ret)
 		{
 			// null terminate string
-			if(dest[ret - 1] != 0) // string isn't null terminated
+			if (dest[ret - 1] != 0) // string isn't null terminated
 			{
-				if(nDestSizeInBytes > ret)
+				if (nDestSizeInBytes > ret)
 					dest[ret] = 0;
 				else
 					dest[ret - 1] = 0;
-
 			}
 		}
 
 		return ret;
-
 	}
 
-	if(nDestSizeInBytes == 0)
+	if (nDestSizeInBytes == 0)
 		return MultiByteToWideChar(CP_UTF8, 0, src, nCharacterNumber, dest, nDestSizeInBytes);
-		
+
 	// allocate internal memory
-	wchar_t *mem = (wchar_t*) malloc(nDestSizeInBytes);
-	if(mem == 0)
+	wchar_t* mem = (wchar_t*)malloc(nDestSizeInBytes);
+	if (mem == 0)
 		return 0;
 
 	// convert ANSI to UNICODE using internal buffer
 	int ret = MultiByteToWideChar(CP_UTF8, 0, src, nCharacterNumber, mem, nDestSizeInBytes);
-	if(ret)
+	if (ret)
 	{
 		// copy data from internal buffer to dest buffer
 		memcpy(dest, mem, ret * 2);
 		// null terminate string
-		if(dest[ret - 1] != 0) // string isn't null terminated
+		if (dest[ret - 1] != 0) // string isn't null terminated
 		{
-			if(nDestSizeInBytes > ret)
+			if (nDestSizeInBytes > ret)
 				dest[ret] = 0;
 			else
 				dest[ret - 1] = 0;
-
 		}
 	}
 
 	return ret;
 }
 
-
 void RemoveEndingSpaces(char* buff)
 {
 	int size = strlen(buff);
-	for(int i = size - 1; i >= 0; i--)
+	for (int i = size - 1; i >= 0; i--)
 	{
-		if(buff[i] == ' ')
+		if (buff[i] == ' ')
 			buff[i] = 0;
 		else
 			return;
@@ -685,12 +659,11 @@ void RemoveEndingSpaces(char* buff)
 
 void RemoveEndingSpacesEx(char* buff, int size)
 {
-	for(int i = size - 1; i >= 0; i--)
+	for (int i = size - 1; i >= 0; i--)
 	{
-		if(buff[i] == ' ')
+		if (buff[i] == ' ')
 			buff[i] = 0;
 		else
 			return;
 	}
 }
-

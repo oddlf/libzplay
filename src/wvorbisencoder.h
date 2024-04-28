@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_VORBISENCODER_H_
 #define _W_VORBISENCODER_H_
@@ -31,31 +31,25 @@
 
 #include <vorbis/vorbisenc.h>
 
-
-
-class WVorbisEncoder : public WAudioEncoder {
+class WVorbisEncoder : public WAudioEncoder
+{
 public:
-
 	WVorbisEncoder();
 	~WVorbisEncoder();
 
-int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			);
-
+	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback);
 
 	int Uninitialize();
-	int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples);
-	void  Release();
-	DECODER_ERROR_MESSAGE * GetError();
-
+	int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples);
+	void Release();
+	DECODER_ERROR_MESSAGE* GetError();
 
 private:
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 
@@ -66,27 +60,20 @@ private:
 	unsigned int c_nBitBerSample;
 	unsigned int c_nBlockAllign;
 
-
-	void *c_user_data;
+	void* c_user_data;
 
 	TEncoderReadCallback c_read_calllback;
 	TEncoderWriteCallback c_write_callback;
 	TEncoderSeekCallback c_seek_callback;
 	TEncoderTellCallback c_tell_callback;
 
-	  ogg_stream_state os; /* take physical pages, weld into a logicalstream of packets */
-	  ogg_page         og; /* one Ogg bitstream page.  Vorbis packets are inside */
-	  ogg_packet       op; /* one raw packet of data for decode */
-	  vorbis_info      vi; /* struct that stores all the static vorbis bitstream settings */
-	  vorbis_comment   vc; /* struct that stores all the user comments */
-	  vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
-	  vorbis_block     vb; /* local working space for packet->PCM decode */
-
-
-
+	ogg_stream_state os; /* take physical pages, weld into a logicalstream of packets */
+	ogg_page og;		 /* one Ogg bitstream page.  Vorbis packets are inside */
+	ogg_packet op;		 /* one raw packet of data for decode */
+	vorbis_info vi;		 /* struct that stores all the static vorbis bitstream settings */
+	vorbis_comment vc;	 /* struct that stores all the user comments */
+	vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
+	vorbis_block vb;	 /* local working space for packet->PCM decode */
 };
-
-
-
 
 #endif

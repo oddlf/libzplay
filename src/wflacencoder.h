@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_FLACENCODER_H_
 #define _W_FLACENCODER_H_
@@ -36,29 +36,25 @@
 #include <FLAC/stream_encoder.h>
 #include <FLAC/metadata.h>
 
-
-class WFLACEncoder : public WAudioEncoder {
+class WFLACEncoder : public WAudioEncoder
+{
 public:
-
 	WFLACEncoder(int fOgg);
 	~WFLACEncoder();
 
-int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback
-			);
+	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
+		unsigned int custom_value,
+		TEncoderReadCallback read_callback,
+		TEncoderWriteCallback write_callback,
+		TEncoderSeekCallback seek_callback,
+		TEncoderTellCallback tell_callback);
 
 	int Uninitialize();
-	int EncodeSamples(void *pSamples, unsigned int nNumberOfSamples);
-	void  Release();
-	DECODER_ERROR_MESSAGE * GetError();
-
+	int EncodeSamples(void* pSamples, unsigned int nNumberOfSamples);
+	void Release();
+	DECODER_ERROR_MESSAGE* GetError();
 
 private:
-
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
 
@@ -69,32 +65,23 @@ private:
 	unsigned int c_nBitBerSample;
 	unsigned int c_nBlockAllign;
 
-
-	FLAC__StreamEncoder *c_encoder;
-	FLAC__int32 *c_pcm;
+	FLAC__StreamEncoder* c_encoder;
+	FLAC__int32* c_pcm;
 	unsigned int c_pcm_size;
 
 	int c_fOgg;
 
-	void *c_user_data;
-
+	void* c_user_data;
 
 	TEncoderReadCallback c_read_calllback;
 	TEncoderWriteCallback c_write_callback;
 	TEncoderSeekCallback c_seek_callback;
 	TEncoderTellCallback c_tell_callback;
 
-
-
-	static FLAC__StreamEncoderReadStatus f_read_callback(const FLAC__StreamEncoder *encoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
-	static  FLAC__StreamEncoderWriteStatus  f_write_callback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data);
-	static FLAC__StreamEncoderSeekStatus f_seek_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data);
-	static FLAC__StreamEncoderTellStatus f_tell_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
-
-
+	static FLAC__StreamEncoderReadStatus f_read_callback(const FLAC__StreamEncoder* encoder, FLAC__byte buffer[], size_t* bytes, void* client_data);
+	static FLAC__StreamEncoderWriteStatus f_write_callback(const FLAC__StreamEncoder* encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void* client_data);
+	static FLAC__StreamEncoderSeekStatus f_seek_callback(const FLAC__StreamEncoder* encoder, FLAC__uint64 absolute_byte_offset, void* client_data);
+	static FLAC__StreamEncoderTellStatus f_tell_callback(const FLAC__StreamEncoder* encoder, FLAC__uint64* absolute_byte_offset, void* client_data);
 };
-
-
-
 
 #endif

@@ -22,55 +22,46 @@
  * ver: 1.14
  * date: 15. April, 2010.
  *
-*/
+ */
 
 #include <string.h>
 #include <stdio.h>
 #include "debug.h"
 #include "woutputprocessor.h"
 
-
-
-
 WOutputProcessor::WOutputProcessor()
 {
-
 }
-
 
 WOutputProcessor::~WOutputProcessor()
 {
-
 }
-
-
 
 int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample)
 {
-// send this data to next processor
-
+	// send this data to next processor
 
 	// check input parameters
-	if(nSampleRate == 0)
+	if (nSampleRate == 0)
 	{
 		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Sample rate can't be %u.", nSampleRate);
-		if(c_pchReturnError)
+		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
 	}
 
-	if(nChannel != 1 && nChannel != 2)
+	if (nChannel != 1 && nChannel != 2)
 	{
 		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Nuber of channels can't be %u.", nChannel);
-		if(c_pchReturnError)
+		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
 	}
 
-	if(nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
+	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
 		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
-		if(c_pchReturnError)
+		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
 
@@ -80,15 +71,14 @@ int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRat
 	c_nBitPerSample = nBitPerSample;
 	c_nBlockAlign = nChannel * (nBitPerSample / 8);
 
-
-	if(fBroadcast && c_next)
+	if (fBroadcast && c_next)
 	{
-		#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-			if(c_pchReturnError == 0)
-				c_next->c_pchReturnError = c_pchErrorMessageStr;
-			else
-				c_next->c_pchReturnError = c_pchReturnError;
-		#endif
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+		if (c_pchReturnError == 0)
+			c_next->c_pchReturnError = c_pchErrorMessageStr;
+		else
+			c_next->c_pchReturnError = c_pchReturnError;
+#endif
 
 		return c_next->Configure(fBroadcast, nSampleRate, nChannel, nBitPerSample);
 	}
@@ -96,18 +86,16 @@ int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRat
 	return 1;
 }
 
-
-
 int WOutputProcessor::Enable(int fBroadcast, int fEnable)
 {
-	if(fBroadcast && c_next)
+	if (fBroadcast && c_next)
 	{
-		#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-			if(c_pchReturnError == 0)
-				c_next->c_pchReturnError = c_pchErrorMessageStr;
-			else
-				c_next->c_pchReturnError = c_pchReturnError;
-		#endif
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+		if (c_pchReturnError == 0)
+			c_next->c_pchReturnError = c_pchErrorMessageStr;
+		else
+			c_next->c_pchReturnError = c_pchReturnError;
+#endif
 
 		return c_next->Enable(fBroadcast, fEnable);
 	}
@@ -115,17 +103,16 @@ int WOutputProcessor::Enable(int fBroadcast, int fEnable)
 	return 1;
 }
 
-
 int WOutputProcessor::Flush(int fBroadcast)
 {
-	if(fBroadcast && c_next)
+	if (fBroadcast && c_next)
 	{
-		#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-			if(c_pchReturnError == 0)
-				c_next->c_pchReturnError = c_pchErrorMessageStr;
-			else
-				c_next->c_pchReturnError = c_pchReturnError;
-		#endif
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+		if (c_pchReturnError == 0)
+			c_next->c_pchReturnError = c_pchErrorMessageStr;
+		else
+			c_next->c_pchReturnError = c_pchReturnError;
+#endif
 
 		return c_next->Flush(fBroadcast);
 	}
@@ -133,19 +120,18 @@ int WOutputProcessor::Flush(int fBroadcast)
 	return 1;
 }
 
-
 int WOutputProcessor::Clear(int fBroadcast)
 {
 	c_queue.Clear();
 
-	if(fBroadcast && c_next)
+	if (fBroadcast && c_next)
 	{
-		#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-			if(c_pchReturnError == 0)
-				c_next->c_pchReturnError = c_pchErrorMessageStr;
-			else
-				c_next->c_pchReturnError = c_pchReturnError;
-		#endif
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+		if (c_pchReturnError == 0)
+			c_next->c_pchReturnError = c_pchErrorMessageStr;
+		else
+			c_next->c_pchReturnError = c_pchReturnError;
+#endif
 
 		return c_next->Clear(fBroadcast);
 	}
@@ -153,37 +139,34 @@ int WOutputProcessor::Clear(int fBroadcast)
 	return 1;
 }
 
-unsigned int WOutputProcessor::PullSamples(PROCESSOR_AUDIO_DATA *data)
+unsigned int WOutputProcessor::PullSamples(PROCESSOR_AUDIO_DATA* data)
 {
 
 	return c_queue.PullSamples(data);
 }
 
-
-int WOutputProcessor::PushSamples(PROCESSOR_AUDIO_DATA *data)
+int WOutputProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 {
 
 	// send data to next processor
-	if(c_next)
-	{	
-		#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
-			if(c_pchReturnError == 0)
-				c_next->c_pchReturnError = c_pchErrorMessageStr;
-			else
-				c_next->c_pchReturnError = c_pchReturnError;
-		#endif
-				
+	if (c_next)
+	{
+#ifdef AUDIO_PROCESSOR_RETURN_ERROR_STR
+		if (c_pchReturnError == 0)
+			c_next->c_pchReturnError = c_pchErrorMessageStr;
+		else
+			c_next->c_pchReturnError = c_pchReturnError;
+#endif
+
 		return c_next->PushSamples(data);
 	}
 
-
-	if(c_queue.PushSamples(data) == 0)
+	if (c_queue.PushSamples(data) == 0)
 	{
 		strcpy(c_pchErrorMessageStr, "WOutputProcessor::PushData->Can't add data to queue.");
-		if(c_pchReturnError)
+		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
-
 	}
 
 	return 1;

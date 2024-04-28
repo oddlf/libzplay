@@ -22,7 +22,7 @@
  * ver: 2.0
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #ifndef _W_WWAVEIN_H_
 #define _W_WWAVEIN_H_
@@ -30,29 +30,26 @@
 #include <mmsystem.h>
 #include "wdecoder.h"
 
-
-
-
-class WWaveIn : public WAudioDecoder {
+class WWaveIn : public WAudioDecoder
+{
 public:
-
 	WWaveIn();
 	~WWaveIn();
 
-	int OpenStream(WQueue *pQueue, int fDynamic, int param1, int param2);
+	int OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2);
 
-	INPUT_STREAM_INFO *GetStreamInfo();
+	INPUT_STREAM_INFO* GetStreamInfo();
 
-	wchar_t **GetID3Info(int version, char *pStream, unsigned int nStreamSize, int param1, int param2);
+	wchar_t** GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2);
 
 	int Close();
 
-// ======================================================================
-	int  Initialize(int param1, int param2, int param3, int param4);
+	// ======================================================================
+	int Initialize(int param1, int param2, int param3, int param4);
 	//
 	//
 	//			param1
-	//				Specify WaveIn device number.	
+	//				Specify WaveIn device number.
 	//
 	//			param2
 	//				Specifies line control( mic, line, aux, ...)
@@ -63,29 +60,27 @@ public:
 	//			param4
 	//				Big-endian indicator. If this value is 0, little-endian is used.
 	//				If this value is 1, big-endian is used.
-// ===========================================================================
+	// ===========================================================================
 
 	int Uninitialize();
-	void  Release();
-	int GetData(DECODER_DATA *pDecoderData);
+	void Release();
+	int GetData(DECODER_DATA* pDecoderData);
 
 	// seek current position
 	int Seek(unsigned int nSamples);
 
 	int GetBitrate(int fAverage);
 
-	DECODER_ERROR_MESSAGE *GetError();
+	DECODER_ERROR_MESSAGE* GetError();
 
 	int SetReverseMode(int fReverse);
 
 private:
-
-
 	HWAVEIN c_hWaweIn;
 	unsigned int c_InDeviceID;
 	WAVEHDR c_wavehdr[2];
-	char *c_buffer1;
-	char *c_buffer2;
+	char* c_buffer1;
+	char* c_buffer2;
 	int c_fWorking;
 	CRITICAL_SECTION cs;
 
@@ -99,7 +94,7 @@ private:
 	unsigned int c_nMaxQueueSizeInBytes;
 
 	// callback function
-	static void CALLBACK _WaveInProc(HWAVEIN hwi, UINT uMsg, DWORD dwInstance,DWORD dwParam1, DWORD dwParam2);
+	static void CALLBACK _WaveInProc(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
 
 	// input data
 	int c_nInSampleRate;
@@ -116,15 +111,11 @@ private:
 
 	void err(unsigned int error_code);
 	DECODER_ERROR_MESSAGE c_err_msg;
-	
+
 	unsigned int c_nCurrentPosition;
 
-	char *c_user_mixer_line;
+	char* c_user_mixer_line;
 	unsigned int c_user_mixer_volume;
-
 };
-
-
-
 
 #endif

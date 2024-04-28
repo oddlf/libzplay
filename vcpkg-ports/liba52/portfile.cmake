@@ -1,12 +1,9 @@
-vcpkg_download_distfile(ARCHIVE
-    URLS "https://liba52.sourceforge.io/files/a52dec-0.7.4.tar.gz"
-    FILENAME "a52dec-0.7.4.tar.gz"
-    SHA512 4b26fe9492f218b775fb190b76ecf06edaeb656adfe6dcbd24d0a0f86871c3ba917edb88a398eb12dccedaa1605b6f0a0be06b09f9fddd9a46e457b7dd244848
-)
-
-vcpkg_extract_source_archive_ex(
+vcpkg_from_gitlab(
+    GITLAB_URL https://code.videolan.org
     OUT_SOURCE_PATH SOURCE_PATH
-    ARCHIVE ${ARCHIVE}
+    REPO videolan/liba52
+    REF "${VERSION}"
+    SHA512 85a406053410b9ccd861b94e249ad4241e150801c91536496446bdf977bac1b42025dbcb63f519a5b169330ba40e56dba85f5ce101d890dc09d33617e2b51c76
 )
 
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt" DESTINATION "${SOURCE_PATH}")

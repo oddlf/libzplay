@@ -23,8 +23,7 @@
  * date: 15. April, 2010.
  *
  *
-*/
-
+ */
 
 #ifndef _W_BPM_DETECT1_H_
 #define _W_BPM_DETECT1_H_
@@ -35,43 +34,41 @@
 #define BPM_DETECT1_REAL REAL
 
 typedef struct {
-	BPM_DETECT1_REAL *Buffer;
+	BPM_DETECT1_REAL* Buffer;
 	unsigned int BufferLoad;
-	unsigned int *BPMHistoryHit; 
+	unsigned int* BPMHistoryHit;
 	unsigned int BPM;
 } SUBBAND1;
 
-
-
-class WBPMDetect1 : public WBPMDetect {
+class WBPMDetect1 : public WBPMDetect
+{
 public:
 	WBPMDetect1();
 	~WBPMDetect1();
 	int Initialize(unsigned int nSampleRate, unsigned int nChannel);
 	int SetFrequencyBand(unsigned int nLowLimit, unsigned int nHighLimit);
 	unsigned int NumOfSamples();
-	int PutSamples(short *pSamples, unsigned int nSampleNum);
-	unsigned int GetBPM(); 
-	void  Release();   
+	int PutSamples(short* pSamples, unsigned int nSampleNum);
+	unsigned int GetBPM();
+	void Release();
 
 private:
 	unsigned int c_nLowLimitIndex;
 	unsigned int c_nHighLimitIndex;
 	unsigned int c_nBandSizeIndex;
 
-
 	unsigned int c_fReady;
-	unsigned int *c_pnOffset;
+	unsigned int* c_pnOffset;
 	// subbands array
-	SUBBAND1 *c_pSubBand;
+	SUBBAND1* c_pSubBand;
 	// array of amplitudes returned from FFT analyse
-	BPM_DETECT1_REAL *c_Amplitudes;
+	BPM_DETECT1_REAL* c_Amplitudes;
 	// array of samples sent to FFT analyse
-	BPM_DETECT1_REAL *c_Samples;
+	BPM_DETECT1_REAL* c_Samples;
 
-	BPM_DETECT1_REAL *c_pflWindow;			// FFT window
-	int *c_pnIp;				// work area for bit reversal
-	BPM_DETECT1_REAL *c_pflw;				// cos/sin table
+	BPM_DETECT1_REAL* c_pflWindow; // FFT window
+	int* c_pnIp;				   // work area for bit reversal
+	BPM_DETECT1_REAL* c_pflw;	   // cos/sin table
 	unsigned int c_nChannel;
 	unsigned int c_nSampleRate;
 
@@ -82,23 +79,13 @@ private:
 	unsigned int c_nOverlapSuccessStart;
 	unsigned int c_nOverlapFailStart;
 
-
 	// number of subbands with detected BPM
 	unsigned int c_nSubbandBPMDetected;
 
 	BPM_DETECT1_REAL c_sqrtFFTPoints;
 
-
 	int AllocateInternalMemory();
 	int FreeInternalMemory();
-
 };
-
-
-
-
-
-
-
 
 #endif

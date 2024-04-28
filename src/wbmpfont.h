@@ -23,8 +23,7 @@
  * date: 15. April, 2010.
  *
  *
-*/
-
+ */
 
 #ifndef _WBMPFONT_
 #define _WBMPFONT_
@@ -32,14 +31,15 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-class WBmpFont {
+class WBmpFont
+{
 public:
 	WBmpFont();
 	~WBmpFont();
 	int Open(HBITMAP hbFont, char* lpCharMap, int dwFontHeight);
 	int SetText(char* lpText);
 	int Draw(HDC hdc, RECT* rcDest, BOOL fStretch, BOOL fTransparent, COLORREF crTransparent);
-	int GetTextWidth(char *pText);
+	int GetTextWidth(char* pText);
 	int Colored(int fEnable);
 	int SetColor(COLORREF color);
 
@@ -54,11 +54,8 @@ private:
 	int c_Colored;
 	COLORREF c_crColor;
 
-	static int _Draw(WBmpFont* font,HDC hdc, RECT* rcDest,
-    		BOOL fStretch, BOOL fTransparent, COLORREF crTransparent);
-
+	static int _Draw(WBmpFont* font, HDC hdc, RECT* rcDest,
+		BOOL fStretch, BOOL fTransparent, COLORREF crTransparent);
 };
-
-
 
 #endif

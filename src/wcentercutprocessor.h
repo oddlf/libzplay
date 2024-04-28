@@ -24,11 +24,11 @@
  *
  * SUPPORTED BY:
  * ============================================================================
- * Center Cut DSP Plugin for Winamp 2.x 
+ * Center Cut DSP Plugin for Winamp 2.x
  * Copyright (C) 2004  Moitah (moitah@yahoo.com)
  * GNU General Public License ( GPL.TXT )
  * ============================================================================
-*/
+ */
 
 #ifndef _W_CENTERCUTPROCESSOR_H_
 #define _W_CENTERCUTPROCESSOR_H_
@@ -42,27 +42,23 @@ typedef float MYREAL;
 #define WINDOW_SIZE_CT 8192
 #define OVERLAP_COUNT_CT 4
 
-
 typedef MYREAL REALMATRIX[2];
 typedef MYREAL REALMATRIX1[WINDOW_SIZE_CT / OVERLAP_COUNT_CT];
 
-
-
-
-
-class WCenterCutProcessor : public WAudioProcessor {
+class WCenterCutProcessor : public WAudioProcessor
+{
 public:
 	WCenterCutProcessor();
 	~WCenterCutProcessor();
 
-	int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	int PushSamples(PROCESSOR_AUDIO_DATA* data);
 
-// change virtual functions
+	// change virtual functions
 	int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
-	int  Enable(int fBroadcast, int fEnable);
+	int Enable(int fBroadcast, int fEnable);
 
-// ================================================================
-//	SET PARAMETERS
+	// ================================================================
+	//	SET PARAMETERS
 
 	int SetParameters(int fOutputCenter, int fBassToSides);
 
@@ -78,25 +74,20 @@ public:
 	//		1 - all OK
 	//		0 - error, call GetError() to get error string
 
-// ================================================================
+	// ================================================================
 
 	int Flush(int fBroadcast);
 	int Clear(int fBroadcast);
 
-
-	
-
-
-// ===========================================================================================================================
+	// ===========================================================================================================================
 private:
-
 	PROCESSOR_AUDIO_DATA c_LastData;
 
 	// control echo processing in thread
 	CRITICAL_SECTION c_CriticalSection;
 
 	// output buffer
-	char * c_pchOutputBuffer;
+	char* c_pchOutputBuffer;
 	// output buffer size
 	unsigned int c_nOutputBufferSize;
 
@@ -105,41 +96,31 @@ private:
 	BOOL c_fOutputCenter;
 	BOOL c_fBassToSides;
 
-
-	static int CenterCutProcessSamples(WCenterCutProcessor *instance, unsigned char *inSamples, int inSampleCount, unsigned char *outSamples, int outSampleCount);
-	static BOOL CenterCut_Run(WCenterCutProcessor *instance);
-	static BOOL CenterCut_Start(WCenterCutProcessor *instance);
-	static void OutputBufferInit(WCenterCutProcessor *instance);
-	static void OutputBufferFree(WCenterCutProcessor *instance);
-	static void OutputBufferReadComplete(WCenterCutProcessor *instance);
-	static BOOL OutputBufferBeginWrite(WCenterCutProcessor *instance);
-	static int _Flush(WCenterCutProcessor *instance);
+	static int CenterCutProcessSamples(WCenterCutProcessor* instance, unsigned char* inSamples, int inSampleCount, unsigned char* outSamples, int outSampleCount);
+	static BOOL CenterCut_Run(WCenterCutProcessor* instance);
+	static BOOL CenterCut_Start(WCenterCutProcessor* instance);
+	static void OutputBufferInit(WCenterCutProcessor* instance);
+	static void OutputBufferFree(WCenterCutProcessor* instance);
+	static void OutputBufferReadComplete(WCenterCutProcessor* instance);
+	static BOOL OutputBufferBeginWrite(WCenterCutProcessor* instance);
+	static int _Flush(WCenterCutProcessor* instance);
 
 	unsigned int mInputSamplesNeeded;
-	int	mOutputReadSampleOffset;
-	int	mOutputBufferCount;  // How many buffers are actually in use (there may be more
-									 // allocated than in use)
-	MYREAL **mOutputBuffer;
-	int	mOutputDiscardBlocks;
+	int mOutputReadSampleOffset;
+	int mOutputBufferCount; // How many buffers are actually in use (there may be more
+							// allocated than in use)
+	MYREAL** mOutputBuffer;
+	int mOutputDiscardBlocks;
 	unsigned int mInputPos;
 
 	int freqBelowToSides;
 	int mOutputMaxBuffers;
 
-	REALMATRIX *mInput;
-	REALMATRIX1 *mOverlapC;
-	MYREAL *mTempLBuffer;
-	MYREAL *mTempRBuffer;
-	MYREAL *mTempCBuffer;
-
-
-
+	REALMATRIX* mInput;
+	REALMATRIX1* mOverlapC;
+	MYREAL* mTempLBuffer;
+	MYREAL* mTempRBuffer;
+	MYREAL* mTempCBuffer;
 };
 
-
-
-
-
-
 #endif
-

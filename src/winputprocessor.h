@@ -23,22 +23,22 @@
  * date: 15. April, 2010.
  *
  *
-*/
+ */
 
 #ifndef _W_INPUT_PROCESSOR_H_
 #define _W_INPUT_PROCESSOR_H_
 
 #include "waudioprocessor.h"
 
-
-class WInputProcessor : public WAudioProcessor {
+class WInputProcessor : public WAudioProcessor
+{
 public:
 	WInputProcessor();
 	~WInputProcessor();
 
-	int PushSamples(PROCESSOR_AUDIO_DATA *data);
+	int PushSamples(PROCESSOR_AUDIO_DATA* data);
 
-	int PushData(char *pchData, unsigned int nDataSize, unsigned int nUserData);
+	int PushData(char* pchData, unsigned int nDataSize, unsigned int nUserData);
 	int Configure(unsigned int fBroadcast, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitPerSample);
 	int Enable(int fBroadcast, int fEnable);
 
@@ -46,9 +46,6 @@ public:
 	int Clear(int fBroadcast);
 
 private:
-	
 };
-
-
 
 #endif

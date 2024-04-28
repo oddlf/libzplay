@@ -22,7 +22,7 @@
  * ver: 2.00
  * date: 24. April, 2010.
  *
-*/
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -32,24 +32,18 @@
 #include "debug.h"
 #include "wmp3encoder.h"
 
-
-
-enum {
+enum
+{
 	ENCODER_NO_ERROR = 0,
 	ENCODER_FILEOPEN_ERROR,
 	ENCODER_NOT_READY,
 	ENCODER_INIT_ERROR,
 	ENCODER_MEMORY_ALLOCATION_FAIL,
 
-
 	ENCODER_UNKNOWN_ERROR
 };
 
-
-
-
-
-wchar_t *g_mp3_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
+wchar_t* g_mp3_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WMp3Encoder::No error.",
 
 	L"WMp3Encoder::File open error.",
@@ -57,32 +51,27 @@ wchar_t *g_mp3_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WMp3Encoder::Encoder initialization error.",
 	L"WMp3Encoder::Memory allocation fail.",
 
-
 	L"WMp3Encoder::Unknown error."
 
 };
-
 
 void WMp3Encoder::Release()
 {
 	delete this;
 }
 
-DECODER_ERROR_MESSAGE *WMp3Encoder::GetError()
+DECODER_ERROR_MESSAGE* WMp3Encoder::GetError()
 {
 	return &c_err_msg;
 }
 
-
 void WMp3Encoder::err(unsigned int error_code)
 {
-	if(error_code > ENCODER_UNKNOWN_ERROR)
+	if (error_code > ENCODER_UNKNOWN_ERROR)
 		error_code = ENCODER_UNKNOWN_ERROR;
 
 	c_err_msg.errorW = g_mp3_encoder_error_strW[error_code];
-
 }
-
 
 WMp3Encoder::WMp3Encoder()
 {
@@ -95,19 +84,17 @@ WMp3Encoder::WMp3Encoder()
 	gfp = NULL;
 }
 
-
 WMp3Encoder::~WMp3Encoder()
 {
 	Uninitialize();
 }
 
-
 int WMp3Encoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChannels, unsigned int nBitPerSample,
-			unsigned int custom_value,
-			TEncoderReadCallback read_callback,
-			TEncoderWriteCallback write_callback,
-			TEncoderSeekCallback seek_callback,
-			TEncoderTellCallback tell_callback)
+	unsigned int custom_value,
+	TEncoderReadCallback read_callback,
+	TEncoderWriteCallback write_callback,
+	TEncoderSeekCallback seek_callback,
+	TEncoderTellCallback tell_callback)
 {
 	c_nSampleRate = nSampleRate;
 	c_nNumberOfChannels = nNumberOfChannels;
@@ -118,58 +105,54 @@ int WMp3Encoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChan
 	c_seek_callback = seek_callback;
 	c_tell_callback = tell_callback;
 
-	c_user_data = (void*) custom_value;
+	c_user_data = (void*)custom_value;
 
 	// init encoder
 	gfp = lame_init();
 
-	if(gfp == NULL)
+	if (gfp == NULL)
 	{
 		err(ENCODER_INIT_ERROR);
 		return 0;
 	}
 
-   lame_set_num_channels(gfp, c_nNumberOfChannels);
-   lame_set_in_samplerate(gfp, c_nSampleRate);
-   lame_set_brate(gfp, 128);
-   lame_set_mode(gfp, JOINT_STEREO);
-   lame_set_quality(gfp, 7);   /* 2=high  5 = medium  7=low */ 
-   lame_set_VBR(gfp, vbr_off);
+	lame_set_num_channels(gfp, c_nNumberOfChannels);
+	lame_set_in_samplerate(gfp, c_nSampleRate);
+	lame_set_brate(gfp, 128);
+	lame_set_mode(gfp, JOINT_STEREO);
+	lame_set_quality(gfp, 7); /* 2=high  5 = medium  7=low */
+	lame_set_VBR(gfp, vbr_off);
 
-   if(lame_init_params(gfp) < 0)
-   {
+	if (lame_init_params(gfp) < 0)
+	{
 		lame_close(gfp);
 		err(ENCODER_INIT_ERROR);
 		return 0;
-   }
+	}
 
+	// LAME encoding call will accept any number of samples.
+	if (0 == lame_get_version(gfp))
+	{
+		// For MPEG-II, only 576 samples per frame per channel
+		c_NumberOfInputSamples = 576 * lame_get_num_channels(gfp);
+	}
+	else
+	{
+		// For MPEG-I, 1152 samples per frame per channel
+		c_NumberOfInputSamples = 1152 * lame_get_num_channels(gfp);
+	}
 
-  //LAME encoding call will accept any number of samples.  
-    if ( 0 == lame_get_version( gfp ) )
-    {
-        // For MPEG-II, only 576 samples per frame per channel
-        c_NumberOfInputSamples = 576 * lame_get_num_channels( gfp );
-    }
-    else
-    {
-        // For MPEG-I, 1152 samples per frame per channel
-        c_NumberOfInputSamples = 1152 * lame_get_num_channels( gfp );
-    }
-
-
-    // Set MP3 buffer size, conservative estimate
-    c_nSamplesBufferSizeInBytes = (DWORD)( 1.25 * ( c_NumberOfInputSamples / lame_get_num_channels( gfp ) ) + 7200 );
+	// Set MP3 buffer size, conservative estimate
+	c_nSamplesBufferSizeInBytes = (DWORD)(1.25 * (c_NumberOfInputSamples / lame_get_num_channels(gfp)) + 7200);
 
 	// allocate  working buffer
-	c_pWorkingBuffer = (unsigned char*) malloc(c_nSamplesBufferSizeInBytes);
-	if(c_pWorkingBuffer == NULL)
+	c_pWorkingBuffer = (unsigned char*)malloc(c_nSamplesBufferSizeInBytes);
+	if (c_pWorkingBuffer == NULL)
 	{
 		lame_close(gfp);
 		err(ENCODER_MEMORY_ALLOCATION_FAIL);
 		return 0;
-
 	}
-
 
 	c_fReady = 1;
 	return 1;
@@ -178,13 +161,13 @@ int WMp3Encoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChan
 int WMp3Encoder::Uninitialize()
 {
 
-	if(c_fReady)
+	if (c_fReady)
 	{
 		EncodeSamples(NULL, 0);
 
 		lame_close(gfp);
 
-		if(c_pWorkingBuffer)
+		if (c_pWorkingBuffer)
 			free(c_pWorkingBuffer);
 
 		c_pWorkingBuffer = NULL;
@@ -195,12 +178,11 @@ int WMp3Encoder::Uninitialize()
 	return 1;
 }
 
-
-int WMp3Encoder::EncodeSamples(void *pSamples, unsigned int nNumberOfSamples)
+int WMp3Encoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 {
 	ASSERT_W(c_nBitBerSample == 16);
-	
-	if(c_fReady == 0)
+
+	if (c_fReady == 0)
 	{
 		err(ENCODER_NOT_READY);
 		return 0;
@@ -208,28 +190,25 @@ int WMp3Encoder::EncodeSamples(void *pSamples, unsigned int nNumberOfSamples)
 
 	int nOutputBytes;
 
-	short *samples = (short*) pSamples;
+	short* samples = (short*)pSamples;
 	unsigned int nHaveSamples = nNumberOfSamples;
 
-	if(nNumberOfSamples == 0)
+	if (nNumberOfSamples == 0)
 	{
 		nOutputBytes = lame_encode_flush(gfp, c_pWorkingBuffer, c_nSamplesBufferSizeInBytes);
-		if(nOutputBytes > 0)
+		if (nOutputBytes > 0)
 			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // 	Chunk ID
-			
-		return 1;
 
+		return 1;
 	}
 
-	while(nHaveSamples)
+	while (nHaveSamples)
 	{
 		unsigned int nFill = c_NumberOfInputSamples;
-		if(nFill > nHaveSamples)
+		if (nFill > nHaveSamples)
 			nFill = nHaveSamples;
 
-		
-
-		if ( 1 == lame_get_num_channels( gfp ) )
+		if (1 == lame_get_num_channels(gfp))
 		{
 			nOutputBytes = lame_encode_buffer(gfp, samples, samples, nFill, c_pWorkingBuffer, 0);
 			samples = &samples[nFill];
@@ -242,11 +221,9 @@ int WMp3Encoder::EncodeSamples(void *pSamples, unsigned int nNumberOfSamples)
 
 		nHaveSamples -= nFill;
 
-		if(nOutputBytes > 0)
+		if (nOutputBytes > 0)
 			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // 	Chunk ID
-
 	}
 
 	return 1;
 }
-
