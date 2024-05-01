@@ -45,10 +45,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "wflacdecoder.h"
 #include "wtags.h"
@@ -92,7 +93,6 @@ wchar_t* g_flac_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 
 	L"FLACDecoder: Function not supported.",
 	L"FLACDecoder: Unknown error."
-
 };
 
 typedef struct {
@@ -164,7 +164,6 @@ WFLACDecoder::WFLACDecoder()
 
 WFLACDecoder::WFLACDecoder(int fOgg)
 {
-
 	c_decoder = 0;
 
 	c_ogg_transport_layer = fOgg;
@@ -365,7 +364,6 @@ INPUT_STREAM_INFO* WFLACDecoder::GetStreamInfo()
 
 wchar_t** WFLACDecoder::GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2)
 {
-
 	err(DECODER_NO_ERROR);
 
 	// free previous fields
@@ -469,7 +467,7 @@ wchar_t** WFLACDecoder::GetID3Info(int version, char* pStream, unsigned int nStr
 		wchar_t* tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 		if (tmp)
 		{
-			swprintf(tmp, L"%u", picture.data_length);
+			swprintf(tmp, 10, L"%u", picture.data_length);
 			if (c_fields[ID3_INFO_PICTURE_DATA_SIZE])
 				free(c_fields[ID3_INFO_PICTURE_DATA_SIZE]);
 
@@ -497,7 +495,7 @@ wchar_t** WFLACDecoder::GetID3Info(int version, char* pStream, unsigned int nStr
 		tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 		if (tmp)
 		{
-			swprintf(tmp, L"%u", picture.type);
+			swprintf(tmp, 10, L"%u", picture.type);
 			if (c_fields[ID3_INFO_PICTURE_TYPE])
 				free(c_fields[ID3_INFO_PICTURE_TYPE]);
 
@@ -514,7 +512,7 @@ wchar_t** WFLACDecoder::GetID3Info(int version, char* pStream, unsigned int nStr
 		{
 			for (j = 0; j < OGG_TABLE_SIZE; j++)
 			{
-				if (strnicmp((char*)tags->data.vorbis_comment.comments[i].entry, OGG_ID3_ID[j].str_id, OGG_ID3_ID[j].size) == 0)
+				if (_strnicmp((char*)tags->data.vorbis_comment.comments[i].entry, OGG_ID3_ID[j].str_id, OGG_ID3_ID[j].size) == 0)
 				{
 					unsigned int len = tags->data.vorbis_comment.comments[i].length - OGG_ID3_ID[j].size;
 
@@ -880,7 +878,6 @@ FLAC__StreamDecoderReadStatus WFLACDecoder::read_func(const FLAC__StreamDecoder*
 
 FLAC__StreamDecoderReadStatus WFLACDecoder::managed_read_func(const FLAC__StreamDecoder* decoder, FLAC__byte buffer[], size_t* bytes, void* client_data)
 {
-
 	if (*bytes > 0)
 	{
 		WFLACDecoder* instance = (WFLACDecoder*)client_data;
@@ -971,7 +968,6 @@ void WFLACDecoder::metadata_callback(const FLAC__StreamDecoder* decoder, const F
 
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO)
 	{
-
 		instance->c_isInfo.nSampleRate = metadata->data.stream_info.sample_rate;
 		if (instance->c_isInfo.nSampleRate == 0)
 		{
@@ -995,7 +991,7 @@ void WFLACDecoder::metadata_callback(const FLAC__StreamDecoder* decoder, const F
 		}
 
 		instance->c_isInfo.fVbr = 1;
-		instance->c_isInfo.nLength = metadata->data.stream_info.total_samples;
+		instance->c_isInfo.nLength = (unsigned int)metadata->data.stream_info.total_samples;
 
 		if (instance->c_ogg_transport_layer == 0)
 		{

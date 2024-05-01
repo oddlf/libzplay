@@ -71,7 +71,6 @@ typedef struct {
 	FLAC__StreamDecoderWriteCallback write_func;
 	FLAC__StreamDecoderMetadataCallback metadata_func;
 	FLAC__StreamDecoderErrorCallback error_func;
-
 } FLAC_CALLBACK_FUNCTIONS;
 
 class WFLACDecoder : public WAudioDecoder

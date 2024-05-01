@@ -25,8 +25,8 @@
  *
  */
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "winputProcessor.h"
 

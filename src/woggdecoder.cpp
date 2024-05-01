@@ -30,11 +30,12 @@
  * ============================================================================
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "woggdecoder.h"
 #include "wtags.h"
@@ -71,7 +72,6 @@ wchar_t* g_ogg_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 
 	L"OggDecoder: Functinon not supported.",
 	L"OggDecoder: Unknown error."
-
 };
 
 // size of working buffer in samples
@@ -108,7 +108,6 @@ OGG_ID3_TABLE OGG_ID3_ID[OGG_TABLE_SIZE] = { "ARTIST=", 7, ID3_INFO_ARTIST,
 
 WOggDecoder::WOggDecoder()
 {
-
 	err(DECODER_NO_ERROR);
 
 	c_Queue = NULL;
@@ -152,7 +151,6 @@ WOggDecoder::WOggDecoder()
 
 WOggDecoder::~WOggDecoder()
 {
-
 	Close();
 	Uninitialize();
 }
@@ -193,7 +191,6 @@ DECODER_ERROR_MESSAGE* WOggDecoder::GetError()
 
 int WOggDecoder::_OpenFile(unsigned int fLite)
 {
-
 	bit_stream.start = c_pchStreamStart;
 	bit_stream.end = c_pchStreamStart + c_nStreamSize - 1;
 	bit_stream.pos = c_pchStreamStart;
@@ -250,7 +247,7 @@ int WOggDecoder::_OpenFile(unsigned int fLite)
 	if (len == OV_EINVAL)
 		c_isInfo.nLength = 0;
 	else
-		c_isInfo.nLength = len;
+		c_isInfo.nLength = (unsigned int)len;
 
 	if (c_isInfo.nChannel > 2)
 		c_isInfo.pchStreamDescription = "VORBIS OGG MULTI CHANNEL";
@@ -281,7 +278,6 @@ int WOggDecoder::_OpenFile(unsigned int fLite)
 
 int WOggDecoder::Close()
 {
-
 	FreeID3Fields(c_fields, ID3_FIELD_NUMBER_EX);
 
 	ov_clear(&vf);
@@ -328,7 +324,6 @@ INPUT_STREAM_INFO* WOggDecoder::GetStreamInfo()
 
 wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2)
 {
-
 	err(DECODER_NO_ERROR);
 
 	// free previous fields
@@ -357,9 +352,8 @@ wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStre
 	{
 		for (j = 0; j < OGG_TABLE_SIZE; j++)
 		{
-			if (strnicmp(vcomment->user_comments[i], OGG_ID3_ID[j].str_id, OGG_ID3_ID[j].size) == 0)
+			if (_strnicmp(vcomment->user_comments[i], OGG_ID3_ID[j].str_id, OGG_ID3_ID[j].size) == 0)
 			{
-
 				if (OGG_ID3_ID[j].id == ID3_INFO_PICTURE_DATA)
 				{
 					if (have_picture)
@@ -383,7 +377,7 @@ wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStre
 					wchar_t* tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 					if (tmp)
 					{
-						swprintf(tmp, L"%u", outlen);
+						swprintf(tmp, 10, L"%zu", outlen);
 						if (c_fields[ID3_INFO_PICTURE_DATA_SIZE])
 							free(c_fields[ID3_INFO_PICTURE_DATA_SIZE]);
 
@@ -395,7 +389,7 @@ wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStre
 						tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 						if (tmp)
 						{
-							swprintf(tmp, L"%u", 3);
+							swprintf(tmp, 10, L"%u", 3);
 							if (c_fields[ID3_INFO_PICTURE_TYPE])
 								free(c_fields[ID3_INFO_PICTURE_TYPE]);
 
@@ -438,7 +432,7 @@ wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStre
 					wchar_t* tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 					if (tmp)
 					{
-						swprintf(tmp, L"%u", nType);
+						swprintf(tmp, 10, L"%u", nType);
 						field = &c_fields[ID3_INFO_PICTURE_TYPE];
 						if (*field)
 							free(*field);
@@ -541,7 +535,7 @@ wchar_t** WOggDecoder::GetID3Info(int version, char* pStream, unsigned int nStre
 					tmp = (wchar_t*)malloc(10 * sizeof(wchar_t));
 					if (tmp)
 					{
-						swprintf(tmp, L"%u", nDataLength);
+						swprintf(tmp, 10, L"%u", nDataLength);
 						field = &c_fields[ID3_INFO_PICTURE_DATA_SIZE];
 						if (*field)
 							free(*field);
@@ -603,7 +597,6 @@ int WOggDecoder::Seek(unsigned int nSamples)
 
 	if (ov_pcm_seek(&vf, nSamples) != 0)
 	{
-
 		err(DECODER_UNKNOWN_ERROR);
 		return 0;
 	}
@@ -964,7 +957,7 @@ int WOggDecoder::close_func(void* datasource)
 long WOggDecoder::tell_func(void* datasource)
 {
 	USER_OGG_STREAM* bit_stream = (USER_OGG_STREAM*)datasource;
-	return (bit_stream->pos - bit_stream->start);
+	return (long)(bit_stream->pos - bit_stream->start);
 }
 
 void WOggDecoder::err(unsigned int error_code)

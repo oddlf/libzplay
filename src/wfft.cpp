@@ -2531,8 +2531,8 @@ void dstsub(int n, REAL* a, int nc, REAL* c)
 //	Last modified: 97.05.29
 /////////////////////////////////////////////////////////
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 #define pi 3.1415926535897932384626433832795029L
 
@@ -2543,7 +2543,6 @@ void dstsub(int n, REAL* a, int nc, REAL* c)
 
 long bitreverse(long i, long size)
 {
-
 	long result, mask;
 
 	result = 0;
@@ -2582,7 +2581,6 @@ long bitreverse(long i, long size)
 
 long bruun_reverse(long i, long sizze)
 {
-
 	long result, add;
 
 	result = 0;
@@ -2680,7 +2678,6 @@ kesz2:
 
 void dif_butterfly(REAL* data, long size)
 {
-
 	long angle, astep, dl;
 	REAL xr, yr, xi, yi, wr, wi, dr, di, ang;
 	REAL *l1, *l2, *end, *ol2;
@@ -2730,7 +2727,6 @@ void dif_butterfly(REAL* data, long size)
 
 void inverse_dit_butterfly(REAL* data, long size)
 {
-
 	long angle, astep, dl;
 	REAL xr, yr, xi, yi, wr, wi, dr, di, ang;
 	REAL *l1, *l2, *end, *ol2;
@@ -2776,7 +2772,6 @@ void inverse_dit_butterfly(REAL* data, long size)
 
 void unshuffle(REAL* data, long size)
 {
-
 	long i, j, k, l, m;
 	REAL re, im;
 
@@ -2822,7 +2817,6 @@ void unshuffle(REAL* data, long size)
 
 void realize(REAL* data, long size)
 {
-
 	REAL xr, yr, xi, yi, wr, wi, dr, di, ang, astep;
 	REAL *l1, *l2;
 
@@ -2860,7 +2854,6 @@ void realize(REAL* data, long size)
 
 void unrealize(REAL* data, long size)
 {
-
 	REAL xr, yr, xi, yi, wr, wi, dr, di, ang, astep;
 	REAL *l1, *l2;
 
@@ -2901,7 +2894,6 @@ void unrealize(REAL* data, long size)
 
 void fft(REAL* data, long size)
 {
-
 	REAL *l, *end;
 
 	dif_butterfly(data, size);
@@ -2927,7 +2919,6 @@ void fft(REAL* data, long size)
 
 void ifft(REAL* data, long size)
 {
-
 	unshuffle(data, size);
 	inverse_dit_butterfly(data, size);
 }
@@ -2946,7 +2937,6 @@ void ifft(REAL* data, long size)
 
 void realfft_packed(REAL* data, long size)
 {
-
 	REAL *l, *end;
 	REAL div;
 
@@ -2977,7 +2967,6 @@ void realfft_packed(REAL* data, long size)
 
 void irealfft_packed(REAL* data, long size)
 {
-
 	REAL *l, *end;
 
 	size >>= 1;
@@ -3013,7 +3002,6 @@ void irealfft_packed(REAL* data, long size)
 
 void realfft_bruun(REAL* data, long size)
 {
-
 	REAL *end, *l0, *l1, *l2, *l3;
 	long dl, dl2, dl_o, dl2_o, i, j, k, kk;
 	REAL d0, d1, d2, d3, c, c2, p4;
@@ -3115,7 +3103,6 @@ void realfft_bruun(REAL* data, long size)
 // Source: see the routines it calls ...
 void realfft_bruun_unshuffled(REAL* data, long size)
 {
-
 	REAL* data2;
 	long i, j, k;
 
@@ -3262,7 +3249,6 @@ void realfft_bruun_unshuffled(REAL* data, long size)
 
 void realfft_split(REAL* data, long n)
 {
-
 	long i, j, k, i5, i6, i7, i8, i0, id, i1, i2, i3, i4, n2, n4, n8;
 	REAL t1, t2, t3, t4, t5, t6, a3, ss1, ss3, cc1, cc3, a, e, sqrt2;
 
@@ -3416,7 +3402,6 @@ void realfft_split(REAL* data, long n)
 
 void realfft_split_unshuffled(REAL* data, long n)
 {
-
 	REAL* data2;
 	long i, j;
 
@@ -3451,7 +3436,6 @@ void realfft_split_unshuffled(REAL* data, long n)
 
 void irealfft_split(REAL* data, long n)
 {
-
 	long i, j, k, i5, i6, i7, i8, i0, id, i1, i2, i3, i4, n2, n4, n8, n1;
 	REAL t1, t2, t3, t4, t5, a3, ss1, ss3, cc1, cc3, a, e, sqrt2;
 
@@ -3597,7 +3581,6 @@ void irealfft_split(REAL* data, long n)
 
 void realfft_radix2(REAL* data, long n)
 {
-
 	REAL xt, a, e, t1, t2, cc, ss;
 	long i, j, k, n1, n2, n3, n4, i1, i2, i3, i4;
 
@@ -3681,7 +3664,6 @@ void realfft_radix2(REAL* data, long n)
 
 void realfft_radix2_unshuffled(REAL* data, long n)
 {
-
 	REAL* data2;
 	long i, j;
 
@@ -3993,7 +3975,6 @@ int WFFT::_alloc()
 
 int WFFT::_free()
 {
-
 	if (c_window)
 	{
 		free(c_window);
@@ -4210,7 +4191,7 @@ void WFFT::_convertFFTtoPhaseReal(unsigned int FFTPoints, unsigned int SqrtFFTPo
 			return;
 		}
 
-		phase[i] = pi / 2.0;
+		phase[i] = (REAL)(pi / 2.0);
 	}
 }
 

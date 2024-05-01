@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "wmp3encoder.h"
 
@@ -52,7 +53,6 @@ wchar_t* g_mp3_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WMp3Encoder::Memory allocation fail.",
 
 	L"WMp3Encoder::Unknown error."
-
 };
 
 void WMp3Encoder::Release()
@@ -160,7 +160,6 @@ int WMp3Encoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChan
 
 int WMp3Encoder::Uninitialize()
 {
-
 	if (c_fReady)
 	{
 		EncodeSamples(NULL, 0);

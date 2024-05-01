@@ -24,15 +24,15 @@
  *
  */
 
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <algorithm>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "wechoprocessor.h"
 
 WEchoProcessor::WEchoProcessor()
 {
-
 	c_echoEffects = (ECHO_EFFECT_INTERNAL*)malloc(sizeof(ECHO_EFFECT_INTERNAL));
 	c_echoEffects[0].nLeftDelay = 1000;
 	c_echoEffects[0].nLeftSrcVolume = 70;
@@ -137,7 +137,6 @@ int WEchoProcessor::SetParameters(ECHO_DELAY_EFFECT* pEchoEffect, int nNumberOfE
 		// fill internal effects array
 		for (i = 0; i < nNumberOfEffects; i++)
 		{
-
 			effect[i].nLeftDelay = pEchoEffect[i].nLeftDelay;
 			effect[i].nRightDelay = pEchoEffect[i].nRightDelay;
 
@@ -176,7 +175,7 @@ int WEchoProcessor::GetParameters(ECHO_DELAY_EFFECT* pEchoEffect, int nNumberOfE
 		return 0;
 
 	unsigned int i;
-	unsigned int num = min(nNumberOfEffects, c_nEchoEffectsNumber);
+	unsigned int num = std::min((unsigned int)nNumberOfEffects, c_nEchoEffectsNumber);
 	for (i = 0; i < num; i++)
 	{
 		pEchoEffect[i].nLeftDelay = c_echoEffects[i].nLeftDelayBackup;
@@ -314,7 +313,7 @@ int WEchoProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate,
 	// check input parameters
 	if (nSampleRate == 0)
 	{
-		sprintf(c_pchErrorMessageStr, "WEchoProcessor::Configure->Sample rate can't be %u.", nSampleRate);
+		sprintf_s(c_pchErrorMessageStr, "WEchoProcessor::Configure->Sample rate can't be %u.", nSampleRate);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -322,7 +321,7 @@ int WEchoProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate,
 
 	if (nChannel != 1 && nChannel != 2)
 	{
-		sprintf(c_pchErrorMessageStr, "WEchoProcessor::Configure->Nuber of channels can't be %u.", nChannel);
+		sprintf_s(c_pchErrorMessageStr, "WEchoProcessor::Configure->Nuber of channels can't be %u.", nChannel);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -330,7 +329,7 @@ int WEchoProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate,
 
 	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
-		sprintf(c_pchErrorMessageStr, "WEchoProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
+		sprintf_s(c_pchErrorMessageStr, "WEchoProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
@@ -396,7 +395,6 @@ int WEchoProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 
 	if (c_fEnable && c_nEchoMaxDelay)
 	{
-
 		// =========================================================================================
 		// check if we need to reallocate delay line
 

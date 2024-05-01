@@ -23,11 +23,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
+#include <cstdio>
+#include <cmath>
+#include <cstring>
 
 #include "debug.h"
 #include "wmp3x.h"
@@ -116,7 +117,6 @@ wchar_t* g_error_strW[WMP3X_UNKNOWN_ERROR + 1] = {
 	L"Unsupported encoder.",
 	L"Can't find ID3 tag",
 	L"Unknown error."
-
 };
 
 // play section return values
@@ -388,7 +388,6 @@ WMp3x::WMp3x()
 
 WMp3x::~WMp3x()
 {
-
 	// =======================================================
 
 	Stop(); // stop playing
@@ -858,7 +857,7 @@ void __stdcall WMp3x::GetStreamInfo(TStreamInfo* pInfo)
 		return;
 
 	// make duplicate of string to preserve safe pointer when stream is closed
-	char* tmp = strdup(c_isInfo->pchStreamDescription);
+	char* tmp = _strdup(c_isInfo->pchStreamDescription);
 	if (tmp == NULL)
 		return;
 
@@ -1224,7 +1223,6 @@ int __stdcall WMp3x::Close()
 
 	if (c_fReady)
 	{
-
 		EnterCriticalSection(&c_CS_FFT);
 		// ==================================
 		// stop playing
@@ -1398,7 +1396,6 @@ void __stdcall WMp3x::GetVUData(unsigned int* pnLeftChannel, unsigned int* pnRig
 	nNum = c_nVUDataBufferSize / 2;
 	for (i = 0; i < nNum; i++)
 	{
-
 		rSumLeft += (REAL)abs(c_pchVUDataBufferLeft[i]);
 		rSumRight += (REAL)abs(c_pchVUDataBufferRight[i]);
 	}
@@ -1447,7 +1444,6 @@ int __stdcall WMp3x::EnableEqualizer(int fEnable)
 
 int __stdcall WMp3x::SetEqualizerParam(int nPreAmpGain, int* pnBandGain, int nNumberOfBands)
 {
-
 	err(WMP3X_NO_ERROR);
 	if (c_EqualizerProcessor.SetParameters(nPreAmpGain, pnBandGain, nNumberOfBands) == 0)
 	{
@@ -1640,7 +1636,6 @@ int __stdcall WMp3x::SlideVolume(
 	unsigned int nEndVolumeRight	// end fade volume of right channel
 )
 {
-
 	err(WMP3X_NO_ERROR);
 
 	if (c_fReady == 0)
@@ -1780,7 +1775,6 @@ wchar_t* __stdcall WMp3x::GetErrorW()
 
 int __stdcall WMp3x::SetEqualizerPoints(int* pnFreqPoint, int nNumOfPoints)
 {
-
 	Stop(); // stop playing
 	err(WMP3X_NO_ERROR);
 
@@ -2216,7 +2210,6 @@ unsigned int Mp3TimeToSamples(int fFormat, TStreamTime* pTime, unsigned int nSam
 
 	switch (fFormat)
 	{
-
 	case tfSamples:
 		return pTime->samples;
 		break;
@@ -2533,7 +2526,6 @@ void __stdcall WMp3x::GetPlayerVolume(unsigned int* pnLeftVolume, unsigned int* 
 
 int WMp3x::_SendFadeEnter(WMp3x* instance)
 {
-
 	int callback_ret = 0;
 	if (instance->callback_messages & MsgEnterVolumeSlide)
 		callback_ret = instance->send_callback_message(instance, MsgEnterVolumeSlide, 0, 0);
@@ -2656,7 +2648,7 @@ int WMp3x::send_stop(WMp3x* instance)
 	return callback_ret;
 }
 
-int WMp3x::send_callback_message(WMp3x* instance, unsigned int message, unsigned int param1, unsigned int param2)
+int WMp3x::send_callback_message(WMp3x* instance, unsigned int message, ZPLAY_PARAM param1, ZPLAY_PARAM param2)
 {
 	instance->c_callback_ret = 0;
 
@@ -2676,7 +2668,6 @@ int WMp3x::send_callback_message(WMp3x* instance, unsigned int message, unsigned
 
 void WMp3x::load_fft_stereo_buffer(WMp3x* instance, int* pSamples, unsigned int nNumberOfSamples)
 {
-
 	// get current playing index
 	unsigned int nCurrentIndex = instance->c_nPlayingIndex;
 
@@ -2804,7 +2795,6 @@ int __stdcall WMp3x::GetFFTData(
 
 	if (c_fPlay == 0 || c_fReady == 0)
 	{
-
 		if (pnLeftAmplitude)
 			memset(pnLeftAmplitude, 0, nNum * sizeof(int));
 
@@ -2852,7 +2842,6 @@ void WMp3x::_MixChannels(WMp3x* instance, unsigned char* buf, unsigned int size)
 
 int WMp3x::_SetFormat(TStreamFormat nFormat)
 {
-
 	Stop();
 	Close();
 
@@ -3229,9 +3218,8 @@ int WINAPI WMp3x::_ThreadFuncPCM(void* lpdwParam)
 		EnterCriticalSection(&instance->c_CS_waveOut);
 		MMRESULT res;
 		if ((res = waveOutOpen(&instance->c_HWO_WaveOut, wave_output_id, &instance->c_wfx,
-				 (DWORD)_WaveOutProc, (DWORD)instance, CALLBACK_FUNCTION)) != MMSYSERR_NOERROR)
+				 (DWORD_PTR)_WaveOutProc, (DWORD_PTR)instance, CALLBACK_FUNCTION)) != MMSYSERR_NOERROR)
 		{
-
 			if (instance->c_encoder)
 			{
 				instance->c_encoder->Uninitialize();
@@ -3353,7 +3341,7 @@ int WINAPI WMp3x::_ThreadFuncPCM(void* lpdwParam)
 						instance->c_nSongIndex++;
 
 						// delete old decoder, but preserve info
-						char* desc = strdup(instance->c_isInfo->pchStreamDescription);
+						char* desc = _strdup(instance->c_isInfo->pchStreamDescription);
 						if (desc)
 						{
 							if (instance->c_desc_backup)
@@ -3751,7 +3739,7 @@ int WMp3x::_Open(WMp3x* instance, int nWaveBufferLengthMs)
 
 		WAVE_USER_DATA* data = (WAVE_USER_DATA*)(instance->c_WH_WaveHeader[i].lpData + instance->c_nBytesForOneBuffer);
 		data->nIndex = i;
-		instance->c_WH_WaveHeader[i].dwUser = (unsigned long)data;
+		instance->c_WH_WaveHeader[i].dwUser = (DWORD_PTR)data;
 	}
 
 	// set all buffers data to 0
@@ -3855,7 +3843,6 @@ TStreamFormat __stdcall WMp3x::GetFileFormatW(const wchar_t* pchFileName)
 
 	if (wcsncmp(pchFileName, L"wavein://", 9) == 0)
 	{
-
 		// delete custom mixer line id
 		if (c_user_mixer_line)
 		{
@@ -3898,12 +3885,12 @@ TStreamFormat __stdcall WMp3x::GetFileFormatW(const wchar_t* pchFileName)
 
 				// parse source
 #ifdef LIBZPLAY_INPUT_WAVEIN
-				if (stricmp(name, "src") == 0)
+				if (_stricmp(name, "src") == 0)
 				{
 					unsigned int i;
 					for (i = 0; i < WAVE_IN_NUM; i++)
 					{
-						if (stricmp(value, g_wavein_id[i].string_id) == 0)
+						if (_stricmp(value, g_wavein_id[i].string_id) == 0)
 						{
 							c_user_mixer_line_id = i;
 							found = 1;
@@ -3913,7 +3900,7 @@ TStreamFormat __stdcall WMp3x::GetFileFormatW(const wchar_t* pchFileName)
 				}
 				else
 #endif
-					if (stricmp(name, "name") == 0) // parse user name
+					if (_stricmp(name, "name") == 0) // parse user name
 				{
 					if (*value == '(')
 					{
@@ -3922,11 +3909,11 @@ TStreamFormat __stdcall WMp3x::GetFileFormatW(const wchar_t* pchFileName)
 						if (end1)
 						{
 							*end1 = 0;
-							c_user_mixer_line = strdup(value);
+							c_user_mixer_line = _strdup(value);
 						}
 					}
 				}
-				else if (stricmp(name, "volume") == 0) // parse user name
+				else if (_stricmp(name, "volume") == 0) // parse user name
 				{
 					c_user_mixer_volume = atoi(value);
 				}
@@ -4141,7 +4128,6 @@ int WMp3x::_PlayingLoop(WMp3x* instance, unsigned int fFlush)
 
 	if (fFlush == 0)
 	{
-
 		// ===================================================================================================
 		//	FADE VOLUME PROCESSING
 		// ===================================================================================================
@@ -4175,7 +4161,6 @@ int WMp3x::_PlayingLoop(WMp3x* instance, unsigned int fFlush)
 		// fade processing
 		if (instance->c_fFade == 1)
 		{
-
 			// send fade callback message
 			int callback_ret = 0;
 
@@ -4447,7 +4432,6 @@ int WMp3x::_PlayingLoop(WMp3x* instance, unsigned int fFlush)
 
 		if (instance->c_encoder)
 		{
-
 			instance->c_encoder->EncodeSamples(instance->c_pchCurrentWaveBuffer, instance->c_nHaveBytesInWaveBuffer / 4);
 
 			if (fSendToSoundcard == 0) // set position because we will not go into WOM_DONE message
@@ -4523,7 +4507,6 @@ int WMp3x::_PlayingLoop(WMp3x* instance, unsigned int fFlush)
 
 int WMp3x::_AllocateVUBuffers(WMp3x* instance)
 {
-
 	unsigned int nSamplesForOneBuffer = VU_BUFFER_SIZE * instance->c_isInfo->nSampleRate / 1000;
 	unsigned int nBytesForOneBuffer = nSamplesForOneBuffer * 2;
 	// reallocate buffer if needed
@@ -4568,13 +4551,12 @@ void WMp3x::_FreeVUBuffers(WMp3x* instance)
 	instance->c_nVUDataBufferSize = 0;
 }
 
-void CALLBACK WMp3x::_WaveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+void CALLBACK WMp3x::_WaveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
 {
 	WMp3x* instance = (WMp3x*)dwInstance;
 
 	switch (uMsg)
 	{
-
 	case WOM_OPEN:
 
 		instance->c_nPlayingIndex = 0;
@@ -4619,7 +4601,7 @@ void WMp3x::err(unsigned int error_code)
 	if (error_code > WMP3X_UNKNOWN_ERROR)
 		error_code = WMP3X_UNKNOWN_ERROR;
 
-	wcsncpy(c_error_messageW, g_error_strW[error_code], MAX_ERROR_MESSAGE);
+	wcsncpy_s(c_error_messageW, g_error_strW[error_code], MAX_ERROR_MESSAGE);
 	c_error_messageW[MAX_ERROR_MESSAGE] = 0;
 
 	WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, c_error_messageW, -1, c_error_messageA, MAX_ERROR_MESSAGE, NULL, NULL);
@@ -4630,7 +4612,7 @@ void WMp3x::err(DECODER_ERROR_MESSAGE* error)
 {
 	ASSERT_W(error);
 
-	wcsncpy(c_error_messageW, error->errorW, MAX_ERROR_MESSAGE);
+	wcsncpy_s(c_error_messageW, error->errorW, MAX_ERROR_MESSAGE);
 	c_error_messageW[MAX_ERROR_MESSAGE] = 0;
 
 	WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, c_error_messageW, -1, c_error_messageA, MAX_ERROR_MESSAGE, NULL, NULL);
@@ -4639,7 +4621,6 @@ void WMp3x::err(DECODER_ERROR_MESSAGE* error)
 
 int __stdcall WMp3x::DetectBPM(TBMPDetectionMethod nMethod)
 {
-
 	err(WMP3X_NO_ERROR);
 
 	// check if stream is ready
@@ -4723,7 +4704,6 @@ int __stdcall WMp3x::DetectBPM(TBMPDetectionMethod nMethod)
 	// fill detector with data until we have detected BPM
 	while (c_decoder->GetData(&data) == DECODER_OK)
 	{
-
 		if (detect->PutSamples(samples, nSamples))
 			break;
 		data.pSamples = (short*)samples;
@@ -4825,7 +4805,6 @@ int __stdcall WMp3x::DetectFileBPMW(const wchar_t* pchFileName, TStreamFormat nF
 	// open decoder, lite, third parameter is 1
 	if (decoder->OpenStream(&queue, 0, 0, 0) == 0)
 	{
-
 		_CloseFileMapping(&fm, &queue);
 		decoder->Release();
 		err(WMP3X_FILE_OPEN_ERROR);
@@ -4898,7 +4877,6 @@ int __stdcall WMp3x::DetectFileBPMW(const wchar_t* pchFileName, TStreamFormat nF
 	// fill detector with data until we have detected BPM
 	while (decoder->GetData(&data) == DECODER_OK)
 	{
-
 		if (detect->PutSamples(samples, nSamples))
 			break;
 		data.pSamples = (short*)samples;
@@ -4931,7 +4909,6 @@ int __stdcall WMp3x::DrawFFTGraphOnHWND(void* hwnd, int nX, int nY, int nWidth, 
 
 int __stdcall WMp3x::DrawFFTGraphOnHDC(void* hdc, int nX, int nY, int nWidth, int nHeight)
 {
-
 	EnterCriticalSection(&c_CS_FFT);
 
 	err(WMP3X_NO_ERROR);
@@ -5021,7 +4998,6 @@ int __stdcall WMp3x::SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue)
 
 	switch (nParamID)
 	{
-
 	case gpFFTPoints:
 		c_nFFTPointsForDisplay = (unsigned int)nValue;
 		// initialize class and apply changes of sample rate, channel number ...
@@ -5162,7 +5138,6 @@ int __stdcall WMp3x::GetFFTGraphParam(TFFTGraphParamID nParamID)
 
 	switch (nParamID)
 	{
-
 	case gpFFTPoints:
 		LeaveCriticalSection(&c_CS_FFT);
 		return c_nFFTPointsForDisplay;
@@ -5282,7 +5257,6 @@ int __stdcall WMp3x::AddFile(const char* sFileName, TStreamFormat nFormat)
 
 int __stdcall WMp3x::AddFileW(const wchar_t* sFileName, TStreamFormat nFormat)
 {
-
 	err(WMP3X_NO_ERROR);
 
 	if (sFileName == 0)
@@ -5388,7 +5362,6 @@ int __stdcall WMp3x::AddFileW(const wchar_t* sFileName, TStreamFormat nFormat)
 
 	if (c_isInfo->nSampleRate != info->nSampleRate)
 	{
-
 		err(WMP3X_SAMPLERATE_NOT_MATCHING);
 		decoder->Close();
 		decoder->Release();
@@ -5576,7 +5549,6 @@ int __stdcall WMp3x::GetSettings(TSettingID nSettingID)
 {
 	switch (nSettingID)
 	{
-
 	case sidWaveInBufferSize:
 		return c_nWaveInBufferSize;
 
@@ -5609,7 +5581,6 @@ int __stdcall WMp3x::GetSettings(TSettingID nSettingID)
 unsigned int PngLoadImage(png_byte* memory_block, unsigned int block_size, png_byte** ppbImageData,
 	unsigned int* piWidth, unsigned int* piHeight, unsigned int* piChannels, png_color* pBkgColor)
 {
-
 	png_byte* pbSig = memory_block;
 	int iBitDepth;
 	int iColorType;
@@ -5758,7 +5729,6 @@ unsigned int PngLoadImage(png_byte* memory_block, unsigned int block_size, png_b
 
 	catch (...)
 	{
-
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 		*ppbImageData = pbImageData = NULL;
@@ -5779,7 +5749,6 @@ static void png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-
 	PNG_STREAM* stream = (PNG_STREAM*)png_get_io_ptr(png_ptr);
 
 	if (stream->size == 0)
@@ -5985,7 +5954,6 @@ my_output_message(j_common_ptr cinfo)
 
 HBITMAP read_JPEG_file(char* memory_block, unsigned int block_size, unsigned int* width, unsigned int* height)
 {
-
 	HBITMAP hbm = NULL;
 
 	/* This struct contains the JPEG decompression parameters and pointers to
@@ -6126,7 +6094,6 @@ HBITMAP read_JPEG_file(char* memory_block, unsigned int block_size, unsigned int
 			unsigned int j = 0;
 			for (i = 0; i < row_stride; i += 3)
 			{
-
 				dest[j] = src[i + 2];
 				dest[j + 1] = src[i + 1];
 				dest[j + 2] = src[i];
@@ -6194,7 +6161,7 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 {
 	HBITMAP out = NULL;
 
-	if (stricmp(sMIME, "image/png") == 0)
+	if (_stricmp(sMIME, "image/png") == 0)
 	{
 		// draw png image
 		png_byte* ppbImage = NULL;
@@ -6208,7 +6175,6 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 
 		if (ppbImage != NULL)
 		{
-
 			BYTE* bits = NULL;
 			HDC hdc = CreateCompatibleDC(NULL);
 			if (hdc)
@@ -6228,9 +6194,8 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 			free(ppbImage);
 		}
 	}
-	else if (stricmp(sMIME, "image/jpeg") == 0)
+	else if (_stricmp(sMIME, "image/jpeg") == 0)
 	{
-
 		out = read_JPEG_file(memory_block, block_size, pnWidth, pnHeight);
 		if (out)
 		{
@@ -6242,9 +6207,8 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 			}
 		}
 	}
-	else if (stricmp(sMIME, "image/bmp") == 0)
+	else if (_stricmp(sMIME, "image/bmp") == 0)
 	{
-
 		unsigned char* ptr = (unsigned char*)memory_block;
 		BITMAPFILEHEADER* fh = (BITMAPFILEHEADER*)ptr;
 		ptr += sizeof(BITMAPFILEHEADER);
@@ -6283,7 +6247,6 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 		HDC hdc = CreateCompatibleDC(NULL);
 		if (hdc)
 		{
-
 			out = CreateBitmapFromMemory1(hdc, ih->biWidth, ih->biHeight, ih->biBitCount,
 				rgb, ih->biClrUsed, bits, ih->biSizeImage, 0);
 
@@ -6306,7 +6269,6 @@ HBITMAP DecodePicture(char* sMIME, char* memory_block, unsigned int block_size, 
 
 void ConvertFieldUTF16ToANSI(wchar_t* src)
 {
-
 	char* tmp = UTF16ToANSI(src, -1);
 
 	if (tmp)
@@ -6320,7 +6282,6 @@ void ConvertFieldUTF16ToANSI(wchar_t* src)
 
 void ConvertID3UTF16ToANSI(TID3InfoExW* info)
 {
-
 	ConvertFieldUTF16ToANSI(info->Album);
 	ConvertFieldUTF16ToANSI(info->AlbumArtist);
 	ConvertFieldUTF16ToANSI(info->Artist);
@@ -6434,7 +6395,6 @@ int __stdcall WMp3x::LoadFileID3Ex(const char* pchFileName, TStreamFormat nForma
 
 void WMp3x::_FormatID3(wchar_t** info, TID3InfoExW* pId3Info, int fDecodeEmbededPicture)
 {
-
 	unsigned int fPicturePresent = 0;
 	unsigned int fCanDrawPicture = 0;
 	unsigned int nWidth = 0;
@@ -6564,7 +6524,6 @@ int __stdcall WMp3x::LoadFileID3ExW(const wchar_t* pchFileName, TStreamFormat nF
 	// open decoder, lite, third parameter is 1
 	if (c_id3_decoder->OpenStream(&queue, 0, 1, 0) == 0)
 	{
-
 		_CloseFileMapping(&fm, &queue);
 		c_id3_decoder->Release();
 		c_id3_decoder = NULL;
@@ -6575,7 +6534,7 @@ int __stdcall WMp3x::LoadFileID3ExW(const wchar_t* pchFileName, TStreamFormat nF
 	TID3Version version = id3Version2;
 	if (nFormat == sfMp3)
 	{
-		if (fDecodeEmbededPicture & 0xFFFF0000 == 0x00010000)
+		if ((fDecodeEmbededPicture & 0xFFFF0000) == 0x00010000)
 			version = id3Version1;
 	}
 
@@ -6842,7 +6801,6 @@ int __stdcall WMp3x::SetWaveOutFileW(const wchar_t* sFileName, TStreamFormat nFo
 
 	if (c_save_filename == NULL)
 	{
-
 		c_save_format = sfUnknown;
 		err(WMP3X_MEMORY_ALLOCATION_FAIL);
 		return 0;

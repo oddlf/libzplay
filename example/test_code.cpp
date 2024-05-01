@@ -4,14 +4,15 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <olectl.h>
 #include <ole2.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
 #include <dos.h>
 #include <conio.h>
@@ -51,7 +52,7 @@ long filesize(FILE* stream)
 	return length;
 }
 
-int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2);
+int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2);
 
 int main(int argc, char** argv)
 {
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
 	if (player == 0)
 	{
 		printf("Error: Can't create class instance !\nPress key to exit.\n");
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
 	if (ver < 100)
 	{
 		printf("Error: Need library version 1.00 and above !\nPress key to exit.\r\n");
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -196,7 +197,7 @@ int main(int argc, char** argv)
 
 
 		fclose(in);
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	*/
@@ -216,7 +217,7 @@ int main(int argc, char** argv)
 		// if(player->OpenFileW(L"test2.mp3", sfAutodetect) == 0)
 		{
 			printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-			getch();
+			_getch();
 			player->Release();
 			return 0;
 		}
@@ -224,7 +225,7 @@ int main(int argc, char** argv)
 				if(player->AddFile("t2.mp3", sfMp3) == 0)
 				{
 					printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-					getch();
+					_getch();
 					player->Release();
 					return 0;
 				}
@@ -241,7 +242,7 @@ int main(int argc, char** argv)
 				if(player->OpenStream(1, 1, tmp, size, sfMp3) == 0)
 				{
 					printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-					getch();
+					_getch();
 					player->Release();
 					return 0;
 				}
@@ -337,9 +338,13 @@ int main(int argc, char** argv)
 
 				wprintf(L"Size:      %u\r\n", id3_info.Picture.PictureDataSize);
 
-				FILE* out = fopen("out.jpg", "wb");
-				fwrite(id3_info.Picture.PictureData, id3_info.Picture.PictureDataSize, 1, out);
-				fclose(out);
+				FILE* out = NULL;
+				errno_t err = fopen_s(&out, "out.jpg", "wb");
+				if (out != NULL)
+				{
+					fwrite(id3_info.Picture.PictureData, id3_info.Picture.PictureDataSize, 1, out);
+					fclose(out);
+				}
 
 				player->DrawBitmapToHWND(NULL, 0, 0, 0, 0, id3_info.Picture.hBitmap);
 			}
@@ -566,7 +571,7 @@ int main(int argc, char** argv)
 			end = argv[0];
 
 		printf("Usage: %s filename\r\n\r\nPress key to exit\r\n", end);
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -605,7 +610,6 @@ int main(int argc, char** argv)
 
 	while (1)
 	{
-
 		// get current status
 		player->GetStatus(&status);
 
@@ -638,13 +642,12 @@ int main(int argc, char** argv)
 			status.nLoop,
 			fMixChannels);
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 
 			switch (a)
 			{
-
 			case 'i': // side cut
 				fSideCut = !fSideCut;
 				player->StereoCut(fSideCut, 1, 0);
@@ -836,7 +839,7 @@ int main(int argc, char** argv)
 	}
 }
 
-int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2)
+int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2)
 {
 	ZPlay* myinstance = (ZPlay*)instance;
 

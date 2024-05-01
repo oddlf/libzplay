@@ -1,7 +1,7 @@
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
 #include <dos.h>
 #include <conio.h>
@@ -43,7 +43,6 @@ void help()
 
 int main(int argc, char** argv)
 {
-
 	if (argc > 1)
 	{
 		char* input_filename = 0;
@@ -72,10 +71,10 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				if (stricmp(argv[i], "-t") == 0)
+				if (_stricmp(argv[i], "-t") == 0)
 					fOnlyTables = 1;
 
-				if (stricmp(argv[i], "-h") == 0)
+				if (_stricmp(argv[i], "-h") == 0)
 					fHelpInfo = 1;
 			}
 		}
@@ -108,7 +107,7 @@ int main(int argc, char** argv)
 			if (end)
 				*end = 0;
 
-			sprintf(output_filename_tmp, "%s.txt", start);
+			sprintf_s(output_filename_tmp, "%s.txt", start);
 			output_filename = output_filename_tmp;
 		}
 
@@ -117,7 +116,7 @@ int main(int argc, char** argv)
 		if (in == NULL)
 		{
 			printf("Error: Can't load bmp image.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -129,7 +128,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: Can't read bmp image.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -139,7 +138,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: Can't read bmp image.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -148,7 +147,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: This is not valid BMP file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -157,7 +156,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: This is not valid BMP file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -167,7 +166,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: This is not valid BMP file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 0;
 		}
 
@@ -175,7 +174,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: Comprssed bitmaps isn't supported.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 1;
 		}
 
@@ -184,7 +183,7 @@ int main(int argc, char** argv)
 		{
 			fclose(in);
 			printf("Error: Can't create optput file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			return 1;
 		}
 
@@ -325,7 +324,7 @@ int main(int argc, char** argv)
 
 		printf("Output: %s\r\n\r\n", output_filename);
 		printf("Press key to exit.\r\n");
-		getch();
+		_getch();
 	}
 	else
 	{

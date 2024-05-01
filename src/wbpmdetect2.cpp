@@ -24,9 +24,9 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <memory.h>
 
 #include "debug.h"
@@ -139,7 +139,6 @@ int WBPMDetect2::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 
 int WBPMDetect2::PutSamples(short* pSamples, unsigned int nSampleNum)
 {
-
 	// create samples array
 	unsigned int i;
 
@@ -310,7 +309,6 @@ unsigned int WBPMDetect2::GetBPM()
 
 int WBPMDetect2::AllocateInternalMemory()
 {
-
 	c_Samples = (BPM_DETECT2_REAL*)malloc(BPM_WAVELET_POINTS * sizeof(BPM_DETECT2_REAL));
 	c_pnOffset = (unsigned int*)malloc((BPM_DETECT_MAX_BPM + BPM_DETECT_MAX_MARGIN + 2) * sizeof(unsigned int));
 
@@ -356,7 +354,6 @@ int WBPMDetect2::AllocateInternalMemory()
 
 int WBPMDetect2::FreeInternalMemory()
 {
-
 	if (c_Samples)
 	{
 		free(c_Samples);
@@ -371,7 +368,6 @@ int WBPMDetect2::FreeInternalMemory()
 
 	if (c_pSubBand)
 	{
-
 		unsigned int i;
 		for (i = 0; i < BPM_NUMBER_OF_SUBBANDS; i++)
 		{

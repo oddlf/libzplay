@@ -24,11 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "wdecoder.h"
 #include "debug.h"
@@ -388,11 +388,10 @@ int GetID3v1(ID3_Header* header, wchar_t** fields)
 	buff[30] = 0;
 	if (buff[28] == 0)
 	{
-
 		RemoveEndingSpacesEx(buff, 27);
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, buff, -1, fields[ID3_INFO_COMMENT], 62);
 
-		sprintf(buff, "%u", buff[29]);
+		sprintf_s(buff, "%u", buff[29]);
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, buff, -1, fields[ID3_INFO_TRACK], 62);
 	}
 	else
@@ -483,7 +482,6 @@ int DecodeID3v2Header(ID3_Header* header, wchar_t** fields)
 
 	switch (header->MajorVersion)
 	{
-
 	case 2:
 		return decode_id3v2_2(header, fields);
 
@@ -566,7 +564,6 @@ int decode_id3v2_3(ID3_Header* header, wchar_t** fields)
 		// check if we have unsupported flags
 		if (fExit)
 		{
-
 			ptr += 10;
 			size -= 10;
 			ptr += nExtraSize;
@@ -584,7 +581,6 @@ int decode_id3v2_3(ID3_Header* header, wchar_t** fields)
 
 		switch (id)
 		{
-
 		case PACK_ID3_ID('A', 'P', 'I', 'C'): {
 			ptr += 10;
 			size -= 10;
@@ -799,7 +795,6 @@ int decode_id3v2_2(ID3_Header* header, wchar_t** fields)
 
 		switch (id)
 		{
-
 		case PACK_ID3_ID('T', 'B', 'P', '\0'):
 			field = &fields[ID3_INFO_BPM];
 			break;
@@ -880,7 +875,6 @@ int decode_id3v2_2(ID3_Header* header, wchar_t** fields)
 			wchar_t* str = id3_get_comment_unicode_str(ptr, &data_length);
 			if (str)
 			{
-
 				if (*field)
 					free(*field);
 
@@ -928,11 +922,9 @@ int decode_id3v2_2(ID3_Header* header, wchar_t** fields)
 
 		if (field)
 		{
-
 			wchar_t* str = id3_get_unicode_str(ptr, &data_length);
 			if (str)
 			{
-
 				if (*field)
 					free(*field);
 
@@ -953,7 +945,6 @@ int decode_id3v2_2(ID3_Header* header, wchar_t** fields)
 
 int decode_id3v2_4(ID3_Header* header, wchar_t** fields)
 {
-
 	unsigned char* ptr = header->pos;
 	unsigned char* end = header->stream_end;
 	unsigned int size = header->stream_size;
@@ -965,7 +956,6 @@ int decode_id3v2_4(ID3_Header* header, wchar_t** fields)
 
 	if (header->Flags.Extended)
 	{
-
 		if (ptr[0] > 0x80 || ptr[1] > 0x80 || ptr[2] > 0x80 || ptr[3] > 0x80)
 			return 0;
 
@@ -1025,7 +1015,6 @@ int decode_id3v2_4(ID3_Header* header, wchar_t** fields)
 		// check if we have unsupported flags
 		if (fExit)
 		{
-
 			ptr += 10;
 			size -= 10;
 			ptr += len;
@@ -1060,7 +1049,6 @@ int decode_id3v2_4(ID3_Header* header, wchar_t** fields)
 
 		switch (id)
 		{
-
 		case PACK_ID3_ID('A', 'P', 'I', 'C'): {
 			ptr += 10;
 			size -= 10;
@@ -1285,7 +1273,7 @@ int id3_get_picture_unicode(unsigned char* buf, unsigned int len, wchar_t** fiel
 		field = &fields[ID3_INFO_PICTURE_TYPE];
 
 		unsigned int t = buf[0];
-		swprintf(ptype, L"%u", t);
+		swprintf(ptype, 12, L"%u", t);
 
 		if (*field)
 			free(*field);
@@ -1313,7 +1301,7 @@ int id3_get_picture_unicode(unsigned char* buf, unsigned int len, wchar_t** fiel
 		return 1;
 
 	wchar_t** field1 = &fields[ID3_INFO_PICTURE_DATA_SIZE];
-	swprintf(size, L"%u", len);
+	swprintf(size, 12, L"%u", len);
 
 	if (*field1)
 		free(*field1);
@@ -1323,7 +1311,7 @@ int id3_get_picture_unicode(unsigned char* buf, unsigned int len, wchar_t** fiel
 	char* tmp = (char*)malloc(len);
 	if (tmp == NULL)
 	{
-		swprintf(*field1, L"0");
+		swprintf(*field1, 12, L"0");
 		return 1;
 	}
 
@@ -1360,7 +1348,6 @@ unsigned int id3_deunsynchronise(unsigned char* data, unsigned int length)
 
 wchar_t* id3_get_unicode_str(unsigned char* buf, unsigned int* len)
 {
-
 	unsigned int length = *len;
 	if (length < 2)
 		return NULL;
@@ -1378,7 +1365,6 @@ wchar_t* id3_get_unicode_str(unsigned char* buf, unsigned int* len)
 // decode src string, allocate dest memory and copy string into dest memory
 wchar_t* id3_decode_unicode_str(unsigned char** src, unsigned int* in_size, unsigned int encoding, unsigned int* out_size)
 {
-
 	unsigned char* str = *src;
 	unsigned char* dest = NULL;
 	wchar_t* out = NULL;
@@ -1643,7 +1629,6 @@ wchar_t* id3_get_comment_unicode_str(unsigned char* buf, unsigned int* len)
 
 wchar_t* get_genre_from_index_unicode(wchar_t* ptr, unsigned int size)
 {
-
 	if (size >= 3 && ptr[0] == L'(' && ptr[1] != L'(')
 	{
 		// search )
@@ -1688,7 +1673,6 @@ wchar_t* get_genre_from_index_unicode(wchar_t* ptr, unsigned int size)
 
 wchar_t* id3_get_url_unicode_str(unsigned char* buf, unsigned int* len)
 {
-
 	if (*len < 1)
 		return NULL;
 
@@ -1735,7 +1719,6 @@ wchar_t** ID3Tag::LoadID3Info(unsigned char* buffer, unsigned int buffer_size, i
 
 	switch (version)
 	{
-
 	case 1:
 		ret = GetID3v1(&header, c_fields);
 		if (header.unsync_buf)

@@ -32,7 +32,8 @@
 
 #include "wspectrum.h"
 #include "debug.h"
-#include <stdio.h>
+#include <algorithm>
+#include <cstdio>
 
 #define MASK_RED 0
 #define MASK_GREEN 0
@@ -1431,7 +1432,6 @@ int WSpectrum::_AllocateFFTMemory()
 
 void WSpectrum::_FreeFFTMemory()
 {
-
 	if (c_pnLeftAmplitude)
 		free(c_pnLeftAmplitude);
 
@@ -1488,7 +1488,6 @@ void WSpectrum::Free()
 
 int WSpectrum::Initialize(unsigned int nFFTPoints, unsigned int nSampleRate, unsigned int nChannel, unsigned int nBitsPerSample)
 {
-
 	if (nFFTPoints == c_nFFTPoints && nSampleRate == c_nSampleRate && nChannel == c_nChannel && nBitsPerSample == c_nBitsPerSample)
 		return 1; // nothing to do
 
@@ -1662,7 +1661,6 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	if (hPenLeft == 0 || hPenLeftOverlap == 0 || hPenRight == 0 || hPenRightOverlap == 0 ||
 		hBrushFFTLeft == 0 || hBrushFFTLeftOverlap == 0 || hBrushFFTRight == 0 || hBrushFFTRightOverlap == 0)
 	{
-
 		_FreeFFTGDI();
 		return 0;
 	}
@@ -1686,7 +1684,6 @@ int WSpectrum::_AllocateFFTGDI(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeight)
 {
-
 	c_spectrum_pos = 0;
 
 	// now we have GDI allocated, create background bitmap
@@ -1796,7 +1793,7 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 	if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM && c_fShowVScale)
 	{
 		char tmp[10];
-		sprintf(tmp, "%u", MaxDecibel);
+		sprintf_s(tmp, "%u", MaxDecibel);
 		nMaxTextWidthDecibel = c_BmpFont->GetTextWidth(tmp);
 
 		c_InnerRect.right -= (nMaxTextWidthDecibel + 2 * RightHSpace);
@@ -1846,7 +1843,7 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 			else
 			{
 				x = w / 2 - c_nBitmapWidth / 2;
-				w1 = min(c_nBitmapWidth, w);
+				w1 = std::min(c_nBitmapWidth, w);
 			}
 
 			if (c_nBitmapHeight > h)
@@ -1857,7 +1854,7 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 			else
 			{
 				y = h / 2 - c_nBitmapHeight / 2;
-				h1 = min(c_nBitmapHeight, h);
+				h1 = std::min(c_nBitmapHeight, h);
 			}
 
 			// center bitmap
@@ -2111,7 +2108,6 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 		if (i > 0)
 		{
-
 			unsigned int nMarkStep = DecibelTable[nDecibelResolutionIndex].MarkStep;
 			unsigned int nMarksNumber = nDecibelResolution / nMarkStep;
 
@@ -2120,7 +2116,6 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 			for (j = 1; j < nMarksNumber; j++)
 			{
-
 				p[0].x = c_InnerRect.right + 1;
 				p[0].y = nPrevY + MulDiv(nSpace, j, nMarksNumber);
 				p[1].y = p[0].y;
@@ -2175,7 +2170,7 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 				{
 					// draw text
 					char text[10];
-					sprintf(text, "%u", i * nDecibelResolution);
+					sprintf_s(text, "%u", i * nDecibelResolution);
 					c_BmpFont->SetText(text);
 					c_BmpFontInverse->SetText(text);
 					rc.left = c_InnerRect.right + RightHSpace + nMaxTextWidthDecibel + 2 - c_BmpFont->GetTextWidth(0);
@@ -2225,7 +2220,6 @@ int WSpectrum::_CreateBgBitmap(HDC hdc, unsigned int nWidth, unsigned int nHeigh
 
 	if (flWidthScale < 1.0)
 	{
-
 		for (nSrcIndex = 1; nSrcIndex < c_nHarmonicsNumber; nSrcIndex++)
 		{
 			if (FFT_Left[nDestIndex].x != FFT_Left[nSrcIndex].x)
@@ -2493,7 +2487,6 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 		// stereo
 		if (c_fft.GetAmplitudeInt(c_pnLeftAmplitude, c_pnRightAmplitude) == 0)
 		{
-
 			if (c_nSpectrumType != GRAPH_TYPE_SPECTRUM)
 			{
 				// fail to get amplitude
@@ -2541,7 +2534,7 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
 					FFT_Right[i].y = sumright / c_pnReductionTable[i];
-					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
+					FFT_Tmp[i].y = std::max(FFT_Left[i].y, FFT_Right[i].y);
 				}
 			}
 			else
@@ -2559,7 +2552,7 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 
 					FFT_Left[i].y = sumleft / c_pnReductionTable[i];
 					FFT_Right[i].y = sumright / c_pnReductionTable[i];
-					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
+					FFT_Tmp[i].y = std::max(FFT_Left[i].y, FFT_Right[i].y);
 				}
 			}
 		}
@@ -2573,7 +2566,7 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 
 					FFT_Left[i].y = (FFT_Left[i].y + (c_InnerRect.bottom - (int)((float)c_pnLeftAmplitude[i] * flHeightScale))) / 2;
 					FFT_Right[i].y = (FFT_Right[i].y + (c_InnerRect.bottom - (int)((float)c_pnRightAmplitude[i] * flHeightScale))) / 2;
-					FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
+					FFT_Tmp[i].y = std::max(FFT_Left[i].y, FFT_Right[i].y);
 				}
 			}
 			else
@@ -2585,7 +2578,7 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 					{
 						FFT_Left[i].y = (FFT_Left[i].y + (c_InnerRect.bottom - c_pnLeftAmplitude[i])) / 2;
 						FFT_Right[i].y = (FFT_Right[i].y + (c_InnerRect.bottom - c_pnRightAmplitude[i])) / 2;
-						FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
+						FFT_Tmp[i].y = std::max(FFT_Left[i].y, FFT_Right[i].y);
 					}
 				}
 				else
@@ -2594,7 +2587,7 @@ int WSpectrum::SetSamples(void* pSamples, unsigned int nSampleNum)
 					{
 						FFT_Left[i].y = (FFT_Left[i].y + c_pnLeftAmplitude[i]) / 2;
 						FFT_Right[i].y = (FFT_Right[i].y + c_pnRightAmplitude[i]) / 2;
-						FFT_Tmp[i].y = max(FFT_Left[i].y, FFT_Right[i].y);
+						FFT_Tmp[i].y = std::max(FFT_Left[i].y, FFT_Right[i].y);
 					}
 				}
 			}
@@ -3080,12 +3073,11 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int n
 		// calculate sum size of all text labels
 		for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 		{
-
 			// calculate text width
 			if (freq_table[j].nWidth == 0)
 			{
 				char tmp[10];
-				sprintf(tmp, "%u", j);
+				sprintf_s(tmp, "%u", j);
 				freq_table[j].nWidth = c_BmpFont->GetTextWidth(tmp);
 			}
 
@@ -3118,7 +3110,6 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int n
 	{
 		if (j != nStartFreq || fDrawZerroGrid == 1)
 		{
-
 			// draw grid line
 			p[0].x = freq_table[j].nX;
 			p[0].y = c_InnerRect.top;
@@ -3215,7 +3206,7 @@ void WSpectrum::DrawXLinear(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned int n
 
 		// draw text
 		char text[10];
-		sprintf(text, "%u", j);
+		sprintf_s(text, "%u", j);
 		c_BmpFont->SetText(text);
 		c_BmpFontInverse->SetText(text);
 		rc.left = freq_table[j].nX - freq_table[j].nWidth / 2;
@@ -3259,7 +3250,7 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned 
 			if (freq_table[j].nWidth == 0)
 			{
 				char tmp[10];
-				sprintf(tmp, "%u", j);
+				sprintf_s(tmp, "%u", j);
 				freq_table[j].nWidth = c_BmpFont->GetTextWidth(tmp);
 			}
 
@@ -3293,10 +3284,8 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned 
 	POINT p[5];
 	for (j = nStartFreq; j <= nEndFreq; j += nResolutionStep)
 	{
-
 		if (j != nStartFreq || fDrawZerroGrid == 1)
 		{
-
 			// draw grid line
 			p[0].x = freq_table[j].nX;
 			p[0].y = c_InnerRect.top;
@@ -3400,7 +3389,7 @@ void WSpectrum::DrawXLogarithmic(HDC hdc, FREQUENCY_TABLE* freq_table, unsigned 
 
 		// draw text
 		char text[10];
-		sprintf(text, "%u", j);
+		sprintf_s(text, "%u", j);
 		c_BmpFont->SetText(text);
 		c_BmpFontInverse->SetText(text);
 		rc.left = freq_table[j].nX - freq_table[j].nWidth / 2;
@@ -3525,7 +3514,6 @@ int WSpectrum::GetTransparency()
 
 int WSpectrum::ShowFrequencyScale(int fShow)
 {
-
 	if (fShow == -1)
 		return c_fShowHScale;
 
@@ -3652,7 +3640,6 @@ int WSpectrum::SetBgBitmap(HBITMAP hbm)
 
 int WSpectrum::SetColor(int nIndex, COLORREF color)
 {
-
 	switch (nIndex)
 	{
 	case 0:

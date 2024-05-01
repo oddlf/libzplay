@@ -3,14 +3,15 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <olectl.h>
 #include <ole2.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
 #include <dos.h>
 #include <conio.h>
@@ -49,7 +50,7 @@ int main(int argc, char** argv)
 	if (player == 0)
 	{
 		printf("Error: Can't create class instance !\nPress key to exit.\n");
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
 	if (ver < 200)
 	{
 		printf("Error: Need library version 2.00 and above !\nPress key to exit.\r\n");
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -78,7 +79,7 @@ int main(int argc, char** argv)
 	if (player->OpenFile("wavein://src=line;volume=50;", sfAutodetect) == 0)
 	{
 		printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -87,7 +88,7 @@ int main(int argc, char** argv)
 	if (player->SetWaveOutFile("out.ogg", sfOgg, 1) == 0)
 	{
 		printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -124,7 +125,6 @@ int main(int argc, char** argv)
 
 	while (1)
 	{
-
 		// get current status
 		player->GetStatus(&status);
 
@@ -157,13 +157,12 @@ int main(int argc, char** argv)
 			status.nLoop,
 			fMixChannels);
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 
 			switch (a)
 			{
-
 			case 'i': // side cut
 				fSideCut = !fSideCut;
 				player->StereoCut(fSideCut, 1, 0);

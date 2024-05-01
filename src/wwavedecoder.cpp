@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "wwavedecoder.h"
 #include "wtags.h"
@@ -70,7 +71,6 @@ wchar_t* g_wave_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 
 	L"WaveDecoder: Function not supported.",
 	L"WaveDecoder: Unknown error."
-
 };
 
 // number of samples to output
@@ -81,6 +81,12 @@ typedef struct {
 	unsigned int size;
 	unsigned char data;
 } RIFF_CHUNK;
+
+#if defined(_WIN64)
+	#define ZPLAY_RIFF_SIZE __int64
+#else
+	#define ZPLAY_RIFF_SIZE int
+#endif
 
 #define RIFF_CHUNK_SIZE 8
 
@@ -145,13 +151,11 @@ WWaveDecoder::~WWaveDecoder()
 
 int WWaveDecoder::Initialize(int param1, int param2, int param3, int param4)
 {
-
 	return 1;
 }
 
 int WWaveDecoder::Uninitialize()
 {
-
 	return 1;
 }
 
@@ -167,7 +171,6 @@ DECODER_ERROR_MESSAGE* WWaveDecoder::GetError()
 
 int WWaveDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 {
-
 	// read RIFF chunk and check if this is valid file
 	RIFF_CHUNK* riff = get_riff_subchunk((char*)c_pchStreamStart, c_nStreamSize, "RIFF", fSkipExtraChecking);
 	if (riff == 0)
@@ -293,7 +296,7 @@ int WWaveDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 	if (fmt->NumberOfChannels == 1)
 		channel = "MONO";
 
-	sprintf(c_pchDesc, "WAVE PCM %u-bit UNCOMPRESSED %s", fmt->BitPerSample, channel);
+	sprintf_s(c_pchDesc, "WAVE PCM %u-bit UNCOMPRESSED %s", fmt->BitPerSample, channel);
 	c_isInfo.pchStreamDescription = c_pchDesc;
 
 	c_nCurrentPosition = 0;
@@ -376,7 +379,6 @@ RIFF_CHUNK* get_riff_subchunk(char* data, unsigned int size, char* id, unsigned 
 
 	if (fSkipExtraCheck == 0)
 	{
-
 		while (ck <= upper_limit && (ck->size + RIFF_CHUNK_SIZE <= size))
 		{
 			allign = 0;
@@ -385,13 +387,13 @@ RIFF_CHUNK* get_riff_subchunk(char* data, unsigned int size, char* id, unsigned 
 
 			if (ck->id == nId)
 			{
-				if ((RIFF_CHUNK*)((unsigned int)ck + ck->size) > upper_limit)
+				if ((RIFF_CHUNK*)((ZPLAY_RIFF_SIZE)ck + ck->size) > upper_limit)
 					return 0;
 
 				return ck;
 			}
 
-			ck = (RIFF_CHUNK*)((unsigned int)ck + ck->size + 8 + allign);
+			ck = (RIFF_CHUNK*)((ZPLAY_RIFF_SIZE)ck + ck->size + 8 + allign);
 		}
 	}
 	else
@@ -405,7 +407,7 @@ RIFF_CHUNK* get_riff_subchunk(char* data, unsigned int size, char* id, unsigned 
 			if (ck->id == nId)
 				return ck;
 
-			ck = (RIFF_CHUNK*)((unsigned int)ck + ck->size + 8 + allign);
+			ck = (RIFF_CHUNK*)((ZPLAY_RIFF_SIZE)ck + ck->size + 8 + allign);
 		}
 	}
 
@@ -420,7 +422,6 @@ INPUT_STREAM_INFO* WWaveDecoder::GetStreamInfo()
 
 wchar_t** WWaveDecoder::GetID3Info(int version, char* pStream, unsigned int nStreamSize, int param1, int param2)
 {
-
 	err(DECODER_NO_ERROR);
 
 	FreeID3Fields(c_fields, ID3_FIELD_NUMBER_EX);
@@ -542,7 +543,6 @@ wchar_t** WWaveDecoder::GetID3Info(int version, char* pStream, unsigned int nStr
 
 wchar_t* get_riff_wave_id3_field(char* data, unsigned int size, char* id)
 {
-
 	RIFF_CHUNK* ck = get_riff_subchunk(data, size, id, 0);
 	if (ck)
 	{
@@ -714,7 +714,6 @@ int WWaveDecoder::GetData(DECODER_DATA* pDecoderData)
 			// check if we have enough data to fill user buffer
 			if (nSamplesNeed > nSamplesHave)
 			{
-
 				if (c_fEndOfStream) // end of stream, give user data we have
 					nSamplesNeed = nSamplesHave;
 				else
@@ -885,7 +884,6 @@ int WWaveDecoder::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param
 
 	if (param1 == 0)
 	{
-
 		c_pchStreamStart = ptr;
 		c_nStreamSize = size;
 		c_pchStreamEnd = c_pchStreamStart + c_nStreamSize - 1;

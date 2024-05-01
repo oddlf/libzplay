@@ -25,11 +25,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 #include "waudioprocessor.h"
 #include "debug.h"
@@ -122,7 +123,6 @@ WAudioQueue::~WAudioQueue()
 
 void WAudioQueue::Clear()
 {
-
 	AUDIO_QUEUE_ELEM* elem = c_first;
 	while (elem)
 	{
@@ -194,7 +194,6 @@ unsigned int WAudioQueue::PullSamples(PROCESSOR_AUDIO_DATA* data)
 
 	while (1)
 	{
-
 		d = (PROCESSOR_AUDIO_DATA*)c_first->pAllocatedBuffer;
 
 		if (d->nNumberOfSamples >= nSamplesNeed) // we have enough data

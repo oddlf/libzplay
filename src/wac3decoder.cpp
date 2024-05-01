@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 #include "debug.h"
 #include "wac3decoder.h"
@@ -89,7 +90,6 @@ wchar_t* g_ac3_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 	L"AC3Decoder: Reverse mod is not supported on managed stream.",
 	L"AC3Decoder: Function not supported in this decoder.",
 	L"AC3Decoder: Unknown error."
-
 };
 
 // Summary:
@@ -170,7 +170,6 @@ WAC3Decoder::~WAC3Decoder()
 
 int WAC3Decoder::Initialize(int param1, int param2, int param3, int param4)
 {
-
 	// Every A/52 frame is composed of 6 blocks, each with an output of 256
 	// samples for each channel.
 	c_pchBuffer = (int*)malloc((SAMPLES_IN_ONE_FRAME * INPUT_FRAME_NUMBER + DECODER_DELAY) * 4); // always use 16 bit stereo
@@ -215,7 +214,6 @@ DECODER_ERROR_MESSAGE* WAC3Decoder::GetError()
 
 int WAC3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 {
-
 	c_state = a52_init(0); // O to disable accel
 
 	if (c_state == NULL)
@@ -306,7 +304,6 @@ int WAC3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 	// detect channel state
 	switch (c_flags & A52_CHANNEL_MASK)
 	{
-
 	case A52_CHANNEL:
 		channel = "AC3 Dual mono";
 		break;
@@ -376,7 +373,6 @@ int WAC3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 
 int WAC3Decoder::Close()
 {
-
 	if (c_fReady == 0)
 		return 1;
 
@@ -541,7 +537,6 @@ void float2s16_2(float* _f, int16_t* s16)
 
 int WAC3Decoder::_FillBuffer()
 {
-
 	unsigned int output_size = 0;
 	int sample_rate;
 	int flags;
@@ -670,7 +665,6 @@ int WAC3Decoder::_FillBuffer()
 		int n;
 		for (n = 0; n < 6; n++)
 		{
-
 			if (a52_block(c_state))
 			{
 				// error
@@ -701,7 +695,6 @@ int WAC3Decoder::_FillBuffer()
 			int n;
 			for (n = 0; n < 6; n++)
 			{
-
 				if (a52_block(c_state))
 				{
 					// error
@@ -933,7 +926,6 @@ int WAC3Decoder::GetData(DECODER_DATA* pDecoderData)
 
 int WAC3Decoder::GetBitrate(int fAverage)
 {
-
 	if (fAverage)
 		return c_isInfo.nFileBitrate;
 
@@ -995,7 +987,6 @@ void WAC3Decoder::err(unsigned int error_code)
 // resync stream
 int WAC3Decoder::_Sync(int* sample_rate, int* flags, int* bitrate)
 {
-
 	while (c_pchPosition + 7 < c_pchEnd)
 	{
 		int length = a52_syncinfo(c_pchPosition, flags, sample_rate, bitrate);
@@ -1014,7 +1005,6 @@ int WAC3Decoder::_Sync(int* sample_rate, int* flags, int* bitrate)
 unsigned int WAC3Decoder::get_frame_pointers(unsigned char* buff, unsigned int size, int sample_rate,
 	unsigned char*** frame_ptr, unsigned int initial_num)
 {
-
 	unsigned char* pos = buff;
 	unsigned char* end = pos + size - 1;
 
@@ -1039,7 +1029,6 @@ unsigned int WAC3Decoder::get_frame_pointers(unsigned char* buff, unsigned int s
 
 	while (pos + 7 < end)
 	{
-
 		int length = a52_syncinfo(pos, &flags, &sr, &br);
 		if (length == 0 || pos + length > end || sr != sample_rate)
 		{
@@ -1186,7 +1175,6 @@ int WAC3Decoder::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2
 
 	if (param1 == 0)
 	{
-
 		c_pchStreamStart = ptr;
 		c_nStreamSize = size;
 		c_pchStreamEnd = c_pchStreamStart + c_nStreamSize - 1;

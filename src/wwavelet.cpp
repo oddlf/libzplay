@@ -24,9 +24,9 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 
 #include "wwavelet.h"
 
@@ -41,7 +41,6 @@ WWavelet::WWavelet(unsigned int WaveletType)
 
 	switch (WaveletType)
 	{
-
 	case D4_WAVELET:
 		forward_step = daubechies4_forward_step;
 		inverse_step = daubechies4_inverse_step;
@@ -107,7 +106,6 @@ void WWavelet::haar_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned
 // Haar wavelet packet transform ( frequency ordered )
 void WWavelet::haar_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse)
 {
-
 	unsigned int i;
 	unsigned int j;
 	const unsigned int N_half = N >> 1;
@@ -132,7 +130,6 @@ void WWavelet::haar_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned
 // Daubechies D4
 void WWavelet::daubechies4_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse)
 {
-
 	unsigned int i;
 	unsigned int j;
 	const unsigned int N_half = N >> 1;
@@ -158,7 +155,6 @@ void WWavelet::daubechies4_forward_step(WAVELET_REAL* src, WAVELET_REAL* dest, u
 // Daubechies D4 inverse packet transform ( frequency ordered )
 void WWavelet::daubechies4_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, unsigned int N, unsigned int reverse)
 {
-
 	unsigned int i;
 	unsigned int j;
 	const unsigned int N_half = N >> 1;
@@ -176,7 +172,6 @@ void WWavelet::daubechies4_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, u
 
 	for (i = 0, j = 2; i < (N_half - 1); i++, j += 2)
 	{
-
 		dest[j] = lp[i] * D4_H[2] + hp[i] * D4_G[2] + lp[i + 1] * D4_H[0] + hp[i + 1] * D4_G[0];
 		dest[j + 1] = lp[i] * D4_H[3] + hp[i] * D4_G[3] + lp[i + 1] * D4_H[1] + hp[i + 1] * D4_G[1];
 	}
@@ -184,7 +179,6 @@ void WWavelet::daubechies4_inverse_step(WAVELET_REAL* src, WAVELET_REAL* dest, u
 
 int WWavelet::ForwardTrans(WAVELET_REAL* data, unsigned int N, unsigned int Level)
 {
-
 	if (N > 1 && (N & (N - 1)) == 0)
 	{
 		// reallocate buffer if needed
@@ -255,7 +249,6 @@ int WWavelet::ForwardTrans(WAVELET_REAL* data, unsigned int N, unsigned int Leve
 // combine low pass filter and high pass filter data to original data
 int WWavelet::InverseTrans(WAVELET_REAL* data, unsigned int N, unsigned int Level)
 {
-
 	if (N > 1 && (N & (N - 1)) == 0)
 	{
 		// reallocate buffer if needed

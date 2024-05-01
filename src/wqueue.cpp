@@ -24,10 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "wqueue.h"
 
@@ -346,7 +347,6 @@ unsigned int WQueue::GetSizeSum()
 
 unsigned int WQueue::PullDataFifo(void* pOutputBuffer, unsigned int nBytesToRead, int* pnBufferIsOut)
 {
-
 	unsigned int nOutBufferNum = 0;
 	if (c_num == 0 || c_sum_size == 0 || nBytesToRead == 0)
 		return 0;
@@ -439,7 +439,6 @@ unsigned int WQueue::QueryLastPointer(void** ppDest, unsigned int* pnSize)
 
 int WQueue::QueryData(unsigned int nOffset, void* pOutputBuffer, unsigned int nBytesToRead, unsigned int* nBytesRead)
 {
-
 	// check input parameters
 	if (pOutputBuffer == 0 || nBytesToRead == 0)
 		return 0;
@@ -509,7 +508,6 @@ int WQueue::QueryData(unsigned int nOffset, void* pOutputBuffer, unsigned int nB
 
 int WQueue::CutDataFifo(unsigned int nBytesToCut)
 {
-
 	if (c_num == 0 || c_sum_size == 0)
 		return 0;
 

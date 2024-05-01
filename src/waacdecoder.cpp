@@ -24,12 +24,13 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <malloc.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "waacdecoder.h"
 #include "wtags.h"
@@ -65,7 +66,6 @@ wchar_t* g_aac_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 	L"AACDecoder: Function not supported in this decoder.",
 
 	L"AACDecoder: Unknown error."
-
 };
 
 #define ADIF_MAX_SIZE 30 /* Should be enough */
@@ -159,7 +159,6 @@ int WAACDecoder::Initialize(int param1, int param2, int param3, int param4)
 
 int WAACDecoder::Uninitialize()
 {
-
 	return 1;
 }
 
@@ -175,7 +174,6 @@ DECODER_ERROR_MESSAGE* WAACDecoder::GetError()
 
 int WAACDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 {
-
 	c_hDecoder = NeAACDecOpen();
 
 	c_pchStart = c_pchStreamStart;
@@ -445,31 +443,31 @@ int WAACDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 	switch (type)
 	{
 	case 0:
-		strcat(c_description, " MAIN");
+		strcat_s(c_description, " MAIN");
 		break;
 
 	case 1:
-		strcat(c_description, " LC");
+		strcat_s(c_description, " LC");
 		break;
 
 	case 2:
-		strcat(c_description, " SSR");
+		strcat_s(c_description, " SSR");
 		break;
 
 	case 3:
-		strcat(c_description, " LTP");
+		strcat_s(c_description, " LTP");
 		break;
 	}
 
 	if (version == 2)
-		strcat(c_description, " MPEG2");
+		strcat_s(c_description, " MPEG2");
 	else
-		strcat(c_description, " MPEG4");
+		strcat_s(c_description, " MPEG4");
 
 	if (ch >= 2)
-		strcat(c_description, " STEREO");
+		strcat_s(c_description, " STEREO");
 	else
-		strcat(c_description, " MONO");
+		strcat_s(c_description, " MONO");
 
 	c_isInfo.pchStreamDescription = c_description;
 	c_nCurrentPosition = 0;
@@ -485,7 +483,6 @@ int WAACDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 
 int WAACDecoder::Close()
 {
-
 	// =============================================================
 	// free accurate seek structures and initialize values
 	if (c_pFramePtr)
@@ -666,7 +663,6 @@ int WAACDecoder::GetData(DECODER_DATA* pDecoderData)
 
 	while (nSamplesNeed)
 	{
-
 		if (c_nBufferSize == 0)
 		{
 			int ret = _FillBuffer();
@@ -863,7 +859,6 @@ unsigned char** reallocate_aac_ptr(unsigned char** src, unsigned int old_size, u
 
 int WAACDecoder::_FillBuffer()
 {
-
 	unsigned int output_size = 0;
 	unsigned int nFrameCount = INPUT_FRAME_NUMBER;
 
@@ -873,7 +868,6 @@ int WAACDecoder::_FillBuffer()
 	// reverse mode
 	if (c_fReverse)
 	{
-
 		ASSERT_W(c_pFramePtr); // we need pointer to each frame
 
 		c_nSkipSamlesNum = 0;
@@ -942,7 +936,6 @@ int WAACDecoder::_FillBuffer()
 
 		if (NeAACDecDecode2(c_hDecoder, &c_frameInfo, c_pchManagedBuffer, ret, (void**)&c_pchBufferPos, c_pchBufferAllocSize) == NULL)
 		{
-
 			if ((unsigned int)c_frameInfo.bytesconsumed < ret)
 			{
 				c_Queue->PushFirst(c_pchManagedBuffer + c_frameInfo.bytesconsumed, ret - (unsigned int)c_frameInfo.bytesconsumed);
@@ -954,7 +947,6 @@ int WAACDecoder::_FillBuffer()
 
 		if (c_frameInfo.error > 0 || c_frameInfo.channels == 0)
 		{
-
 			if ((unsigned int)c_frameInfo.bytesconsumed < ret)
 			{
 				c_Queue->PushFirst(c_pchManagedBuffer + c_frameInfo.bytesconsumed, ret - (unsigned int)c_frameInfo.bytesconsumed);
@@ -982,7 +974,6 @@ int WAACDecoder::_FillBuffer()
 		{
 			while (c_nFrameOverlay)
 			{
-
 				// check position, return if end of stream
 				if (c_pchPosition + ADTS_MAX_SIZE > c_pchEnd)
 					return DECODER_END_OF_DATA;
@@ -1097,7 +1088,6 @@ int WAACDecoder::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2
 
 	if (param1 == 0)
 	{
-
 		c_pchStreamStart = ptr;
 		c_nStreamSize = size;
 		c_pchStreamEnd = c_pchStreamStart + c_nStreamSize - 1;

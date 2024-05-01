@@ -26,6 +26,7 @@
 #ifndef _WMP3X_Z_
 #define _WMP3X_Z_
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
@@ -306,7 +307,7 @@ private:
 	// =============================================
 
 	// callback function
-	static void CALLBACK _WaveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+	static void CALLBACK _WaveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 
 	static int _AllocateVUBuffers(WMp3x* instance);
 	static void _FreeVUBuffers(WMp3x* instance);
@@ -446,7 +447,7 @@ private:
 	static int send_stop(WMp3x* instance);
 	static int send_buffer_done(WMp3x* instance, unsigned int count, unsigned int sumsize);
 	static int send_stream_out_of_data(WMp3x* instance);
-	static int send_callback_message(WMp3x* instance, unsigned int message, unsigned int param1, unsigned int param2);
+	static int send_callback_message(WMp3x* instance, unsigned int message, ZPLAY_PARAM param1, ZPLAY_PARAM param2);
 	int c_callback_ret;
 	void* c_user_callback_data;
 

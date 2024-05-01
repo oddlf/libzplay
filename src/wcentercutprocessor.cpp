@@ -30,12 +30,14 @@
  * ============================================================================
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <algorithm>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include "debug.h"
 #include "wcentercutprocessor.h"
 
@@ -152,7 +154,7 @@ int WCenterCutProcessor::Configure(unsigned int fBroadcast, unsigned int nSample
 	// check input parameters
 	if (nSampleRate == 0)
 	{
-		sprintf(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Sample rate can't be %u.", nSampleRate);
+		sprintf_s(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Sample rate can't be %u.", nSampleRate);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -160,7 +162,7 @@ int WCenterCutProcessor::Configure(unsigned int fBroadcast, unsigned int nSample
 
 	if (nChannel != 1 && nChannel != 2)
 	{
-		sprintf(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Number of channels can't be %u.", nChannel);
+		sprintf_s(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Number of channels can't be %u.", nChannel);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -168,7 +170,7 @@ int WCenterCutProcessor::Configure(unsigned int fBroadcast, unsigned int nSample
 
 	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
-		sprintf(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
+		sprintf_s(c_pchErrorMessageStr, "WCenterCutProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
@@ -213,7 +215,6 @@ int WCenterCutProcessor::SetParameters(int fOutputCenter, int fBassToSides)
 
 int WCenterCutProcessor::Enable(int fBroadcast, int fEnable)
 {
-
 	EnterCriticalSection(&c_CriticalSection);
 
 	if (fEnable)
@@ -221,7 +222,6 @@ int WCenterCutProcessor::Enable(int fBroadcast, int fEnable)
 		c_nLatencyInSamples = 0;
 		if (c_fEnable == 0)
 		{
-
 			mOutputMaxBuffers = 4;
 
 			mInput = (REALMATRIX*)malloc(kWindowSize * 2 * sizeof(MYREAL));
@@ -311,7 +311,6 @@ int WCenterCutProcessor::Flush(int fBroadcast)
 
 	if (c_fEnable)
 	{
-
 		if (_Flush(this) == 0)
 		{
 			c_nLatencyInSamples = 0;
@@ -398,7 +397,7 @@ int WCenterCutProcessor::CenterCutProcessSamples(WCenterCutProcessor* instance, 
 	// process all input data
 	while (inSampleCount > 0)
 	{
-		copyCount = min((int)instance->mInputSamplesNeeded, inSampleCount);
+		copyCount = std::min((int)instance->mInputSamplesNeeded, inSampleCount);
 
 		ConvertSamples(BYTES_TO_REAL, inSamples, &instance->mInput[instance->mInputPos][0], copyCount, instance->c_nBitPerSample, 2);
 
@@ -419,7 +418,7 @@ int WCenterCutProcessor::CenterCutProcessSamples(WCenterCutProcessor* instance, 
 		if (sampD == 0)
 			return 0; // memory allocation error
 
-		copyCount = min(mOutputSampleCount - instance->mOutputReadSampleOffset,
+		copyCount = std::min(mOutputSampleCount - instance->mOutputReadSampleOffset,
 			maxOutSampleCount - outSampleCount);
 
 		ConvertSamples(REAL_TO_BYTES, outSamples, sampD + (instance->mOutputReadSampleOffset * 2), copyCount, instance->c_nBitPerSample, 2);
@@ -438,7 +437,6 @@ int WCenterCutProcessor::CenterCutProcessSamples(WCenterCutProcessor* instance, 
 
 void ConvertSamples(int type, uint8* sampB, MYREAL* sampD, int sampleCount, int bitsPerSample, int chanCount)
 {
-
 	int bytesPerSample, shiftCount;
 	sint32 xor ;
 	uint8* max;
@@ -949,7 +947,6 @@ BOOL WCenterCutProcessor::CenterCut_Run(WCenterCutProcessor* instance)
 
 int WCenterCutProcessor::_Flush(WCenterCutProcessor* instance)
 {
-
 	if (instance->c_nLatencyInSamples > 0)
 	{
 		unsigned int nInputSizeInSamples = 10000;
@@ -1038,7 +1035,6 @@ int WCenterCutProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 
 	if (c_fEnable && c_nChannel != 0)
 	{
-
 		unsigned int nDataSize = data->nNumberOfSamples * data->nBlockAllign;
 
 		// reallocate output buffer

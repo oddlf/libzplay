@@ -24,6 +24,7 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -154,7 +155,6 @@ void PCM16MonoToPCM16Stereo(short* inSamples, unsigned int inSampleNum, short* o
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 {
-
 	unsigned int i;
 	unsigned int index;
 	for (i = 1; i <= inSampleNum; i++)
@@ -217,7 +217,6 @@ void PCM8StereoSignedToPCM16Stereo(char* inSamples, unsigned int inSampleNum, sh
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 {
-
 	unsigned int i;
 	unsigned int index;
 
@@ -313,7 +312,6 @@ void PCM32StereoToPCM16Stereo(int* inSamples, unsigned int inSampleNum, short* o
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 {
-
 	unsigned int i;
 	for (i = 0; i < inSampleNum * 2; i++)
 		outSamples[i] = inSamples[i] >> 16;
@@ -371,7 +369,6 @@ void PCM16StereoReverse(int* inSamples, unsigned int inSampleNum, int* outSample
 //	REMARKS:
 //		Buffer inSamples and outSamples can be the same buffer.
 {
-
 	if (inSampleNum < 2)
 		return;
 
@@ -420,7 +417,6 @@ void PCM16StereoBEToPCM16StereoLE(short* inSamples, unsigned int inSampleNum, sh
 
 int UTF16ToANSI(wchar_t* src, int nCharacterNumber, char* dest, int nDestSizeInBytes)
 {
-
 	if ((char*)src != dest)
 	{
 		int ret = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, src, nCharacterNumber, dest, nDestSizeInBytes, NULL, NULL);
@@ -474,7 +470,6 @@ int UTF16ToANSI(wchar_t* src, int nCharacterNumber, char* dest, int nDestSizeInB
 
 int UTF8ToANSI(char* src, int nBytes, char* dest, int nDestSizeInBytes)
 {
-
 	// convert UTF-8 to UTF-16
 	int size = MultiByteToWideChar(CP_UTF8, 0, src, nBytes, NULL, 0);
 	if (size == 0)

@@ -25,9 +25,9 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 #include <memory.h>
 
 #include "debug.h"
@@ -152,7 +152,7 @@ int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 		subband->LastSamplePos = 0;
 
 		subband->ForwardTreshold = FORWARD_TRESHOLD;
-		subband->BackwardTreshold = BACKWARD_TRESHOLD;
+		subband->BackwardTreshold = (REAL)BACKWARD_TRESHOLD;
 
 		memset(subband->BPMHistoryHit, 0, (BPM_MAX + 2) * sizeof(unsigned int));
 	}
@@ -163,7 +163,6 @@ int WBPMDetect3::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 
 int WBPMDetect3::PutSamples(short* pSamples, unsigned int nSampleNum)
 {
-
 	// create samples array
 
 	unsigned int i;
@@ -221,7 +220,6 @@ int WBPMDetect3::PutSamples(short* pSamples, unsigned int nSampleNum)
 
 		if (subband->PeakLoad >= subband->PeakWindow)
 		{
-
 			amp = subband->BackwardAmplitude[subband->BackwardIndex];
 			// update backward window
 			subband->SumBackwardAmplitude -= amp;
@@ -333,7 +331,7 @@ int WBPMDetect3::PutSamples(short* pSamples, unsigned int nSampleNum)
 								subband->PeakPos = subband->LastSamplePos;
 								subband->BPMCandidate = bpm;
 							}
-							subband->BackwardTreshold -= 0.05;
+							subband->BackwardTreshold -= 0.05f;
 							if (subband->BackwardTreshold < 1.0)
 								subband->BackwardTreshold = 1.0;
 						}
@@ -369,7 +367,7 @@ int WBPMDetect3::PutSamples(short* pSamples, unsigned int nSampleNum)
 					else
 					{
 						subband->HistoryBPMPos = subband->PeakPos;
-						subband->BackwardTreshold += 0.1;
+						subband->BackwardTreshold += 0.1f;
 					}
 				}
 			}
@@ -598,7 +596,6 @@ int WBPMDetect3::FreeInternalMemory()
 
 	if (c_pSubBand)
 	{
-
 		unsigned int i;
 		for (i = 0; i < NUMBER_OF_SUBBANDS; i++)
 		{

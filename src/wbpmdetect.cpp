@@ -34,7 +34,6 @@ WBPMDetect* CreateBPMDetect(unsigned int nMethod)
 {
 	switch (nMethod)
 	{
-
 	case BPM_DETECT_USING_WAVELETS:
 		return (WBPMDetect*)new WBPMDetect2();
 

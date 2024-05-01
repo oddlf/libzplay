@@ -4,8 +4,10 @@
  * Play 2 songs, each song on different soundcard.
  */
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <conio.h>
 
 #include "libzplay/libzplay.h"
@@ -74,9 +76,9 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// check key press
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 			if (a == 'q' || a == 'Q')
 				break; // end program if Q key is pressed
 		}

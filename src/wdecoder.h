@@ -27,6 +27,7 @@
 #ifndef _W_DECODER_H_
 #define _W_DECODER_H_
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "debug.h"
@@ -111,7 +112,6 @@ typedef struct {
 	unsigned int nSongIndex;
 
 	unsigned int fEndOfStream;
-
 } DECODER_DATA;
 
 typedef struct {

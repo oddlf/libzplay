@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "wwavein.h"
 
@@ -86,7 +87,6 @@ wchar_t* g_recorder_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 	L"WaveIn: Reverse mod is not supported on managed stream.",
 	L"WaveIn: Function not supported in this decoder.",
 	L"WaveIn: Unknown error."
-
 };
 
 int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* user_mixer_line, unsigned int nLeftVolume, unsigned int nRightVolume);
@@ -172,7 +172,6 @@ DECODER_ERROR_MESSAGE* WWaveIn::GetError()
 
 int WWaveIn::Close()
 {
-
 	c_fWorking = 0;
 	c_user_mixer_line = NULL;
 
@@ -369,7 +368,7 @@ int WWaveIn::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2)
 		return 0;
 	}
 
-	if ((res = waveInOpen(&c_hWaweIn, c_InDeviceID, &wfx, (DWORD)_WaveInProc, (DWORD)this, CALLBACK_FUNCTION)) != MMSYSERR_NOERROR)
+	if ((res = waveInOpen(&c_hWaweIn, c_InDeviceID, &wfx, (DWORD_PTR)_WaveInProc, (DWORD_PTR)this, CALLBACK_FUNCTION)) != MMSYSERR_NOERROR)
 	{
 		err(DECODER_WAVE_INPUT_OPEN_ERROR);
 		return 0;
@@ -500,7 +499,6 @@ void CALLBACK WWaveIn::_WaveInProc(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWO
 
 	switch (uMsg)
 	{
-
 	case MM_WIM_OPEN:
 		break;
 
@@ -669,7 +667,6 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 
 			if (dwi >= dwMultipleItems)
 			{
-
 				if (user_mixer_line)
 				{
 					// could not find it using line IDs, some mixer drivers have
@@ -677,7 +674,7 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 					// let's try comparing the item names.
 					for (dwi = 0; dwi < dwMultipleItems; dwi++)
 					{
-						if (stricmp(pmxcdSelectText[dwi].szName, user_mixer_line) == 0)
+						if (_stricmp(pmxcdSelectText[dwi].szName, user_mixer_line) == 0)
 						{
 							// found, dwi is the index.
 							dwIndex = dwi;
@@ -703,7 +700,7 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 				// let's try comparing the item names.
 				for (dwi = 0; dwi < dwMultipleItems; dwi++)
 				{
-					if (stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name1) == 0)
+					if (_stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name1) == 0)
 					{
 						// found, dwi is the index.
 						dwIndex = dwi;
@@ -720,7 +717,7 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 				// let's try comparing the item names.
 				for (dwi = 0; dwi < dwMultipleItems; dwi++)
 				{
-					if (stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name2) == 0)
+					if (_stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name2) == 0)
 					{
 						// found, dwi is the index.
 						dwIndex = dwi;
@@ -737,7 +734,7 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 				// let's try comparing the item names.
 				for (dwi = 0; dwi < dwMultipleItems; dwi++)
 				{
-					if (stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name3) == 0)
+					if (_stricmp(pmxcdSelectText[dwi].szName, g_wavein_id[nComponentID].string_name3) == 0)
 					{
 						// found, dwi is the index.
 						dwIndex = dwi;
@@ -803,7 +800,6 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 
 	if (nLeftVolume <= 100 && nRightVolume <= 100)
 	{
-
 		mxl.cbStruct = sizeof(MIXERLINE);
 		mxl.dwLineID = dwLine;
 		if (mixerGetLineInfo((HMIXEROBJ)hMixer, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_LINEID) == MMSYSERR_NOERROR)
@@ -815,7 +811,6 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 			mxlc.pamxctrl = &mxc;
 			if (mixerGetLineControls((HMIXEROBJ)hMixer, &mxlc, MIXER_OBJECTF_HMIXER | MIXER_GETLINECONTROLSF_ONEBYTYPE) == MMSYSERR_NOERROR)
 			{
-
 				if (nLeftVolume > 100)
 					nLeftVolume = 100;
 

@@ -24,11 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "wwaveencoder.h"
 
@@ -48,7 +48,6 @@ wchar_t* g_wave_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WWaveEncoder::Encoder is not ready.",
 
 	L"WWaveEncoder::Unknown error."
-
 };
 
 void WWaveEncoder::Release()
@@ -97,7 +96,6 @@ int WWaveEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 	TEncoderSeekCallback seek_callback,
 	TEncoderTellCallback tell_callback)
 {
-
 	c_read_calllback = read_callback;
 	c_write_callback = write_callback;
 	c_seek_callback = seek_callback;
@@ -111,7 +109,6 @@ int WWaveEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 
 	if (c_fRaw == 0)
 	{
-
 		// write wave RIFF header
 		unsigned int nFileSize = 0;					// unknown for now, we will set this value at the end
 		unsigned int nSubChunkSize = 16;			// for PCM files this is 1

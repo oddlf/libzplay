@@ -31,12 +31,12 @@
  * ============================================================================
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cmath>
 #include "debug.h"
 #include "wmp3decoder.h"
 #include "wtags.h"
@@ -277,7 +277,6 @@ wchar_t* g_mp3_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 	L"Mp3Decoder: Invalid ID3 version parameter.",
 
 	L"Mp3Decoder: Unknown error."
-
 };
 
 WMp3Decoder::WMp3Decoder()
@@ -412,7 +411,6 @@ DECODER_ERROR_MESSAGE* WMp3Decoder::GetError()
 
 int WMp3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 {
-
 	unsigned char* start = c_pchStreamStart;
 	unsigned char* end = c_pchStreamEnd;
 	unsigned int size = c_nStreamSize;
@@ -443,7 +441,6 @@ int WMp3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 		// check if this is valid ID3v2 tag
 		if (size > (id3v2_size + MIN_FRAME_SIZE))
 		{
-
 			if (SKIP_ID3TAG_AT_BEGINNING && (*(start + id3v2_size) == 0xFF) && ((*(start + id3v2_size + 1) & 0xE0) == 0xE0))
 			{
 				// adjust stream pointers to exclude ID3v2 tag from stream
@@ -585,12 +582,10 @@ int WMp3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 
 	if (mad_frame_decode(&frame, &stream) == 0)
 	{
-
 		// check if first frame is XING frame
 
 		if (tag_parse(&c_xing, &stream, &frame) == 0)
 		{
-
 			if (c_xing.flags != 0) // we have empty blank frame with XING/LAME/VBRI, skip this frame
 			{
 				c_nBlankSamplesAtBeginning = (32 * MAD_NSBSAMPLES(&frame.header));
@@ -643,7 +638,6 @@ int WMp3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 	{
 		if (c_fPreciseSongLength)
 		{
-
 			// get number of frames to preallocate array for all frame pointers, prevent multiple array reallocations
 			unsigned int prealloc = 0;
 			if (valid_xing)
@@ -865,7 +859,7 @@ int WMp3Decoder::_OpenFile(unsigned int fSkipExtraChecking)
 		break;
 	}
 
-	sprintf(c_pchDescription, "%s %s %s", mpeg_ver, layer_ver, ch_mode);
+	sprintf_s(c_pchDescription, "%s %s %s", mpeg_ver, layer_ver, ch_mode);
 	c_isInfo.pchStreamDescription = c_pchDescription;
 
 	// initialize decoder
@@ -1079,7 +1073,6 @@ int WMp3Decoder::Seek(unsigned int nSamples)
 			// check if we have valid TOC table
 			if ((c_xing.flags & TAG_XING) && (c_xing.xing.flags & TAG_XING_TOC))
 			{
-
 				double pa, pb, px;
 				double percentage = 100.0 * (double)nSamples / (double)c_isInfo.nLength;
 
@@ -1366,7 +1359,6 @@ int WMp3Decoder::SetReverseMode(int fReverse)
 
 void WMp3Decoder::_ClearForSeek()
 {
-
 	// free mad buffer guard
 	if (c_pchMadBuffGuard)
 	{
@@ -1542,7 +1534,6 @@ int tag_parse(struct tag_xl* tag, struct mad_stream const* stream, struct mad_fr
 
 	if (memcmp(tag->encoder, "LAME", 4) == 0 && stream->next_frame - stream->this_frame >= 192)
 	{
-
 		unsigned int crc_size = 190; // MPEG1 STEREO (SIDE INFO is 32 bytes )
 		if (frame->header.flags & MAD_FLAG_LSF_EXT)
 		{
@@ -1742,7 +1733,7 @@ static int parse_lame(struct tag_lame* lame,
 		memcpy(str, version, 5);
 		str[5] = 0;
 
-		sscanf(str, "%u.%u.%u", &major, &minor, &patch);
+		sscanf_s(str, "%u.%u.%u", &major, &minor, &patch);
 
 		if (major == 3 && minor < 95)
 		{
@@ -2167,7 +2158,6 @@ unsigned int WMp3Decoder::getFrameIndex(unsigned int nSamples)
 
 int WMp3Decoder::_FillBuffer(WMp3Decoder* instance)
 {
-
 	struct mad_stream* stream = &instance->c_stream;
 	struct mad_frame* frame = &instance->c_frame;
 	struct mad_synth* synth = &instance->c_synth;
@@ -2612,7 +2602,6 @@ int WMp3Decoder::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2
 
 	if (param1 == 0)
 	{
-
 		c_pchStreamStart = ptr;
 		c_nStreamSize = size;
 		c_pchStreamEnd = c_pchStreamStart + c_nStreamSize - 1;

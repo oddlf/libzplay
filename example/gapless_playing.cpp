@@ -6,8 +6,10 @@
  * Use callback mechanism to get information on song change
  */
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <conio.h>
 
 #define LIB_ZPLAY_STATIC
@@ -19,8 +21,8 @@ using namespace libZPlay;
 int __stdcall myCallbackFunc(void* instance,
 	void* user_data,
 	TCallbackMessage message,
-	unsigned int param1,
-	unsigned int param2);
+	ZPLAY_PARAM param1,
+	ZPLAY_PARAM param2);
 
 int main(int argc, char** argv)
 {
@@ -66,9 +68,9 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// check key press
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 			if (a == 'q' || a == 'Q')
 				break; // end program if Q key is pressed
 		}
@@ -94,7 +96,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-int __stdcall myCallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2)
+int __stdcall myCallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2)
 {
 	ZPlay* myinstance = (ZPlay*)instance;
 

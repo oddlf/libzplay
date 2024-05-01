@@ -4,14 +4,15 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <olectl.h>
 #include <ole2.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
 #include <dos.h>
 #include <conio.h>
@@ -22,7 +23,7 @@ using namespace libZPlay;
 
 ZPlay* player;
 
-int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2);
+int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2);
 
 int main(int argc, char** argv)
 {
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
 	if (player == 0)
 	{
 		printf("Error: Can't create class instance !\nPress key to exit.\n");
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -46,7 +47,7 @@ int main(int argc, char** argv)
 	if (ver < 200)
 	{
 		printf("Error: Need library version 2.00 and above !\nPress key to exit.\r\n");
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -56,7 +57,6 @@ int main(int argc, char** argv)
 
 	if (argc > 1)
 	{
-
 		TID3InfoEx id3_info;
 		if (player->LoadFileID3Ex(argv[1], sfAutodetect, &id3_info, 1)) // loading ID3v2
 		{
@@ -102,9 +102,9 @@ int main(int argc, char** argv)
 			end = argv[0];
 
 		printf("Usage: %s filename\r\n\r\nPress key to exit\r\n", end);
-		getch();
+		_getch();
 		return 0;
 	}
 
-	getch();
+	_getch();
 }

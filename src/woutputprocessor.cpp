@@ -24,8 +24,8 @@
  *
  */
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "woutputprocessor.h"
 
@@ -44,7 +44,7 @@ int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRat
 	// check input parameters
 	if (nSampleRate == 0)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Sample rate can't be %u.", nSampleRate);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Sample rate can't be %u.", nSampleRate);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -52,7 +52,7 @@ int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRat
 
 	if (nChannel != 1 && nChannel != 2)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Nuber of channels can't be %u.", nChannel);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Nuber of channels can't be %u.", nChannel);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -60,7 +60,7 @@ int WOutputProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRat
 
 	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
@@ -141,13 +141,11 @@ int WOutputProcessor::Clear(int fBroadcast)
 
 unsigned int WOutputProcessor::PullSamples(PROCESSOR_AUDIO_DATA* data)
 {
-
 	return c_queue.PullSamples(data);
 }
 
 int WOutputProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 {
-
 	// send data to next processor
 	if (c_next)
 	{

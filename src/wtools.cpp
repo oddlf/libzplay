@@ -24,11 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "wtools.h"
 
@@ -419,7 +419,6 @@ bool base64_decode_alloc(const char* in, size_t inlen, char** out,
 
 char* UTF16ToANSI(wchar_t* src, int nCharacterNumber)
 {
-
 	int size = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, src, nCharacterNumber, NULL, 0, NULL, NULL);
 	char* tmp = (char*)malloc((size + 1) * sizeof(char));
 	if (tmp == NULL)
@@ -434,7 +433,6 @@ char* UTF16ToANSI(wchar_t* src, int nCharacterNumber)
 
 wchar_t* ANSIToUTF16(char* src, int nCharacterNumber)
 {
-
 	int size = MultiByteToWideChar(CP_ACP, 0, src, nCharacterNumber, NULL, 0);
 	wchar_t* tmp = (wchar_t*)malloc((size + 1) * sizeof(wchar_t));
 	if (tmp == NULL)
@@ -449,7 +447,6 @@ wchar_t* ANSIToUTF16(char* src, int nCharacterNumber)
 
 wchar_t* UTF8ToUTF16(char* src, int nCharacterNumber)
 {
-
 	int size = MultiByteToWideChar(CP_UTF8, 0, src, nCharacterNumber, NULL, 0);
 	wchar_t* tmp = (wchar_t*)malloc((size + 1) * sizeof(wchar_t));
 	if (tmp == NULL)

@@ -321,8 +321,8 @@ Appendix :
 	w[] and ip[] are compatible with all routines.
 */
 
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 #ifdef REAL_IS_FLOAT
 typedef float REAL;

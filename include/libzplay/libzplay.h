@@ -203,6 +203,12 @@ namespace libZPlay
 
 #define ZPLAY_HANDLE char*
 
+#if defined(_WIN64)
+	#define ZPLAY_PARAM __int64
+#else
+	#define ZPLAY_PARAM int
+#endif
+
 enum TStreamFormat
 {
 	sfUnknown = 0,
@@ -540,7 +546,6 @@ enum TFFTGraphParamID
 
 enum TCallbackMessage
 {
-
 	MsgStopAsync = 1,
 	MsgPlayAsync = 2,
 	MsgEnterLoopAsync = 4,
@@ -562,7 +567,7 @@ enum TCallbackMessage
 	MsgWaveBuffer = 33554432
 };
 
-typedef int(__stdcall* TCallbackFunc)(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2);
+typedef int(__stdcall* TCallbackFunc)(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2);
 
 enum TSettingID
 {

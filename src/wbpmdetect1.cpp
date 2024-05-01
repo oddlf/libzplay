@@ -25,9 +25,9 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <memory.h>
 
 #include "debug.h"
@@ -145,7 +145,6 @@ int WBPMDetect1::Initialize(unsigned int nSampleRate, unsigned int nChannel)
 
 int WBPMDetect1::PutSamples(short* pSamples, unsigned int nSampleNum)
 {
-
 	// create samples array
 
 	unsigned int i;
@@ -232,7 +231,6 @@ int WBPMDetect1::PutSamples(short* pSamples, unsigned int nSampleNum)
 		// mark bpm in history
 		if (bpm >= BPM_DETECT_MIN_BPM && bpm <= BPM_DETECT_MAX_BPM)
 		{
-
 			unsigned int HistoryHit = subband->BPMHistoryHit[bpm] + subband->BPMHistoryHit[bpm - 1] + subband->BPMHistoryHit[bpm + 1];
 			if (HistoryHit)
 			{
@@ -343,7 +341,6 @@ unsigned int WBPMDetect1::GetBPM()
 
 int WBPMDetect1::AllocateInternalMemory()
 {
-
 	c_Amplitudes = (BPM_DETECT1_REAL*)malloc(BPM_DETECT_FFT_POINTS1 / 2 * sizeof(BPM_DETECT1_REAL));
 	c_Samples = (BPM_DETECT1_REAL*)malloc(BPM_DETECT_FFT_POINTS1 * sizeof(BPM_DETECT1_REAL));
 	c_pflWindow = (BPM_DETECT1_REAL*)malloc(BPM_DETECT_FFT_POINTS1 * sizeof(BPM_DETECT1_REAL));
@@ -444,7 +441,6 @@ int WBPMDetect1::FreeInternalMemory()
 
 	if (c_pSubBand)
 	{
-
 		unsigned int i;
 		for (i = 0; i < BPM_NUMBER_OF_SUBBANDS; i++)
 		{

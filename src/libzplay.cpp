@@ -27,6 +27,7 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "wmp3x.h"
@@ -77,7 +78,6 @@ int __stdcall libZPlay::zplay_GetVersion(ZPLAY_HANDLE handle)
 
 char* __stdcall libZPlay::zplay_GetError(ZPLAY_HANDLE handle)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -89,7 +89,6 @@ char* __stdcall libZPlay::zplay_GetError(ZPLAY_HANDLE handle)
 
 wchar_t* __stdcall libZPlay::zplay_GetErrorW(ZPLAY_HANDLE handle)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -343,7 +342,6 @@ int __stdcall libZPlay::zplay_ReverseMode(
 
 int __stdcall libZPlay::zplay_Stop(ZPLAY_HANDLE handle)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -353,7 +351,6 @@ int __stdcall libZPlay::zplay_Stop(ZPLAY_HANDLE handle)
 
 int __stdcall libZPlay::zplay_Pause(ZPLAY_HANDLE handle)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -363,7 +360,6 @@ int __stdcall libZPlay::zplay_Pause(ZPLAY_HANDLE handle)
 
 int __stdcall libZPlay::zplay_Resume(ZPLAY_HANDLE handle)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -376,7 +372,6 @@ void __stdcall libZPlay::zplay_GetPosition(
 	TStreamTime* pTime // pointer to TStreamTime structure
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return;
@@ -390,7 +385,6 @@ int __stdcall libZPlay::zplay_SetMasterVolume(
 	unsigned int nRightVolume // right channel volume
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -404,7 +398,6 @@ int __stdcall libZPlay::zplay_SetPlayerVolume(
 	unsigned int nRightVolume // right channel volume
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -443,7 +436,6 @@ int __stdcall libZPlay::zplay_GetBitrate(
 	int fAverage // get average bitrate of decoded frame  or current bitrate of decoded frame
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -456,7 +448,6 @@ void __stdcall libZPlay::zplay_GetStatus(
 	TStreamStatus* pStatus // pointer to TStreamStatus structure
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return;
@@ -529,7 +520,6 @@ int __stdcall libZPlay::zplay_SetEqualizerPoints(
 	int nNumOfPoints  // number of elements in pnFreqPoint array( min value is 2)
 )
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -663,7 +653,6 @@ int __stdcall libZPlay::zplay_GetEchoParam(
 	TEchoEffect* pEchoEffect, // pointer to array of echo effects
 	int nNumberOfEffects)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;
@@ -772,7 +761,6 @@ int __stdcall libZPlay::zplay_StereoCut(
 	int fOutputCenter,
 	int fBassToSides)
 {
-
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
 		return 0;

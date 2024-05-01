@@ -37,12 +37,14 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <algorithm>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include "weqprocessor.h"
 #include "debug.h"
 
@@ -114,7 +116,6 @@ static REAL izero(REAL x)
 
 WEqProcessor::WEqProcessor()
 {
-
 	lires1 = NULL;
 	lires2 = NULL;
 	rires1 = NULL;
@@ -169,7 +170,6 @@ WEqProcessor::WEqProcessor()
 
 WEqProcessor::~WEqProcessor()
 {
-
 	if (c_pchOutput)
 		free(c_pchOutput);
 
@@ -189,7 +189,7 @@ int WEqProcessor::GetEqBands(int* pnFreqPoint, int nFreqPointNumber)
 		return c_nNumberOfBands - 1;
 
 	int i;
-	int num = min(nFreqPointNumber, c_nNumberOfBands - 1);
+	int num = std::min(nFreqPointNumber, (int)c_nNumberOfBands - 1);
 	for (i = 0; i < num; i++)
 		pnFreqPoint[i] = (int)c_eqParam[i].nFreqPoint;
 
@@ -201,7 +201,7 @@ int WEqProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, u
 	// check input parameters
 	if (nSampleRate == 0)
 	{
-		sprintf(c_pchErrorMessageStr, "WEqProcessor::Configure->Sample rate can't be %u.", nSampleRate);
+		sprintf_s(c_pchErrorMessageStr, "WEqProcessor::Configure->Sample rate can't be %u.", nSampleRate);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -209,7 +209,7 @@ int WEqProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, u
 
 	if (nChannel != 1 && nChannel != 2)
 	{
-		sprintf(c_pchErrorMessageStr, "WEqProcessor::Configure->Number of channels can't be %u.", nChannel);
+		sprintf_s(c_pchErrorMessageStr, "WEqProcessor::Configure->Number of channels can't be %u.", nChannel);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -217,7 +217,7 @@ int WEqProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, u
 
 	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
-		sprintf(c_pchErrorMessageStr, "WEqProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
+		sprintf_s(c_pchErrorMessageStr, "WEqProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
@@ -257,7 +257,6 @@ int WEqProcessor::Configure(unsigned int fBroadcast, unsigned int nSampleRate, u
 
 int WEqProcessor::SetParameters(int nPreAmpGain, int* pnBandGain, int nNumberOfBands)
 {
-
 	ASSERT_W(c_eqParam);
 
 	// check input parameters
@@ -269,7 +268,7 @@ int WEqProcessor::SetParameters(int nPreAmpGain, int* pnBandGain, int nNumberOfB
 
 	if (nNumberOfBands != c_nNumberOfBands)
 	{
-		sprintf(c_pchErrorMessageStr, "WEqProcessor::SetParameters->Number of bands must be %u.", c_nNumberOfBands);
+		sprintf_s(c_pchErrorMessageStr, "WEqProcessor::SetParameters->Number of bands must be %u.", c_nNumberOfBands);
 		return 0;
 	}
 
@@ -292,7 +291,7 @@ int WEqProcessor::GetParameters(int* pnPreAmpGain, int* pnBandGain, int nNumberO
 		return c_nNumberOfBands;
 
 	int i;
-	int num = min(nNumberOfBands, c_nNumberOfBands);
+	int num = std::min(nNumberOfBands, (int)c_nNumberOfBands);
 	for (i = 0; i < num; i++)
 		pnBandGain[i] = c_eqParam[i].nGain;
 
@@ -353,7 +352,6 @@ int WEqProcessor::Enable(int fBroadcast, int fEnable)
 
 int WEqProcessor::CreateEqBands(int* pnFreqPoint, int nNumOfPoints)
 {
-
 	if (pnFreqPoint == 0 || nNumOfPoints == 0) // reset parameters to default values
 	{
 		_CreateDefaultBands(this);
@@ -407,7 +405,6 @@ int WEqProcessor::Flush(int fBroadcast)
 
 	if (c_nCurrentEqLatency < c_nMaxLatencySamples)
 	{
-
 		// allocate flash buffer
 		char* buf = (char*)malloc(c_nMaxLatencySamples * c_nBlockAlign);
 		if (buf == 0)
@@ -541,12 +538,11 @@ static REAL win(REAL n, int N)
 
 static REAL sinc(REAL x)
 {
-	return x == 0 ? 1 : sin(x) / x;
+	return x == 0 ? 1 : (REAL)(sin(x) / x);
 }
 
 static REAL hn_lpf(int n, REAL f, REAL fs)
 {
-
 	REAL t = 1 / fs;
 	REAL omega = 2 * PI * f;
 	return 2 * f * t * sinc(n * omega * t);
@@ -554,7 +550,7 @@ static REAL hn_lpf(int n, REAL f, REAL fs)
 
 static REAL hn_imp(int n)
 {
-	return n == 0 ? 1.0 : 0.0;
+	return n == 0 ? 1.0f : 0.0f;
 }
 
 int WEqProcessor::_CreateDefaultBands(WEqProcessor* instance)
@@ -715,7 +711,6 @@ void WEqProcessor::_FreeInternalMemory(WEqProcessor* instance)
 
 void WEqProcessor::_MakeEqTables(WEqProcessor* instance)
 {
-
 	int i;
 	int j;
 	int cires = instance->cur_ires;
@@ -727,13 +722,13 @@ void WEqProcessor::_MakeEqTables(WEqProcessor* instance)
 	REAL fs = (REAL)instance->c_nSampleRate;
 	REAL fs2 = fs / 2.0;
 
-	for (i = 0; i < instance->c_nNumberOfBands; i++)
+	for (i = 0; i < (int)instance->c_nNumberOfBands; i++)
 		instance->c_eqParam[i].gain = pow(10.0, (double)((double)instance->c_nPreampGain / 1000.0 + (double)instance->c_eqParam[i].nGain / 1000.0) / 20.0);
 
 	instance->c_eqParam[instance->c_nNumberOfBands - 1].upper = instance->c_nSampleRate;
 
 	int fs2index;
-	for (fs2index = 0; fs2index < instance->c_nNumberOfBands; fs2index++)
+	for (fs2index = 0; fs2index < (int)instance->c_nNumberOfBands; fs2index++)
 	{
 		if (instance->c_eqParam[fs2index].upper >= fs2)
 			break;
@@ -743,7 +738,6 @@ void WEqProcessor::_MakeEqTables(WEqProcessor* instance)
 	int n;
 	for (i = 0; i < WinLen; i++)
 	{
-
 		n = i - WinLen / 2;
 		sum = 0;
 		lhn1 = 0;
@@ -933,7 +927,6 @@ int WEqProcessor::_ModifySamples(WEqProcessor* instance, char* input_buf, char* 
 
 			if (instance->weq_enable)
 			{
-
 				rdft(TabSize, 1, instance->fsamples, instance->c_bit_reversal, instance->c_cos_sin_table);
 
 				instance->fsamples[0] = ires[0] * instance->fsamples[0];
@@ -971,7 +964,6 @@ int WEqProcessor::_ModifySamples(WEqProcessor* instance, char* input_buf, char* 
 
 	switch (bps)
 	{
-
 	case 8:
 		for (i = 0; i < nsamples * nch; i++)
 		{
@@ -1132,7 +1124,6 @@ int WEqProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 
 	if (c_fEnable)
 	{
-
 		// check if we need to reallocate output buffer
 		if (c_nOutputBufferSize < nDataSize)
 		{

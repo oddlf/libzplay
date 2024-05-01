@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "wpcmdecoder.h"
 
@@ -69,7 +70,6 @@ wchar_t* g_pcm_error_strW[DECODER_UNKNOWN_ERROR + 1] = {
 	L"PCMDecoder: Function not supported in this decoder.",
 
 	L"PCMDecoder: Unknown error."
-
 };
 
 // number of samples to output
@@ -177,7 +177,6 @@ DECODER_ERROR_MESSAGE* WPCMDecoder::GetError()
 
 int WPCMDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 {
-
 	c_pchStart = c_pchStreamStart;
 	c_nSize = c_nStreamSize;
 	c_pchEnd = c_pchStart + c_nSize - 1;
@@ -213,7 +212,6 @@ int WPCMDecoder::_OpenFile(unsigned int fSkipExtraChecking)
 
 int WPCMDecoder::Close()
 {
-
 	if (c_fReady == 0)
 		return 1;
 
@@ -362,7 +360,6 @@ int WPCMDecoder::GetData(DECODER_DATA* pDecoderData)
 			// check if we have enough data
 			if (nSamplesNeed > nSamplesHave)
 			{
-
 				if (c_fEndOfStream)
 					nSamplesNeed = nSamplesHave;
 				else
@@ -530,7 +527,6 @@ int WPCMDecoder::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2
 
 	if (param1 == 0)
 	{
-
 		c_pchStreamStart = ptr;
 		c_nStreamSize = size;
 		c_pchStreamEnd = c_pchStreamStart + c_nStreamSize - 1;

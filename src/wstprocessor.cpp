@@ -30,18 +30,18 @@
  * ============================================================================
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include "wstprocessor.h"
 #include "debug.h"
 
 WSoundTouchProcessor::WSoundTouchProcessor()
 {
-
 	st.setSetting(SETTING_USE_QUICKSEEK, 0);
 	st.setSetting(SETTING_USE_AA_FILTER, 1);
 	st.setSetting(SETTING_AA_FILTER_LENGTH, 32);
@@ -65,7 +65,7 @@ int WSoundTouchProcessor::Configure(unsigned int fBroadcast, unsigned int nSampl
 	// check input parameters
 	if (nSampleRate == 0)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Sample rate can't be %u.", nSampleRate);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Sample rate can't be %u.", nSampleRate);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -73,7 +73,7 @@ int WSoundTouchProcessor::Configure(unsigned int fBroadcast, unsigned int nSampl
 
 	if (nChannel != 1 && nChannel != 2)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Nuber of channels can't be %u.", nChannel);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Nuber of channels can't be %u.", nChannel);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 		return 0;
@@ -81,7 +81,7 @@ int WSoundTouchProcessor::Configure(unsigned int fBroadcast, unsigned int nSampl
 
 	if (nBitPerSample != 8 && nBitPerSample != 16 && nBitPerSample != 24)
 	{
-		sprintf(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
+		sprintf_s(c_pchErrorMessageStr, "WSoundTouchProcessor::Configure->Bit per sample can't be %u.", nBitPerSample);
 		if (c_pchReturnError)
 			strcpy(c_pchReturnError, c_pchErrorMessageStr);
 	}
@@ -116,7 +116,6 @@ int WSoundTouchProcessor::Configure(unsigned int fBroadcast, unsigned int nSampl
 
 int WSoundTouchProcessor::Enable(int fBroadcast, int fEnable)
 {
-
 	EnterCriticalSection(&c_CriticalSection);
 	if (fEnable)
 		c_fEnable = 1;
@@ -263,7 +262,6 @@ int WSoundTouchProcessor::Flush(int fBroadcast)
 	unsigned int nHaveSamples = st.numSamples();
 	if (nHaveSamples)
 	{
-
 		c_LastData.pSamples = st.ptrBegin();
 
 		if (nHaveSamples > nLatencyInSamples)
@@ -376,7 +374,6 @@ int WSoundTouchProcessor::PushSamples(PROCESSOR_AUDIO_DATA* data)
 
 	if (c_fEnable)
 	{
-
 		st.putSamples((SAMPLETYPE*)data->pSamples, data->nNumberOfSamples);
 
 		unsigned int nHaveSamples = st.numSamples();

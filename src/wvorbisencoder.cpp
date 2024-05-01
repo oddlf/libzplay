@@ -24,11 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "wtools.h"
 #include "wvorbisencoder.h"
@@ -53,7 +53,6 @@ wchar_t* g_vorbis_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WVorbisEncoder::Encoder initialization error.",
 
 	L"WVorbisEncoder::Unknown error."
-
 };
 
 void WVorbisEncoder::Release()
@@ -94,7 +93,6 @@ int WVorbisEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfC
 	TEncoderSeekCallback seek_callback,
 	TEncoderTellCallback tell_callback)
 {
-
 	c_nSampleRate = nSampleRate;
 	c_nNumberOfChannels = nNumberOfChannels;
 	c_nBitBerSample = nBitPerSample;
@@ -201,14 +199,12 @@ int WVorbisEncoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 	   block for encoding now */
 	while (vorbis_analysis_blockout(&vd, &vb) == 1)
 	{
-
 		/* analysis, assume we want to use bitrate management */
 		vorbis_analysis(&vb, NULL);
 		vorbis_bitrate_addblock(&vb);
 
 		while (vorbis_bitrate_flushpacket(&vd, &op))
 		{
-
 			/* weld the packet into the bitstream */
 			ogg_stream_packetin(&os, &op);
 

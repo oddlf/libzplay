@@ -24,11 +24,11 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
 #include "debug.h"
 #include "wtools.h"
 #include "WFLACEncoder.h"
@@ -52,7 +52,6 @@ wchar_t* g_flac_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WFLACEncoder::Memory allocation fail.",
 
 	L"WFLACEncoder::Unknown error."
-
 };
 
 void WFLACEncoder::Release()
@@ -97,7 +96,6 @@ int WFLACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 	TEncoderSeekCallback seek_callback,
 	TEncoderTellCallback tell_callback)
 {
-
 	c_nSampleRate = nSampleRate;
 	c_nNumberOfChannels = nNumberOfChannels;
 	c_nBitBerSample = nBitPerSample;
@@ -204,7 +202,6 @@ int WFLACEncoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 
 	switch (c_nBitBerSample)
 	{
-
 	case 16: {
 
 		short* samples = (short*)pSamples;

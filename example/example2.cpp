@@ -6,10 +6,12 @@
  *
  */
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
 #include <dos.h>
 #include <conio.h>
@@ -21,7 +23,7 @@
 using namespace libZPlay;
 
 // callback function prototype, need this to use callback message to push more data into managed stream
-int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2);
+int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2);
 
 int nRate = 100;
 int nPitch = 100;
@@ -45,7 +47,6 @@ char buf[BUFFER_SIZE];
 
 int main(int argc, char** argv)
 {
-
 	// clear screen
 	system("CLS");
 
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
 	if (player == 0)
 	{
 		printf("Error: Can't create class instance !\nPress key to exit.\n");
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
 	if (ver < 190)
 	{
 		printf("Error: Need library version 1.00 and above !\nPress key to exit.\r\n");
-		getch();
+		_getch();
 		player->Release();
 		return 0;
 	}
@@ -90,17 +91,18 @@ int main(int argc, char** argv)
 		if (nFormat == sfUnknown)
 		{
 			printf("Error: Unknown file format.\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			player->Release();
 			return 0;
 		}
 
 		// open disk file, I will use this to load file into memory and then use OpenStream to play this memory data
-		in = fopen(argv[1], "rb");
-		if (in == 0)
+		FILE* in = NULL;
+		errno_t err = fopen_s(&in, argv[1], "rb");
+		if (in == NULL)
 		{
 			printf("Error: Can't open file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			player->Release();
 			return 0;
 		}
@@ -113,7 +115,7 @@ int main(int argc, char** argv)
 		if (nRead == 0)
 		{
 			printf("Error: Can't read file.\r\nPress key to exit.\r\n");
-			getch();
+			_getch();
 			player->Release();
 			fclose(in);
 			return 0;
@@ -128,7 +130,7 @@ int main(int argc, char** argv)
 		if (player->OpenStream(1, 1, buf, nRead, nFormat) == 0)
 		{
 			printf("Error: %s\nPress key to exit.\r\n", player->GetError());
-			getch();
+			_getch();
 			player->Release();
 			fclose(in);
 			return 0;
@@ -192,7 +194,7 @@ int main(int argc, char** argv)
 			end = argv[0];
 
 		printf("Usage: %s filename\r\n\r\nPress key to exit\r\n", end);
-		getch();
+		_getch();
 		return 0;
 	}
 
@@ -225,7 +227,6 @@ int main(int argc, char** argv)
 	int running = 1;
 	while (running)
 	{
-
 		// get current status
 		player->GetStatus(&status);
 
@@ -258,13 +259,12 @@ int main(int argc, char** argv)
 			status.nLoop,
 			fMixChannels);
 
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 
 			switch (a)
 			{
-
 			case '1':
 				player->SetFFTGraphParam(gpGraphType, gtAreaLeftOnTop);
 				break;
@@ -472,7 +472,7 @@ int main(int argc, char** argv)
 	return 1;
 }
 
-int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2)
+int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2)
 {
 	ZPlay* myinstance = (ZPlay*)instance;
 

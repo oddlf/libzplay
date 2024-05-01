@@ -4,8 +4,10 @@
  * Use dynamic stream.
  */
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <conio.h>
 
 #include "libzplay/libzplay.h"
@@ -16,8 +18,8 @@ using namespace libZPlay;
 int __stdcall myCallbackFunc(void* instance,
 	void* user_data,
 	TCallbackMessage message,
-	unsigned int param1,
-	unsigned int param2);
+	ZPLAY_PARAM param1,
+	ZPLAY_PARAM param2);
 
 unsigned int nOutputDataSize = 0;
 
@@ -37,7 +39,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	FILE* in = fopen("test.mp3", "rb"); // open input file
+	FILE* in = NULL;
+	errno_t err = fopen_s(&in, "test.mp3", "rb"); // open input file
 	if (in == NULL)
 	{
 		printf("Can't open test.mp3.");
@@ -72,9 +75,9 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// check key press
-		if (kbhit())
+		if (_kbhit())
 		{
-			int a = getch();
+			int a = _getch();
 			if (a == 'q' || a == 'Q')
 				break; // end program if Q key is pressed
 		}
@@ -101,7 +104,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-int __stdcall myCallbackFunc(void* instance, void* user_data, TCallbackMessage message, unsigned int param1, unsigned int param2)
+int __stdcall myCallbackFunc(void* instance, void* user_data, TCallbackMessage message, ZPLAY_PARAM param1, ZPLAY_PARAM param2)
 {
 	ZPlay* myplayer = (ZPlay*)instance;
 

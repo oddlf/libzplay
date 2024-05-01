@@ -25,8 +25,8 @@
  *
  */
 
-#include <malloc.h>
-#include <stdlib.h>
+#include <algorithm>
+#include <cstdlib>
 
 #include "wbmpfont.h"
 
@@ -221,11 +221,10 @@ int WBmpFont::GetTextWidth(char* pText)
 int WBmpFont::_Draw(WBmpFont* font, HDC hdc, RECT* rcDest,
 	BOOL fStretch, BOOL fTransparent, COLORREF crTransparent)
 {
-
 	if (font->_dwTextLen == 0)
 		return 0;
 
-	int height = min((int)rcDest->bottom, font->_dwHeight);
+	int height = std::min((int)rcDest->bottom, font->_dwHeight);
 	HDC hdcCharFont = CreateCompatibleDC(hdc);
 	HBITMAP hbOldCharFont = (HBITMAP)SelectObject(hdcCharFont, font->_hbFont);
 	HDC hdcText = CreateCompatibleDC(hdc);
@@ -303,7 +302,6 @@ int WBmpFont::_Draw(WBmpFont* font, HDC hdc, RECT* rcDest,
 
 	if (!fTransparent)
 	{
-
 		BitBlt(hdc, rcDest->left, rcDest->top,
 			bitmap_width, height, hdcText,
 			0, 0,

@@ -24,11 +24,12 @@
  *
  */
 
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 #include "debug.h"
 #include "waacencoder.h"
 
@@ -51,7 +52,6 @@ wchar_t* g_aac_encoder_error_strW[ENCODER_UNKNOWN_ERROR + 1] = {
 	L"WAACEncoder::Memory allocation fail.",
 
 	L"WAACEncoder::Unknown error."
-
 };
 
 void WAACEncoder::Release()
@@ -94,7 +94,6 @@ int WAACEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChan
 	TEncoderSeekCallback seek_callback,
 	TEncoderTellCallback tell_callback)
 {
-
 	c_nSamplerate = nSampleRate;
 	c_nNumberOfChannels = nNumberOfChannels;
 	c_nBitPerSample = nBitPerSample;
