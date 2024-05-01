@@ -10,7 +10,7 @@ option(LIBZPLAY_PACK_WITH_UPX "Pack programs with UPX"              FALSE)
 option(LIBZPLAY_BUILD_EXAMPLES "Build example programs"             TRUE)
 option(LIBZPLAY_INSTALL "Install library"                           FALSE)
 
-option(LIBZPLAY_DSP_SOUNDTOUCH "Soundtouch audio processor support" FALSE)
+option(LIBZPLAY_DSP_SOUNDTOUCH "Soundtouch audio processor support" TRUE)
 
 option(LIBZPLAY_INPUT_AAC "AAC input support (faad2)"               FALSE)
 option(LIBZPLAY_INPUT_AC3 "AC3 input support (liba52)"              FALSE)
@@ -239,7 +239,10 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE JPEG::JPEG PNG::PNG)
 
 if(LIBZPLAY_DSP_SOUNDTOUCH)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_DSP_SOUNDTOUCH)
+    if(${SoundTouch_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE SoundTouch::SoundTouch)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_DSP_SOUNDTOUCH)
+    endif()
 endif()
 
 if(LIBZPLAY_INPUT_AAC)
