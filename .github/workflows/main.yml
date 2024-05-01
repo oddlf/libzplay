@@ -25,12 +25,16 @@ jobs:
         include:
           - preset: windows-x64-release
             triplet: x64-windows
+            soundtouch: TRUE
           - preset: windows-x64-release-static
             triplet: x64-windows-static
+            soundtouch: FALSE
           - preset: windows-x86-release
             triplet: x86-windows
+            soundtouch: TRUE
           - preset: windows-x86-release-static
             triplet: x86-windows-static
+            soundtouch: FALSE
 
     steps:
     - name: Checkout
@@ -59,7 +63,7 @@ jobs:
 
     - name: Build
       run: |
-        cmake --preset ${{ matrix.preset }} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake --preset ${{ matrix.preset }} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DLIBZPLAY_DSP_SOUNDTOUCH:BOOL=${{ matrix.soundtouch }}
         cmake --build --preset ${{ matrix.preset }}
 
     - name: Create artifact
