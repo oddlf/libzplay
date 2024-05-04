@@ -3578,17 +3578,17 @@ int WSpectrum::StretchBgBitmap(int fStretch)
 	return 1;
 }
 
-int WSpectrum::SetBgBitmap(HBITMAP hbm)
+ZPLAY_PARAM WSpectrum::SetBgBitmap(HBITMAP hbm)
 {
-	if ((int)hbm == -1)
+	if ((ZPLAY_PARAM)hbm == -1)
 	{
 		if (c_bgExternBitmap)
-			return (int)c_bgExternBitmap;
+			return (ZPLAY_PARAM)c_bgExternBitmap;
 
-		return (int)c_bgBitmap;
+		return (ZPLAY_PARAM)c_bgBitmap;
 	}
 
-	if ((int)hbm == 0)
+	if ((ZPLAY_PARAM)hbm == 0)
 	{
 		if (c_bgExternBitmap)
 			DeleteObject(c_bgExternBitmap);

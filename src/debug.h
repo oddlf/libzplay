@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#if _DEBUG
+#if !NDEBUG
 	#define ASSERT_W(f) assert(f)
 	#define PRINT_INT(a) printf("%i\n", a)
 	#define PRINT_UINT(a) printf("%u\n", a)

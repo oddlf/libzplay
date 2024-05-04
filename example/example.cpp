@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 	player->GetStreamInfo(&pInfo);
 
 	// display stream info
-	char* sVbr = "CBR";
+	const char* sVbr = "CBR";
 	if (pInfo.VBR)
 		sVbr = "VBR";
 
@@ -242,7 +242,7 @@ int main(int argc, char** argv)
 		// get current status
 		player->GetStatus(&status);
 
-		char* st = 0;
+		const char* st = 0;
 		if (status.fPlay)
 			st = "Play ";
 		else if (status.fPause)
@@ -523,6 +523,9 @@ int __stdcall CallbackFunc(void* instance, void* user_data, TCallbackMessage mes
 		fFirst = 1;
 	}
 	break;
+
+	default:
+		break;
 	}
 
 	return 0;

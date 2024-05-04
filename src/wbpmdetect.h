@@ -37,6 +37,8 @@
 class WBPMDetect
 {
 public:
+	virtual ~WBPMDetect() = default;
+
 	// ==============================================================================================
 	// initialize class, call this before you put samples into class
 	virtual int Initialize(unsigned int nSampleRate, unsigned int nChannel) = 0;

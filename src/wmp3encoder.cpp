@@ -90,7 +90,7 @@ WMp3Encoder::~WMp3Encoder()
 }
 
 int WMp3Encoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChannels, unsigned int nBitPerSample,
-	unsigned int custom_value,
+	ZPLAY_PARAM custom_value,
 	TEncoderReadCallback read_callback,
 	TEncoderWriteCallback write_callback,
 	TEncoderSeekCallback seek_callback,
@@ -196,7 +196,7 @@ int WMp3Encoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 	{
 		nOutputBytes = lame_encode_flush(gfp, c_pWorkingBuffer, c_nSamplesBufferSizeInBytes);
 		if (nOutputBytes > 0)
-			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // 	Chunk ID
+			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // Chunk ID
 
 		return 1;
 	}
@@ -221,7 +221,7 @@ int WMp3Encoder::EncodeSamples(void* pSamples, unsigned int nNumberOfSamples)
 		nHaveSamples -= nFill;
 
 		if (nOutputBytes > 0)
-			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // 	Chunk ID
+			c_write_callback(c_pWorkingBuffer, nOutputBytes, c_user_data); // Chunk ID
 	}
 
 	return 1;

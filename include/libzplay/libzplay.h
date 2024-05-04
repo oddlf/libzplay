@@ -590,6 +590,7 @@ enum TSettingID
 class ZPlay
 {
 public:
+	virtual ~ZPlay() = default;
 	virtual int __stdcall SetSettings(TSettingID nSettingID, int nValue) = 0;
 	virtual int __stdcall GetSettings(TSettingID nSettingID) = 0;
 	virtual int __stdcall GetVersion() = 0;
@@ -660,8 +661,8 @@ public:
 	virtual int __stdcall GetFFTData(int nFFTPoints, TFFTWindow nFFTWindow, int* pnHarmonicNumber, int* pnHarmonicFreq, int* pnLeftAmplitude, int* pnRightAmplitude, int* pnLeftPhase, int* pnRightPhase) = 0;
 	virtual int __stdcall DrawFFTGraphOnHDC(void* hdc, int nX, int nY, int nWidth, int nHeight) = 0;
 	virtual int __stdcall DrawFFTGraphOnHWND(void* hwnd, int nX, int nY, int nWidth, int nHeight) = 0;
-	virtual int __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue) = 0;
-	virtual int __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID) = 0;
+	virtual ZPLAY_PARAM __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, ZPLAY_PARAM nValue) = 0;
+	virtual ZPLAY_PARAM __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID) = 0;
 
 	// new inferface in ver. 2.0  - 23.04.2010.
 	virtual int __stdcall LoadID3Ex(TID3InfoEx* pId3Info, unsigned int fDecodeEmbededPicture) = 0;
@@ -780,8 +781,8 @@ W_DECLSPEC unsigned int __stdcall zplay_GetTempo(ZPLAY_HANDLE handle);
 W_DECLSPEC int __stdcall zplay_StereoCut(ZPLAY_HANDLE handle, int fEnable, int fOutputCenter, int fBassToSides);
 W_DECLSPEC int __stdcall zplay_DrawFFTGraphOnHDC(ZPLAY_HANDLE handle, void* hdc, int nX, int nY, int nWidth, int nHeight);
 W_DECLSPEC int __stdcall zplay_DrawFFTGraphOnHWND(ZPLAY_HANDLE handle, void* hwnd, int nX, int nY, int nWidth, int nHeight);
-W_DECLSPEC int __stdcall zplay_SetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID, int nParamValue);
-W_DECLSPEC int __stdcall zplay_GetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID);
+W_DECLSPEC ZPLAY_PARAM __stdcall zplay_SetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID, ZPLAY_PARAM nParamValue);
+W_DECLSPEC ZPLAY_PARAM __stdcall zplay_GetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID);
 W_DECLSPEC int __stdcall zplay_DetectBPM(ZPLAY_HANDLE handle, TBMPDetectionMethod nMethod);
 W_DECLSPEC int __stdcall zplay_DetectFileBPM(ZPLAY_HANDLE handle, const char* pchFileName, TStreamFormat nFormat, TBMPDetectionMethod nMethod);
 W_DECLSPEC int __stdcall zplay_DetectFileBPMW(ZPLAY_HANDLE handle, const wchar_t* pchFileName, TStreamFormat nFormat, TBMPDetectionMethod nMethod);

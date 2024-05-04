@@ -131,7 +131,7 @@ WWaveIn::~WWaveIn()
 	DeleteCriticalSection(&cs);
 }
 
-int WWaveIn::Initialize(int param1, int param2, int param3, int param4)
+int WWaveIn::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	WAVEIN_INIT_DATA* data = (WAVEIN_INIT_DATA*)param1;
 
@@ -374,7 +374,7 @@ int WWaveIn::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2)
 		return 0;
 	}
 
-	if (SelectRecordingLine((unsigned int)c_hWaweIn, c_line_control_id, c_user_mixer_line, c_user_mixer_volume, c_user_mixer_volume) == 0)
+	if (SelectRecordingLine((ZPLAY_PARAM)c_hWaweIn, c_line_control_id, c_user_mixer_line, c_user_mixer_volume, c_user_mixer_volume) == 0)
 	{
 		// mixer is not working on Windows Vista and Windows 7, so let go. User can manualy select input.
 		err(DECODER_WAVE_INPUT_OPEN_ERROR);
@@ -386,12 +386,12 @@ int WWaveIn::OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2)
 
 	c_wavehdr[0].lpData = c_buffer1;
 	c_wavehdr[0].dwBufferLength = c_nBytesForOneBuffer;
-	c_wavehdr[0].dwUser = (DWORD)this;
+	c_wavehdr[0].dwUser = (DWORD_PTR)this;
 	c_wavehdr[0].dwFlags = 0;
 
 	c_wavehdr[1].lpData = c_buffer2;
 	c_wavehdr[1].dwBufferLength = c_nBytesForOneBuffer;
-	c_wavehdr[1].dwUser = (DWORD)this;
+	c_wavehdr[1].dwUser = (DWORD_PTR)this;
 	c_wavehdr[1].dwFlags = 0;
 
 	if (waveInPrepareHeader(c_hWaweIn, &c_wavehdr[0], sizeof(WAVEHDR)) != MMSYSERR_NOERROR)
@@ -567,7 +567,7 @@ int SelectRecordingLine(unsigned int nMixerId, unsigned int nComponentID, char* 
 	if (mixerOpen(&hMixer, (unsigned int)nMixerId, 0, 0, MIXER_OBJECTF_HWAVEIN) != MMSYSERR_NOERROR)
 		return 0;
 
-	if (mixerGetDevCaps((unsigned int)hMixer, &mxcaps, sizeof(MIXERCAPS)) != MMSYSERR_NOERROR)
+	if (mixerGetDevCaps((UINT_PTR)hMixer, &mxcaps, sizeof(MIXERCAPS)) != MMSYSERR_NOERROR)
 	{
 		::mixerClose(hMixer);
 		return 0;

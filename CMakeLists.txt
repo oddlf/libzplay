@@ -236,6 +236,11 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${LIBZPLAY_MINIAUDIO_PATH} ${LIBZPLAY_SRC}
 )
+
+if(WIN32 AND MINGW)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE JPEG::JPEG PNG::PNG)
 
 if(LIBZPLAY_DSP_SOUNDTOUCH)

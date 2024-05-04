@@ -638,7 +638,6 @@ int __stdcall libZPlay::zplay_SetEchoParam(
 	ZPLAY_HANDLE handle,
 	TEchoEffect* pEchoEffect, // pointer to array of echo effects
 	int nNumberOfEffects	  // number of effects in pEchoEffect array
-
 )
 {
 	WMp3x* instance = (WMp3x*)handle;
@@ -800,12 +799,10 @@ int __stdcall libZPlay::zplay_DrawFFTGraphOnHWND(
 	return instance->DrawFFTGraphOnHWND(hwnd, nX, nY, nWidth, nHeight);
 }
 
-int __stdcall libZPlay::zplay_SetFFTGraphParam(
+ZPLAY_PARAM __stdcall libZPlay::zplay_SetFFTGraphParam(
 	ZPLAY_HANDLE handle,
 	TFFTGraphParamID nParamID,
-	int nParamValue
-
-)
+	ZPLAY_PARAM nParamValue)
 {
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)
@@ -814,11 +811,9 @@ int __stdcall libZPlay::zplay_SetFFTGraphParam(
 	return instance->SetFFTGraphParam(nParamID, nParamValue);
 }
 
-int __stdcall libZPlay::zplay_GetFFTGraphParam(
+ZPLAY_PARAM __stdcall libZPlay::zplay_GetFFTGraphParam(
 	ZPLAY_HANDLE handle,
-	TFFTGraphParamID nParamID
-
-)
+	TFFTGraphParamID nParamID)
 {
 	WMp3x* instance = (WMp3x*)handle;
 	if (instance == 0)

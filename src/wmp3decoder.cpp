@@ -357,7 +357,7 @@ WMp3Decoder::~WMp3Decoder()
 	Uninitialize();
 }
 
-int WMp3Decoder::Initialize(int param1, int param2, int param3, int param4)
+int WMp3Decoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	// INPUT_MP3_FRAME_NUMBER * 1152 samples
 	c_pchBuffer = (int*)malloc(INPUT_MP3_FRAME_NUMBER * 1152 * 4); // always use 16 bit stereo

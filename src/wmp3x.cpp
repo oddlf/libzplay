@@ -1360,7 +1360,7 @@ void __stdcall WMp3x::GetVUData(unsigned int* pnLeftChannel, unsigned int* pnRig
 		nHave = (int)(c_nBytesForOneBuffer - nOffset);
 		nNum = 0;
 
-		for (j; j < nNeed; j++)
+		for (; j < nNeed; j++)
 		{
 			if (nHave < 4) // go to next buffer
 			{
@@ -1379,7 +1379,7 @@ void __stdcall WMp3x::GetVUData(unsigned int* pnLeftChannel, unsigned int* pnRig
 	}
 
 	// if we don't have enough data in wave buffers, fill rest with 0
-	for (j; j < nNeed / 2; j++)
+	for (; j < nNeed / 2; j++)
 	{
 		c_pchVUDataBufferLeft[j] = 0;
 		c_pchVUDataBufferRight[j] = 0;
@@ -3021,7 +3021,7 @@ int WMp3x::_SetFormat(TStreamFormat nFormat)
 		data.sMixerInputLineName = c_user_mixer_line;
 		data.nWaveBufferSize = c_nWaveInBufferSize;
 
-		if (c_decoder->Initialize((int)&data, 0, 0, 0) == 0)
+		if (c_decoder->Initialize((ZPLAY_PARAM)&data, 0, 0, 0) == 0)
 		{
 			err(c_decoder->GetError());
 			c_decoder->Release();
@@ -3180,7 +3180,7 @@ int WINAPI WMp3x::_ThreadFuncPCM(void* lpdwParam)
 
 		// initialize encoder
 		if (instance->c_encoder->Initialize(instance->c_isInfo->nSampleRate, instance->c_isInfo->nChannel,
-				instance->c_isInfo->nBitPerSample, (unsigned int)hFile,
+				instance->c_isInfo->nBitPerSample, (ZPLAY_PARAM)hFile,
 				read_callback, write_callback, seek_callback, tell_callback) == 0)
 		{
 			instance->err(instance->c_encoder->GetError());
@@ -4447,7 +4447,7 @@ int WMp3x::_PlayingLoop(WMp3x* instance, unsigned int fFlush)
 		if (instance->callback_messages & MsgWaveBuffer)
 		{
 			// send callback message and get return value
-			int return_value = send_callback_message(instance, MsgWaveBuffer, (unsigned int)instance->c_pchCurrentWaveBuffer, instance->c_nHaveBytesInWaveBuffer);
+			int return_value = send_callback_message(instance, MsgWaveBuffer, (ZPLAY_PARAM)instance->c_pchCurrentWaveBuffer, instance->c_nHaveBytesInWaveBuffer);
 			// check return value
 			if (return_value == 2)
 			{
@@ -4969,7 +4969,7 @@ int __stdcall WMp3x::DrawFFTGraphOnHDC(void* hdc, int nX, int nY, int nWidth, in
 	return 1;
 }
 
-int __stdcall WMp3x::SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue)
+ZPLAY_PARAM __stdcall WMp3x::SetFFTGraphParam(TFFTGraphParamID nParamID, ZPLAY_PARAM nValue)
 {
 	err(WMP3X_NO_ERROR);
 
@@ -5127,7 +5127,7 @@ int __stdcall WMp3x::SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue)
 	return 1;
 }
 
-int __stdcall WMp3x::GetFFTGraphParam(TFFTGraphParamID nParamID)
+ZPLAY_PARAM __stdcall WMp3x::GetFFTGraphParam(TFFTGraphParamID nParamID)
 {
 	err(WMP3X_NO_ERROR);
 
@@ -5946,7 +5946,7 @@ my_output_message(j_common_ptr cinfo)
 	/* Create the message */
 	(*cinfo->err->format_message)(cinfo, buffer);
 
-#ifdef _DEBUG
+#if !NDEBUG
 	/* Send it to stderr, adding a newline */
 	fprintf(stderr, "%s\n", buffer);
 #endif

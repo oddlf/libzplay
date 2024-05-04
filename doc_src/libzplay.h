@@ -677,10 +677,10 @@ virtual int __stdcall DrawFFTGraphOnHDC(void* hdc, int nX, int nY, int nWidth, i
 virtual int __stdcall DrawFFTGraphOnHWND(void* hwnd, int nX, int nY, int nWidth, int nHeight) = 0;
 
 /// <INCLUDE .\\Cpp\\zplay\\SetFFTGraphParam.txt>
-virtual int __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue) = 0;
+virtual ZPLAY_PARAM __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, ZPLAY_PARAM nValue) = 0;
 
 /// <INCLUDE .\\Cpp\\zplay\\GetFFTGraphParam.txt>
-virtual int __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID) = 0;
+virtual ZPLAY_PARAM __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID) = 0;
 
 
 
@@ -1042,11 +1042,11 @@ __declspec (dllimport) int __stdcall zplay_DrawFFTGraphOnHWND(ZPLAY_HANDLE handl
 
 /// <param name="handle">ZPLAY handle. Get this handle with <see cref="zplay_CreateZPlay"/>.</param>
 /// <INCLUDE .\\Cpp\\zplay\\SetFFTGraphParam.txt>
-__declspec (dllimport) int __stdcall zplay_SetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID, int nParamValue);
+__declspec (dllimport) ZPLAY_PARAM __stdcall zplay_SetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID, ZPLAY_PARAM nParamValue);
 
 /// <param name="handle">ZPLAY handle. Get this handle with <see cref="zplay_CreateZPlay"/>.</param>
 /// <INCLUDE .\\Cpp\\zplay\\GetFFTGraphParam.txt>
-__declspec (dllimport) int __stdcall zplay_GetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID);
+__declspec (dllimport) ZPLAY_PARAM __stdcall zplay_GetFFTGraphParam(ZPLAY_HANDLE handle, TFFTGraphParamID nParamID);
 
 /// <param name="handle">ZPLAY handle. Get this handle with <see cref="zplay_CreateZPlay"/>.</param>
 /// <INCLUDE .\\Cpp\\zplay\\DetectBPM.txt>

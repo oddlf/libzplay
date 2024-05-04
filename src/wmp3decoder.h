@@ -100,7 +100,7 @@ public:
 
 	int OpenStream(WQueue* pQueue, int fDynamic, int param1, int param2);
 
-	int Initialize(int param1, int param2, int param3, int param4);
+	int Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4);
 	int Uninitialize();
 
 	INPUT_STREAM_INFO* GetStreamInfo();

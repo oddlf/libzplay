@@ -171,8 +171,8 @@ public:
 
 	int __stdcall DrawFFTGraphOnHDC(void* hdc, int nX, int nY, int nWidth, int nHeight);
 	int __stdcall DrawFFTGraphOnHWND(void* hwnd, int nX, int nY, int nWidth, int nHeight);
-	int __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, int nValue);
-	int __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID);
+	ZPLAY_PARAM __stdcall SetFFTGraphParam(TFFTGraphParamID nParamID, ZPLAY_PARAM nValue);
+	ZPLAY_PARAM __stdcall GetFFTGraphParam(TFFTGraphParamID nParamID);
 
 	int __stdcall EnableEqualizer(int fEnable);
 	int __stdcall SetEqualizerPoints(int* pnFreqPoint, int nNumOfPoints);

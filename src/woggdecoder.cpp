@@ -85,7 +85,7 @@ typedef struct {
 
 #define METADATA_BLOCK_PICTURE 1000
 #define OGG_TABLE_SIZE 19
-OGG_ID3_TABLE OGG_ID3_ID[OGG_TABLE_SIZE] = { "ARTIST=", 7, ID3_INFO_ARTIST,
+static OGG_ID3_TABLE OGG_ID3_ID[OGG_TABLE_SIZE] = { "ARTIST=", 7, ID3_INFO_ARTIST,
 	"ALBUM=", 6, ID3_INFO_ALBUM,
 	"GENRE=", 6, ID3_INFO_GENRE,
 	"TITLE=", 6, ID3_INFO_TITLE,
@@ -155,7 +155,7 @@ WOggDecoder::~WOggDecoder()
 	Uninitialize();
 }
 
-int WOggDecoder::Initialize(int param1, int param2, int param3, int param4)
+int WOggDecoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	c_pBufferAlloc = (char*)malloc(SIZE_OF_WORKING_BUFFER * 4); // always use 16 bit stereo
 	if (c_pBufferAlloc == 0)

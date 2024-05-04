@@ -75,7 +75,7 @@ public:
 	// constructor
 	WAudioProcessor();
 	// destructor
-	~WAudioProcessor();
+	virtual ~WAudioProcessor();
 
 	virtual int PushSamples(PROCESSOR_AUDIO_DATA* data);
 

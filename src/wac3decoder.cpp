@@ -168,7 +168,7 @@ WAC3Decoder::~WAC3Decoder()
 	Uninitialize();
 }
 
-int WAC3Decoder::Initialize(int param1, int param2, int param3, int param4)
+int WAC3Decoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	// Every A/52 frame is composed of 6 blocks, each with an output of 256
 	// samples for each channel.

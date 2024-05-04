@@ -43,7 +43,7 @@ public:
 	~WFLACEncoder();
 
 	int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-		unsigned int custom_value,
+		ZPLAY_PARAM custom_value,
 		TEncoderReadCallback read_callback,
 		TEncoderWriteCallback write_callback,
 		TEncoderSeekCallback seek_callback,

@@ -152,7 +152,7 @@ WAACDecoder::~WAACDecoder()
 	Uninitialize();
 }
 
-int WAACDecoder::Initialize(int param1, int param2, int param3, int param4)
+int WAACDecoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	return 1;
 }

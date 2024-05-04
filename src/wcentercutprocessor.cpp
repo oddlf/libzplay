@@ -438,12 +438,12 @@ int WCenterCutProcessor::CenterCutProcessSamples(WCenterCutProcessor* instance, 
 void ConvertSamples(int type, uint8* sampB, MYREAL* sampD, int sampleCount, int bitsPerSample, int chanCount)
 {
 	int bytesPerSample, shiftCount;
-	sint32 xor ;
+	sint32 xor_;
 	uint8* max;
 
 	bytesPerSample = (bitsPerSample + 7) / 8;
 	shiftCount = (4 - bytesPerSample) * 8;
-	xor = (bytesPerSample == 1) ? (1 << 31) : 0;
+	xor_ = (bytesPerSample == 1) ? (1 << 31) : 0;
 	max = sampB + (sampleCount * bytesPerSample * chanCount);
 
 	if (type == BYTES_TO_REAL)
@@ -452,7 +452,7 @@ void ConvertSamples(int type, uint8* sampB, MYREAL* sampD, int sampleCount, int 
 
 		while (sampB < max)
 		{
-			tempI = (*((sint32*)sampB) << shiftCount) ^ xor;
+			tempI = (*((sint32*)sampB) << shiftCount) ^ xor_;
 			*sampD = (MYREAL)tempI * SampleScale;
 
 			sampB += bytesPerSample;
@@ -484,7 +484,7 @@ void ConvertSamples(int type, uint8* sampB, MYREAL* sampD, int sampleCount, int 
 				}
 				tempD -= 0.5;
 			}
-			tempI = (uint32)((sint32)tempD ^ xor) >> shiftCount;
+			tempI = (uint32)((sint32)tempD ^ xor_) >> shiftCount;
 
 			if (sampB < maxw)
 			{

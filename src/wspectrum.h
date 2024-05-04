@@ -36,6 +36,7 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include "libzplay/libzplay.h"
 #include "wfft.h"
 #include "wbmpfont.h"
 
@@ -307,7 +308,7 @@ public:
 	//		1	- all OK
 	//		0	- error
 
-	int SetBgBitmap(HBITMAP hbm);
+	ZPLAY_PARAM SetBgBitmap(HBITMAP hbm);
 
 	// ===================================================================================================================
 

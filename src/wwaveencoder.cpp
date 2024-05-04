@@ -90,7 +90,7 @@ WWaveEncoder::~WWaveEncoder()
 }
 
 int WWaveEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfChannels, unsigned int nBitPerSample,
-	unsigned int custom_value,
+	ZPLAY_PARAM custom_value,
 	TEncoderReadCallback read_callback,
 	TEncoderWriteCallback write_callback,
 	TEncoderSeekCallback seek_callback,
@@ -121,10 +121,10 @@ int WWaveEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 		unsigned int nDataSize = 0;
 		// write RIFF header and set empty wave file
 
-		c_write_callback("RIFF", 4, c_user_data);		   // 	Chunk ID
+		c_write_callback((char*)"RIFF", 4, c_user_data);   // Chunk ID
 		c_write_callback(&nFileSize, 4, c_user_data);	   // chunk size = File Size - 8
-		c_write_callback("WAVE", 4, c_user_data);		   // File Format
-		c_write_callback("fmt ", 4, c_user_data);		   // SubChunk1 ID
+		c_write_callback((char*)"WAVE", 4, c_user_data);   // File Format
+		c_write_callback((char*)"fmt ", 4, c_user_data);   // SubChunk1 ID
 		c_write_callback(&nSubChunkSize, 4, c_user_data);  // SubChunk1 Size = 16 bytes
 		c_write_callback(&nWavFormat, 2, c_user_data);	   // Audio Format - uncompressed audio
 		c_write_callback(&nChannels, 2, c_user_data);	   // number of channels, ALWAYS  2 channels, 16 bit, even if input is different
@@ -132,7 +132,7 @@ int WWaveEncoder::Initialize(unsigned int nSampleRate, unsigned int nNumberOfCha
 		c_write_callback(&nByteRate, 4, c_user_data);	   // byte rate
 		c_write_callback(&nBlockAllign, 2, c_user_data);   // block allign, ALWAYS  2 channels, 16 bit, even if input is different
 		c_write_callback(&nBitPerSample1, 2, c_user_data); // bit per sample, ALWAYS  2 channels, 16 bit, even if input is different
-		c_write_callback("data", 4, c_user_data);		   // SubChunk2 ID
+		c_write_callback((char*)"data", 4, c_user_data);   // SubChunk2 ID
 		c_write_callback(&nDataSize, 4, c_user_data);	   // The number of bytes following the header. The size of the data.
 	}
 

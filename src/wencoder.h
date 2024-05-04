@@ -31,6 +31,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "debug.h"
+#include "libzplay/libzplay.h"
 #include "wqueue.h"
 #include "wdecoder.h"
 
@@ -42,10 +43,12 @@ typedef unsigned int (*TEncoderTellCallback)(void* user_data);
 class WAudioEncoder
 {
 public:
+	virtual ~WAudioEncoder() = default;
+
 	//==============================================
 	// initialize encoder, call before you use encoder
 	virtual int Initialize(unsigned int nSampleRate, unsigned int nNuberOfChannels, unsigned int nBitPerSample,
-		unsigned int custom_value,
+		ZPLAY_PARAM custom_value,
 		TEncoderReadCallback read_callback,
 		TEncoderWriteCallback write_callback,
 		TEncoderSeekCallback seek_callback,

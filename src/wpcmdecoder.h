@@ -44,7 +44,7 @@ public:
 	int Close();
 
 	// ======================================================================
-	int Initialize(int param1, int param2, int param3, int param4);
+	int Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4);
 	//
 	//			Raw uncompressed PCM, 8 or 16 bit per sample, 1 or 2 channel, little-endian and big-endian
 	//

@@ -30,14 +30,11 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <libzplay/libzplay.h>
 #include "debug.h"
 #include "wqueue.h"
 
-#ifdef LIBZPLAY_INPUT_WAVEIN
-	#define WAVE_IN_NUM 15
-#else
-	#define WAVE_IN_NUM 0
-#endif
+#define WAVE_IN_NUM 15
 
 typedef struct {
 	char string_id[20];
@@ -429,9 +426,11 @@ void PCM16StereoBEToPCM16StereoLE(short* inSamples, unsigned int inSampleNum, sh
 class WAudioDecoder
 {
 public:
+	virtual ~WAudioDecoder() = default;
+
 	//==============================================
 	// initialize decoder, call before you use decoder
-	virtual int Initialize(int param1, int param2, int param3, int param4) = 0;
+	virtual int Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4) = 0;
 
 	// PARAMETERS:
 	//		param1	- decoder specific value, depends on decoder type

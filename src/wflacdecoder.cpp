@@ -104,7 +104,7 @@ typedef struct {
 #define FLAC_GO_BACK_SAMPLES 11025
 
 #define OGG_TABLE_SIZE 16
-FLAC_ID3_TABLE OGG_ID3_ID[OGG_TABLE_SIZE] = { "ARTIST=", 7, ID3_INFO_ARTIST,
+static FLAC_ID3_TABLE OGG_ID3_ID[OGG_TABLE_SIZE] = { "ARTIST=", 7, ID3_INFO_ARTIST,
 	"ALBUM=", 6, ID3_INFO_ALBUM,
 	"GENRE=", 6, ID3_INFO_GENRE,
 	"TITLE=", 6, ID3_INFO_TITLE,
@@ -207,7 +207,7 @@ WFLACDecoder::~WFLACDecoder()
 	Uninitialize();
 }
 
-int WFLACDecoder::Initialize(int param1, int param2, int param3, int param4)
+int WFLACDecoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM param3, ZPLAY_PARAM param4)
 {
 	c_decoder = FLAC__stream_decoder_new();
 	if (c_decoder == NULL)
