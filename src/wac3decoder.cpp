@@ -184,8 +184,8 @@ int WAC3Decoder::Initialize(ZPLAY_PARAM param1, ZPLAY_PARAM param2, ZPLAY_PARAM 
 	c_pchBufferPos = c_pchBuffer;
 	c_nBufferSize = 0;
 
-	c_fPreciseSongLength = param1;
-	c_fPreciseSeek = param2;
+	c_fPreciseSongLength = (int)param1;
+	c_fPreciseSeek = (int)param2;
 
 	return 1;
 }

@@ -4,7 +4,7 @@
   "port-version": 1,
   "description": "Freeware Advanced Audio (AAC) Encoder",
   "homepage": "https://sourceforge.net/projects/faac/",
-  "supports": "windows",
+  "supports": "!(android | osx | uwp)",
   "dependencies": [
     {
       "name": "vcpkg-cmake",

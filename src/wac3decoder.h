@@ -35,10 +35,10 @@
 extern "C" {
 #endif
 
-#include <a52dec/config.h>
-#include <a52dec/inttypes.h>
-#include <a52dec/a52.h>
-#include <a52dec/mm_accel.h>
+#include <liba52/config.h>
+#include <liba52/inttypes.h>
+#include <liba52/a52.h>
+#include <liba52/mm_accel.h>
 
 #ifdef __cplusplus
 }

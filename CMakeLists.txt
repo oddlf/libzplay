@@ -13,14 +13,14 @@ option(LIBZPLAY_INSTALL "Install library"                           FALSE)
 option(LIBZPLAY_DSP_SOUNDTOUCH "Soundtouch audio processor support" TRUE)
 
 option(LIBZPLAY_INPUT_AAC "AAC input support (faad2)"               TRUE)
-option(LIBZPLAY_INPUT_AC3 "AC3 input support (liba52)"              FALSE)
+option(LIBZPLAY_INPUT_AC3 "AC3 input support (liba52)"              TRUE)
 option(LIBZPLAY_INPUT_FLAC "FLAC input support (libflac)"           TRUE)
 option(LIBZPLAY_INPUT_MP3 "MP3 input support (libmad)"              TRUE)
 option(LIBZPLAY_INPUT_VORBIS "Vorbis input support (vorbis)"        TRUE)
 option(LIBZPLAY_INPUT_WAV "PCM/WAV input support"                   TRUE)
 option(LIBZPLAY_INPUT_WAVEIN "WAVEIN input support"                 TRUE)
 
-option(LIBZPLAY_OUTPUT_AAC "AAC output support (faac)"              FALSE)
+option(LIBZPLAY_OUTPUT_AAC "AAC output support (faac)"              TRUE)
 option(LIBZPLAY_OUTPUT_FLAC "FLAC output support (libflac)"         TRUE)
 option(LIBZPLAY_OUTPUT_MP3 "MP3 output support (mp3lame)"           TRUE)
 option(LIBZPLAY_OUTPUT_VORBIS "Vorbis output support (vorbis)"      TRUE)
@@ -77,6 +77,12 @@ set(LIBZPLAY_SOURCE_FILES
     ${LIBZPLAY_SRC}/wwavelet.h
 )
 
+if (WIN32)
+    SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
+        ${LIBZPLAY_SRC}/resource.rc
+    )
+endif()
+
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 
@@ -108,10 +114,19 @@ if(LIBZPLAY_INPUT_AAC)
 endif()
 
 if(LIBZPLAY_INPUT_AC3)
-    SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
-        ${LIBZPLAY_SRC}/wac3decoder.cpp
-        ${LIBZPLAY_SRC}/wac3decoder.h
-    )
+    find_path(LIBZPLAY_LIBA52_PATH "liba52/a52.h")
+    find_library(LIBZPLAY_LIBA52_LIB liba52)
+    message(STATUS "LIBZPLAY_LIBA52_PATH set to: ${LIBZPLAY_LIBA52_PATH}")
+    message(STATUS "LIBZPLAY_LIBA52_LIB set to: ${LIBZPLAY_LIBA52_LIB}")
+    if((NOT LIBZPLAY_LIBA52_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_LIBA52_LIB MATCHES "NOTFOUND$"))
+        SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
+            ${LIBZPLAY_SRC}/wac3decoder.cpp
+            ${LIBZPLAY_SRC}/wac3decoder.h
+        )
+    else()
+        SET(LIBZPLAY_INPUT_AC3 FALSE CACHE BOOL "AC3 input support (liba52)" FORCE)
+        MESSAGE(STATUS "Dependencies not found. Disabling ac3 input support")
+    endif()
 endif()
 
 if(LIBZPLAY_INPUT_FLAC)
@@ -172,10 +187,19 @@ if(LIBZPLAY_INPUT_WAVEIN)
 endif()
 
 if(LIBZPLAY_OUTPUT_AAC)
-    SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
-        ${LIBZPLAY_SRC}/waacencoder.cpp
-        ${LIBZPLAY_SRC}/waacencoder.h
-    )
+    find_path(LIBZPLAY_FAAC_PATH "faac.h")
+    find_library(LIBZPLAY_FAAC_LIB faac)
+    message(STATUS "LIBZPLAY_FAAC_PATH set to: ${LIBZPLAY_FAAC_PATH}")
+    message(STATUS "LIBZPLAY_FAAC_LIB set to: ${LIBZPLAY_FAAC_LIB}")
+    if((NOT LIBZPLAY_FAAC_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_FAAC_LIB MATCHES "NOTFOUND$"))
+        SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
+            ${LIBZPLAY_SRC}/waacencoder.cpp
+            ${LIBZPLAY_SRC}/waacencoder.h
+        )
+    else()
+        SET(LIBZPLAY_OUTPUT_AAC FALSE CACHE BOOL "AAC output support (faac)" FORCE)
+        MESSAGE(STATUS "Dependencies not found. Disabling aac output support")
+    endif()
 endif()
 
 if(LIBZPLAY_OUTPUT_FLAC)
@@ -259,7 +283,11 @@ if(LIBZPLAY_INPUT_AAC)
 endif()
 
 if(LIBZPLAY_INPUT_AC3)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_AC3)
+    if((NOT LIBZPLAY_LIBA52_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_LIBA52_LIB MATCHES "NOTFOUND$"))
+        target_include_directories(${PROJECT_NAME} PRIVATE ${LIBZPLAY_LIBA52_PATH})
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBZPLAY_LIBA52_LIB})
+        target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_AC3)
+    endif()
 endif()
 
 if(LIBZPLAY_INPUT_FLAC)
@@ -292,7 +320,11 @@ if(LIBZPLAY_INPUT_WAVEIN)
 endif()
 
 if(LIBZPLAY_OUTPUT_AAC)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_OUTPUT_AAC)
+    if((NOT LIBZPLAY_FAAC_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_FAAC_LIB MATCHES "NOTFOUND$"))
+        target_include_directories(${PROJECT_NAME} PRIVATE ${LIBZPLAY_FAAC_PATH})
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBZPLAY_FAAC_LIB})
+        target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_OUTPUT_AAC)
+    endif()
 endif()
 
 if(LIBZPLAY_OUTPUT_FLAC)

@@ -642,7 +642,7 @@ int UTF8ToUTF16(char* src, int nCharacterNumber, wchar_t* dest, int nDestSizeInB
 
 void RemoveEndingSpaces(char* buff)
 {
-	int size = strlen(buff);
+	int size = (int)strlen(buff);
 	for (int i = size - 1; i >= 0; i--)
 	{
 		if (buff[i] == ' ')

@@ -17,6 +17,10 @@ include_directories(
 )
 add_library(faac ${FAAC_SOURCES} ${FAAC_HEADERS})
 
+if (BUILD_SHARED_LIBS)
+    target_compile_definitions(faac PRIVATE FAACEXPORT)
+endif ()
+
 if (FAAC_BUILD_BINARIES)
     include_directories(
         "${CMAKE_CURRENT_LIST_DIR}/frontend"
