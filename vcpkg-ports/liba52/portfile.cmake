@@ -28,4 +28,5 @@ file(INSTALL "${SOURCE_PATH}/include"
 )
 file(INSTALL "${SOURCE_PATH}/vc++/config.h" DESTINATION "${CURRENT_PACKAGES_DIR}/include/liba52")
 file(INSTALL "${SOURCE_PATH}/vc++/inttypes.h" DESTINATION "${CURRENT_PACKAGES_DIR}/include/liba52")
-file(INSTALL "${SOURCE_PATH}/COPYING" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")

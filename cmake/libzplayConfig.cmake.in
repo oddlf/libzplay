@@ -1,0 +1,52 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+
+find_dependency(JPEG)
+find_dependency(PNG)
+
+if(@LIBZPLAY_DSP_SOUNDTOUCH@)
+    find_dependency(SoundTouch)
+endif()
+
+if(@LIBZPLAY_INPUT_AAC@)
+    find_dependency(faad2)
+endif()
+
+if(@LIBZPLAY_INPUT_AC3@)
+    find_dependency(liba52)
+endif()
+
+if(@LIBZPLAY_INPUT_FLAC@)
+    find_dependency(FLAC)
+endif()
+
+if(@LIBZPLAY_INPUT_MP3@)
+    find_dependency(mad)
+endif()
+
+if(@LIBZPLAY_INPUT_VORBIS@)
+    find_dependency(Vorbis)
+endif()
+
+if(@LIBZPLAY_OUTPUT_AAC@)
+    find_dependency(faac)
+endif()
+
+if(@LIBZPLAY_OUTPUT_FLAC@)
+    find_dependency(FLAC)
+endif()
+
+if(@LIBZPLAY_OUTPUT_MP3@)
+    find_dependency(mp3lame)
+endif()
+
+if(@LIBZPLAY_OUTPUT_VORBIS@)
+    find_dependency(Vorbis)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/libzplayTargets.cmake")
+
+check_required_components(libzplay)

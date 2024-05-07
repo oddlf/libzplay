@@ -6,37 +6,17 @@ option(FAAC_BUILD_BINARIES "Build faac binaries" ON)
 file(GLOB FAAC_SOURCES "${CMAKE_CURRENT_LIST_DIR}/libfaac/*.c")
 file(GLOB FAAC_HEADERS "${CMAKE_CURRENT_LIST_DIR}/libfaac/*.h")
 
-if (BUILD_SHARED_LIBS)
-    list(APPEND FAAC_SOURCES "${CMAKE_CURRENT_LIST_DIR}/project/msvc/libfaac.def")
-endif ()
-
 add_definitions(-DPACKAGE_VERSION=\"${PROJECT_VERSION}\" -D_CRT_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES)
-include_directories(
-    "${CMAKE_CURRENT_LIST_DIR}/include"
-    "${CMAKE_CURRENT_LIST_DIR}/libfaac"
-)
+
 add_library(faac ${FAAC_SOURCES} ${FAAC_HEADERS})
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}/include"
+)
 
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(faac PRIVATE FAACEXPORT)
-endif ()
-
-if (FAAC_BUILD_BINARIES)
-    include_directories(
-        "${CMAKE_CURRENT_LIST_DIR}/frontend"
-    )
-    if (VCPKG_TARGET_IS_WINDOWS)
-        include_directories(
-            "${CMAKE_CURRENT_LIST_DIR}/project/msvc"
-        )
-    endif ()
-    add_executable(FAAC_encoder
-        "${CMAKE_SOURCE_DIR}/frontend/getopt.c"
-        "${CMAKE_SOURCE_DIR}/frontend/input.c"
-        "${CMAKE_SOURCE_DIR}/frontend/main.c"
-        "${CMAKE_SOURCE_DIR}/frontend/mp4write.c"
-    )
-    target_link_libraries(FAAC_encoder PRIVATE faac)
 endif ()
 
 install(
@@ -45,3 +25,28 @@ install(
         LIBRARY DESTINATION "lib"
         RUNTIME DESTINATION "bin"
     )
+
+if (FAAC_BUILD_BINARIES)
+    add_executable(faac_cli
+        "${CMAKE_SOURCE_DIR}/frontend/input.c"
+        "${CMAKE_SOURCE_DIR}/frontend/main.c"
+        "${CMAKE_SOURCE_DIR}/frontend/mp4write.c"
+    )
+    target_include_directories(faac_cli
+        PRIVATE
+            "${CMAKE_CURRENT_LIST_DIR}/frontend"
+            ${FAAC_HEADERS}
+    )
+    if (MSVC)
+        target_include_directories(faac_cli
+            PRIVATE
+                "${CMAKE_CURRENT_LIST_DIR}/project/msvc"
+        )
+    endif ()
+    target_link_libraries(faac_cli PRIVATE faac)
+
+    install(
+        TARGETS faac_cli
+            RUNTIME DESTINATION "bin"
+        )
+endif ()

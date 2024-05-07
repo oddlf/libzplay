@@ -8,7 +8,7 @@ project(libzplay
 option(LIBZPLAY_STATIC_CRT "Use static CRT library"                 FALSE)
 option(LIBZPLAY_PACK_WITH_UPX "Pack programs with UPX"              FALSE)
 option(LIBZPLAY_BUILD_EXAMPLES "Build example programs"             TRUE)
-option(LIBZPLAY_INSTALL "Install library"                           FALSE)
+option(LIBZPLAY_INSTALL "Install library"                           TRUE)
 
 option(LIBZPLAY_DSP_SOUNDTOUCH "Soundtouch audio processor support" TRUE)
 
@@ -30,6 +30,8 @@ set(LIBZPLAY_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(LIBZPLAY_EXAMPLES ${LIBZPLAY_ROOT}/example)
 set(LIBZPLAY_INCLUDE ${LIBZPLAY_ROOT}/include)
 set(LIBZPLAY_SRC ${LIBZPLAY_ROOT}/src)
+
+list(APPEND CMAKE_MODULE_PATH "${LIBZPLAY_ROOT}/cmake")
 
 set(LIBZPLAY_SOURCE_FILES
     ${LIBZPLAY_SRC}/config.h
@@ -100,9 +102,8 @@ if(LIBZPLAY_DSP_SOUNDTOUCH)
 endif()
 
 if(LIBZPLAY_INPUT_AAC)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(FAAD2 QUIET IMPORTED_TARGET faad2)
-    if(${FAAD2_FOUND})
+    find_package(faad2 QUIET)
+    if(${faad2_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/waacdecoder.cpp
             ${LIBZPLAY_SRC}/waacdecoder.h
@@ -114,11 +115,8 @@ if(LIBZPLAY_INPUT_AAC)
 endif()
 
 if(LIBZPLAY_INPUT_AC3)
-    find_path(LIBZPLAY_LIBA52_PATH "liba52/a52.h")
-    find_library(LIBZPLAY_LIBA52_LIB liba52)
-    message(STATUS "LIBZPLAY_LIBA52_PATH set to: ${LIBZPLAY_LIBA52_PATH}")
-    message(STATUS "LIBZPLAY_LIBA52_LIB set to: ${LIBZPLAY_LIBA52_LIB}")
-    if((NOT LIBZPLAY_LIBA52_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_LIBA52_LIB MATCHES "NOTFOUND$"))
+    find_package(liba52 QUIET)
+    if(${liba52_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/wac3decoder.cpp
             ${LIBZPLAY_SRC}/wac3decoder.h
@@ -131,8 +129,7 @@ endif()
 
 if(LIBZPLAY_INPUT_FLAC)
     find_package(FLAC QUIET)
-    find_package(Ogg CONFIG QUIET)
-    if(${FLAC_FOUND} AND ${Ogg_FOUND})
+    if(${FLAC_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/wflacdecoder.cpp
             ${LIBZPLAY_SRC}/wflacdecoder.h
@@ -157,9 +154,8 @@ if(LIBZPLAY_INPUT_MP3)
 endif()
 
 if(LIBZPLAY_INPUT_VORBIS)
-    find_package(Ogg CONFIG QUIET)
     find_package(Vorbis CONFIG QUIET)
-    if(${Ogg_FOUND} AND ${Vorbis_FOUND})
+    if(${Vorbis_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/woggdecoder.cpp
             ${LIBZPLAY_SRC}/woggdecoder.h
@@ -187,11 +183,8 @@ if(LIBZPLAY_INPUT_WAVEIN)
 endif()
 
 if(LIBZPLAY_OUTPUT_AAC)
-    find_path(LIBZPLAY_FAAC_PATH "faac.h")
-    find_library(LIBZPLAY_FAAC_LIB faac)
-    message(STATUS "LIBZPLAY_FAAC_PATH set to: ${LIBZPLAY_FAAC_PATH}")
-    message(STATUS "LIBZPLAY_FAAC_LIB set to: ${LIBZPLAY_FAAC_LIB}")
-    if((NOT LIBZPLAY_FAAC_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_FAAC_LIB MATCHES "NOTFOUND$"))
+    find_package(faac QUIET)
+    if(${faac_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/waacencoder.cpp
             ${LIBZPLAY_SRC}/waacencoder.h
@@ -204,8 +197,7 @@ endif()
 
 if(LIBZPLAY_OUTPUT_FLAC)
     find_package(FLAC QUIET)
-    find_package(Ogg CONFIG QUIET)
-    if(${FLAC_FOUND} AND ${Ogg_FOUND})
+    if(${FLAC_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/wflacencoder.cpp
             ${LIBZPLAY_SRC}/wflacencoder.h
@@ -230,9 +222,8 @@ if(LIBZPLAY_OUTPUT_MP3)
 endif()
 
 if(LIBZPLAY_OUTPUT_VORBIS)
-    find_package(Ogg CONFIG QUIET)
     find_package(Vorbis CONFIG QUIET)
-    if(${Ogg_FOUND} AND ${Vorbis_FOUND})
+    if(${Vorbis_FOUND})
         SET(LIBZPLAY_SOURCE_FILES ${LIBZPLAY_SOURCE_FILES}
             ${LIBZPLAY_SRC}/wvorbisencoder.cpp
             ${LIBZPLAY_SRC}/wvorbisencoder.h
@@ -275,24 +266,22 @@ if(LIBZPLAY_DSP_SOUNDTOUCH)
 endif()
 
 if(LIBZPLAY_INPUT_AAC)
-    if(${FAAD2_FOUND})
-        LIST(REMOVE_ITEM FAAD2_LINK_LIBRARIES m)
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${FAAD2_LINK_LIBRARIES})
+    if(${faad2_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE faad2::faad2)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_AAC)
     endif()
 endif()
 
 if(LIBZPLAY_INPUT_AC3)
-    if((NOT LIBZPLAY_LIBA52_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_LIBA52_LIB MATCHES "NOTFOUND$"))
-        target_include_directories(${PROJECT_NAME} PRIVATE ${LIBZPLAY_LIBA52_PATH})
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBZPLAY_LIBA52_LIB})
+    if(${liba52_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE liba52::liba52)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_AC3)
     endif()
 endif()
 
 if(LIBZPLAY_INPUT_FLAC)
     if(${FLAC_FOUND})
-        target_link_libraries(${PROJECT_NAME} PRIVATE FLAC::FLAC Ogg::ogg)
+        target_link_libraries(${PROJECT_NAME} PRIVATE FLAC::FLAC)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_FLAC)
     endif()
 endif()
@@ -305,8 +294,8 @@ if(LIBZPLAY_INPUT_MP3)
 endif()
 
 if(LIBZPLAY_INPUT_VORBIS)
-    if(${Ogg_FOUND} AND ${Vorbis_FOUND})
-        target_link_libraries(${PROJECT_NAME} PRIVATE Ogg::ogg Vorbis::vorbisfile)
+    if(${Vorbis_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE Vorbis::vorbisfile)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_INPUT_VORBIS)
     endif()
 endif()
@@ -320,16 +309,15 @@ if(LIBZPLAY_INPUT_WAVEIN)
 endif()
 
 if(LIBZPLAY_OUTPUT_AAC)
-    if((NOT LIBZPLAY_FAAC_PATH MATCHES "NOTFOUND$") AND (NOT LIBZPLAY_FAAC_LIB MATCHES "NOTFOUND$"))
-        target_include_directories(${PROJECT_NAME} PRIVATE ${LIBZPLAY_FAAC_PATH})
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBZPLAY_FAAC_LIB})
+    if(${faac_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE faac::faac)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_OUTPUT_AAC)
     endif()
 endif()
 
 if(LIBZPLAY_OUTPUT_FLAC)
-    if(${FLAC_FOUND} AND ${Ogg_FOUND})
-        target_link_libraries(${PROJECT_NAME} PRIVATE FLAC::FLAC Ogg::ogg)
+    if(${FLAC_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE FLAC::FLAC)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_OUTPUT_FLAC)
     endif()
 endif()
@@ -342,8 +330,8 @@ if(LIBZPLAY_OUTPUT_MP3)
 endif()
 
 if(LIBZPLAY_OUTPUT_VORBIS)
-    if(${Ogg_FOUND} AND ${Vorbis_FOUND})
-        target_link_libraries(${PROJECT_NAME} PRIVATE Ogg::ogg Vorbis::vorbisenc)
+    if(${Vorbis_FOUND})
+        target_link_libraries(${PROJECT_NAME} PRIVATE Vorbis::vorbisenc)
         target_compile_definitions(${PROJECT_NAME} PRIVATE LIBZPLAY_OUTPUT_VORBIS)
     endif()
 endif()
@@ -391,6 +379,70 @@ else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE LIB_ZPLAY_STATIC)
 endif()
 
+if(LIBZPLAY_INSTALL)
+    include(CMakePackageConfigHelpers)
+    include(GNUInstallDirs)
+
+    configure_package_config_file(
+        cmake/${PROJECT_NAME}Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+
+    install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+
+    install(
+        DIRECTORY ${LIBZPLAY_INCLUDE}/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+
+    install(
+        EXPORT ${PROJECT_NAME}Targets
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+    )
+
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+
+    if(LIBZPLAY_INPUT_AAC)
+        install(
+            FILES "${LIBZPLAY_ROOT}/cmake/Findfaac.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+    endif()
+
+    if(LIBZPLAY_INPUT_AC3)
+        install(
+            FILES "${LIBZPLAY_ROOT}/cmake/Findliba52.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+    endif()
+
+    if(LIBZPLAY_OUTPUT_AAC)
+        install(
+            FILES "${LIBZPLAY_ROOT}/cmake/Findfaad2.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+    endif()
+
+    export(
+        EXPORT ${PROJECT_NAME}Targets
+        FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+    )
+endif()
+
 if(LIBZPLAY_BUILD_EXAMPLES)
     # Create a list of all examples
     set(examples)
@@ -436,7 +488,6 @@ endmacro()
 
 message(STATUS "libZPlay will be built with the following options:")
 message_bool_option("Build shared library" BUILD_SHARED_LIBS)
-message_bool_option("Export function names" LIBZPLAY_EXPORT_DLL)
 message_bool_option("Use static CRT library" LIBZPLAY_STATIC_CRT)
 message_bool_option("Pack programs with UPX" LIBZPLAY_PACK_WITH_UPX)
 message_bool_option("Build example programs" LIBZPLAY_BUILD_EXAMPLES)

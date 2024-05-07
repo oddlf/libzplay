@@ -13,7 +13,7 @@ file(COPY "${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt" DESTINATION "${SOURCE_PATH}
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
   FEATURES
-    build-encoder   FAAC_BUILD_BINARIES
+    cli   FAAC_BUILD_BINARIES
 )
 
 vcpkg_cmake_configure(
@@ -24,8 +24,13 @@ vcpkg_cmake_configure(
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
 
+if("cli" IN_LIST FEATURES)
+    vcpkg_copy_tools(TOOL_NAMES faac_cli AUTO_CLEAN)
+endif()
+
 file(INSTALL "${SOURCE_PATH}/include" DESTINATION "${CURRENT_PACKAGES_DIR}")
-file(INSTALL "${SOURCE_PATH}/COPYING" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
 
 file(REMOVE "${CURRENT_PACKAGES_DIR}/include/Makefile.am")
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")

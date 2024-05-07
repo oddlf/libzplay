@@ -6,7 +6,9 @@ LIBZPLAY HISTORY
   Version 2.12                     April 2024.
   -------------------------------------------------------------
   - add .clang-format and format all files
-  - move mp3 encoding and ecoding to patent free version
+  - add MinGW compiling support
+  - add vcpkg port
+  - move mp3 encoding and decoding to patent free version
   - remove project files and add CMakeLists.txt and CMakePresets.json
   - update README.md
 

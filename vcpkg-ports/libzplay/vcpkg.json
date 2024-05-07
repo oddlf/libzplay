@@ -1,0 +1,105 @@
+{
+  "name": "libzplay",
+  "version": "2.12",
+  "description": "A simple and easy-to-use audio library for windows",
+  "homepage": "https://github.com/oddlf/libzplay",
+  "license": "GPL-2.0-or-later",
+  "supports": "windows",
+  "dependencies": [
+    "libjpeg-turbo",
+    "libpng",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "default-features": [
+    "in-aac",
+    "in-ac3",
+    "in-flac",
+    "in-mp3",
+    "in-vorbis",
+    "in-wav",
+    "in-wavein",
+    "out-aac",
+    "out-flac",
+    "out-mp3",
+    "out-vorbis",
+    "out-wav"
+  ],
+  "features": {
+    "dsp-soundtouch": {
+      "description": "SoundTouch dsp support",
+      "dependencies": [
+        "soundtouch"
+      ]
+    },
+    "in-aac": {
+      "description": "aac input support",
+      "dependencies": [
+        "faad2"
+      ]
+    },
+    "in-ac3": {
+      "description": "ac3 input support",
+      "dependencies": [
+        "liba52"
+      ]
+    },
+    "in-flac": {
+      "description": "flac input support",
+      "dependencies": [
+        "libflac"
+      ]
+    },
+    "in-mp3": {
+      "description": "mp3 input support",
+      "dependencies": [
+        "libmad"
+      ]
+    },
+    "in-vorbis": {
+      "description": "vorbis input support",
+      "dependencies": [
+        "libvorbis"
+      ]
+    },
+    "in-wav": {
+      "description": "wav input support"
+    },
+    "in-wavein": {
+      "description": "wavein input support"
+    },
+    "out-aac": {
+      "description": "aac output support",
+      "dependencies": [
+        "faac"
+      ]
+    },
+    "out-flac": {
+      "description": "flac output support",
+      "dependencies": [
+        "libflac"
+      ]
+    },
+    "out-mp3": {
+      "description": "mp3 output support",
+      "dependencies": [
+        "mp3lame"
+      ]
+    },
+    "out-vorbis": {
+      "description": "vorbis output support",
+      "dependencies": [
+        "libvorbis"
+      ]
+    },
+    "out-wav": {
+      "description": "wav output support"
+    }
+  }
+}
