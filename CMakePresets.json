@@ -2,112 +2,6 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "linux-base",
-      "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/install/${presetName}",
-      "cacheVariables": {
-        "BUILD_SHARED_LIBS": true
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "linux-base-clang",
-      "hidden": true,
-      "inherits": "linux-base",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++"
-      }
-    },
-    {
-      "name": "linux-base-gcc",
-      "hidden": true,
-      "inherits": "linux-base",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "g++"
-      }
-    },
-    {
-      "name": "linux-base-x64",
-      "hidden": true,
-      "inherits": "linux-base",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      }
-    },
-    {
-      "name": "linux-base-x64-clang",
-      "hidden": true,
-      "inherits": "linux-base-clang",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      }
-    },
-    {
-      "name": "linux-base-x64-gcc",
-      "hidden": true,
-      "inherits": "linux-base-gcc",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      }
-    },
-    {
-      "name": "linux-x64-debug",
-      "displayName": "x64 Debug",
-      "inherits": "linux-base-x64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "linux-x64-debug-clang",
-      "displayName": "x64 Debug Clang",
-      "inherits": "linux-base-x64-clang",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "linux-x64-debug-gcc",
-      "displayName": "x64 Debug GCC",
-      "inherits": "linux-base-x64-gcc",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "linux-x64-release",
-      "displayName": "x64 Release",
-      "inherits": "linux-x64-debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "linux-x64-release-clang",
-      "displayName": "x64 Release Clang",
-      "inherits": "linux-x64-debug-clang",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "linux-x64-release-gcc",
-      "displayName": "x64 Release GCC",
-      "inherits": "linux-x64-debug-gcc",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
       "name": "windows-base",
       "hidden": true,
       "generator": "Ninja",
@@ -232,39 +126,14 @@
   ],
   "buildPresets": [
     {
-      "name": "linux-x64-debug",
-      "configurePreset": "linux-x64-debug",
-      "displayName": "x64 Debug"
-    },
-    {
-      "name": "linux-x64-debug-clang",
-      "configurePreset": "linux-x64-debug-clang",
-      "displayName": "x64 Debug"
-    },
-    {
-      "name": "linux-x64-debug-gcc",
-      "configurePreset": "linux-x64-debug-gcc",
-      "displayName": "x64 Debug"
-    },
-    {
-      "name": "linux-x64-release",
-      "configurePreset": "linux-x64-release",
-      "displayName": "x64 Release"
-    },
-    {
-      "name": "linux-x64-release-clang",
-      "configurePreset": "linux-x64-release-clang",
-      "displayName": "x64 Release"
-    },
-    {
-      "name": "linux-x64-release-gcc",
-      "configurePreset": "linux-x64-release-gcc",
-      "displayName": "x64 Release"
-    },
-    {
       "name": "windows-x64-debug",
       "configurePreset": "windows-x64-debug",
       "displayName": "x64 Debug"
+    },
+    {
+      "name": "windows-x64-mingw-debug",
+      "configurePreset": "windows-x64-mingw-debug",
+      "displayName": "x64 Debug (MinGW)"
     },
     {
       "name": "windows-x64-release",
@@ -272,9 +141,19 @@
       "displayName": "x64 Release"
     },
     {
+      "name": "windows-x64-mingw-release",
+      "configurePreset": "windows-x64-mingw-release",
+      "displayName": "x64 Release (MinGW)"
+    },
+    {
       "name": "windows-x64-release-static",
       "configurePreset": "windows-x64-release-static",
       "displayName": "x64 Release Static"
+    },
+    {
+      "name": "windows-x64-mingw-release-static",
+      "configurePreset": "windows-x64-mingw-release-static",
+      "displayName": "x64 Release Static (MinGW)"
     },
     {
       "name": "windows-x86-debug",

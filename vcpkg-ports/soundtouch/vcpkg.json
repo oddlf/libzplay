@@ -1,7 +1,7 @@
 {
   "name": "soundtouch",
   "version": "2.3.3",
-  "description": "SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or audio files.",
+  "description": "SoundTouch (integer values port) is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or audio files.",
   "homepage": "https://www.surina.net/soundtouch",
   "license": "LGPL-2.1-only",
   "supports": "!uwp",
@@ -20,9 +20,6 @@
     }
   ],
   "features": {
-    "integer": {
-      "description": "Build SoundTouch using integer samples instead of float samples (default)"
-    },
     "soundstretch": {
       "description": "Build the soundstretch command line tool"
     },

@@ -24,15 +24,19 @@ jobs:
           - windows-x86-release-static
         include:
           - preset: windows-x64-release
+            arch: x64
             triplet: x64-windows
             soundtouch: TRUE
           - preset: windows-x64-release-static
+            arch: x64
             triplet: x64-windows-static
             soundtouch: FALSE
           - preset: windows-x86-release
+            arch: x86
             triplet: x86-windows
             soundtouch: TRUE
           - preset: windows-x86-release-static
+            arch: x86
             triplet: x86-windows-static
             soundtouch: FALSE
 
@@ -50,13 +54,13 @@ jobs:
     - name: Setup MSVC
       uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
-        arch: x64
+        arch: ${{ matrix.arch }}
 
     - name: Setup Ninja
       uses: turtlesec-no/get-ninja@main
 
     - name: Install dependencies
-      run: vcpkg install faac faad2 liba52 libflac libjpeg-turbo libmad libogg libpng libvorbis mp3lame pkgconf soundtouch[integer] zlib --overlay-ports=./vcpkg-ports --triplet=${{ matrix.triplet }}
+      run: vcpkg install faac faad2 liba52 libflac libjpeg-turbo libmad libogg libpng libvorbis mp3lame soundtouch zlib --overlay-ports=./vcpkg-ports --triplet=${{ matrix.triplet }}
 
     - name: Build
       run: |
